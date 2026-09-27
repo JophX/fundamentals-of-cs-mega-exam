@@ -1,0 +1,63 @@
+<h2>20.3 Parameter passing: by value, by reference and the others</h2>
+
+<div class="box intuition"><span class="t">The idea in plain words</span>
+<p><b>By value</b> = you give the function a <b>photocopy</b>. It can scribble on the copy; your original is untouched.
+<b>By reference</b> = you give the function <b>the address of your original</b>. Whatever it writes, it writes on
+your original.</p>
+</div>
+
+<h3>20.3.1 Vocabulary first</h3>
+<ul>
+  <li><b>Formal parameter</b>: the name in the function <i>definition</i> (<code>x</code> in <code>void f(int x)</code>).</li>
+  <li><b>Actual parameter (argument)</b>: the expression in the <i>call</i> (<code>a+1</code> in <code>f(a+1)</code>).</li>
+  <li><b>Modes</b> (semantic models): <b>in</b> (data goes into the function), <b>out</b> (data comes back to the
+    caller), <b>in-out</b> (both).</li>
+  <li><b>Implementation</b>: essentially either <b>copy the value</b> or <b>pass an access path (address)</b>.</li>
+</ul>
+
+<h3>20.3.2 The five methods</h3>
+<table class="wide">
+<tr><th style="width:17%">Method</th><th style="width:9%">Mode</th><th>How it works</th><th style="width:25%">Problems</th></tr>
+<tr><td><b>By value</b></td><td>in</td><td>The value of the actual parameter is <b>copied</b> into the formal parameter, which
+acts as a local variable. Changes inside do not affect the caller.</td><td>Copying large data (arrays, structs) costs time
+and memory.</td></tr>
+<tr><td><b>By result</b></td><td>out</td><td>No value is passed in. At return, the formal parameter’s final value is
+<b>copied back</b> to the actual parameter (which must be a variable).</td><td><code>procA(a, a)</code>: two results copied
+to the same variable — the order of copying decides the value. <code>procA(a[i], i)</code>: is the address of
+<code>a[i]</code> computed at the call or at the return?</td></tr>
+<tr><td><b>By value-result</b> (copy-in/copy-out)</td><td>in-out</td><td>Copied in at the call <b>and</b> copied back at
+the return.</td><td>Same aliasing/order problems as by result; copying cost twice. <code>procA(4+4)</code>: an expression
+cannot receive a result.</td></tr>
+<tr><td><b>By reference</b></td><td>in-out</td><td>The <b>address</b> of the actual parameter is passed. The formal parameter
+is an <b>alias</b> of the caller’s variable; every read and write goes to the original.</td><td><b>Aliasing</b> (two names
+for one variable: <code>f(a, a)</code>); unwanted side effects “open up” the caller’s data; indirect access is slightly
+slower.</td></tr>
+<tr><td><b>By name</b></td><td>in-out</td><td>The argument expression is passed <i>unevaluated</i> and re-evaluated every
+time the parameter is used (like textual substitution; Algol 60).</td><td>Hard to understand and slow; basis for lazy
+evaluation (Haskell uses call-by-need).</td></tr>
+</table>
+
+<h3>20.3.3 Verified example</h3>
+<pre class="code" data-lang="cpp" data-src="verify/params.cpp"></pre>
+<pre class="run" data-cmd="g++ verify/params.cpp -o /tmp/params_demo &amp;&amp; /tmp/params_demo" data-show="g++ params.cpp &amp;&amp; ./a.out"></pre>
+<p>The last two lines are the aliasing problem in numbers: with the <b>same</b> function body and the <b>same</b> call
+<code>f(c, c)</code>, pass-by-reference gives 12, pass-by-value-result gives 10 (or 6, depending on copy-back order).</p>
+
+<div class="box model"><span class="t">Model answer: “Explain the differences between pass-by-value and pass-by-reference. Advantages and disadvantages?” (6 p)</span>
+<p><b>Pass-by-value:</b> at the call, the <i>value</i> of the actual parameter is evaluated and <b>copied</b> into the
+formal parameter, which then behaves like a local variable. Changes to it inside the subprogram do not affect the caller
+(in-mode). <i>Advantages:</i> safe — no side effects on the caller’s variables, easy to reason about; the argument can be
+any expression (<code>f(a+1)</code>); access to the parameter is fast (local). <i>Disadvantages:</i> copying large objects
+costs time and memory; it cannot be used to return results through parameters.</p>
+<p><b>Pass-by-reference:</b> the <i>address</i> of the actual parameter is passed, so the formal parameter is an
+<b>alias</b> for the caller’s variable; all reads and writes go directly to the original (in-out mode). <i>Advantages:</i>
+efficient — no copying, only an address is passed, even for large structures; the subprogram can return results through
+parameters (e.g. <code>swap(a, b)</code>). <i>Disadvantages:</i> side effects — the caller’s data can be changed
+unintentionally; <b>aliasing</b> (e.g. <code>f(a, a)</code>, or an array element and the whole array) makes programs hard
+to understand and verify; each access goes through an indirection (slightly slower); the argument must be a variable,
+not an arbitrary expression.</p>
+<p><b>Example:</b> <code>swap(a, b)</code> works only with pass-by-reference; with pass-by-value it swaps the copies and
+<code>a</code>, <code>b</code> are unchanged. (Java passes everything by value, but for objects the value <i>is</i> a
+reference — so the object can be modified, but the caller’s variable cannot be made to point elsewhere.)</p>
+</div>
+

@@ -1,0 +1,80 @@
+<h1>16. Recursion and accumulators <span class="tag pl">PL</span></h1>
+
+<div class="box intuition"><span class="t">How to think recursively (“trust the recursion”)</span>
+<p>To write <code>mySum (x:xs)</code>, <b>pretend <code>mySum xs</code> already works</b>. If <code>mySum [2,3]</code> is 5,
+then <code>mySum [1,2,3]</code> is <code>1 + 5</code>. You only have to answer two questions: <b>what’s the answer for the
+empty list</b>, and <b>how do I combine the first element with the answer for the rest</b>.</p>
+</div>
+
+<div class="box recipe"><span class="t">Recipe (use it for every exam function)</span>
+<ol>
+  <li>Write the <b>type signature</b>.</li>
+  <li>Write the <b>base case</b> (<code>f [] = …</code>, or <code>f 0 = …</code>).</li>
+  <li>Write the <b>recursive case</b> using <code>f xs</code> (smaller input).</li>
+  <li><b>Trace</b> it on a 2–3 element list by hand.</li>
+</ol>
+</div>
+
+<h2>16.1 Pattern 1 — plain recursion</h2>
+<pre class="hs" data-file="Basics.hs" data-block="recursion"></pre>
+<pre class="ghci" data-file="Basics.hs">mySum [1,2,3,4]
+myProduct [1,2,3,4]
+myElem 3 [1,2,3]
+myTake 2 "hello"
+myDrop 2 "hello"
+factorial 20</pre>
+<p>Trace <code>mySum [1,2,3]</code> = <code>1 + mySum [2,3]</code> = <code>1 + (2 + mySum [3])</code> =
+<code>1 + (2 + (3 + mySum []))</code> = <code>1 + (2 + (3 + 0))</code> = 6. Notice the additions wait until the end — the
+computer must remember them on the stack.</p>
+
+<h3>Sorting — classic exam material</h3>
+<pre class="hs" data-file="Basics.hs" data-block="sorts"></pre>
+<pre class="ghci" data-file="Basics.hs">insertionSort [5,2,9,1,5,6]
+quicksort [5,2,9,1,5,6]
+mergeSort [5,2,9,1,5,6]</pre>
+
+<h2>16.2 Pattern 2 — accumulators and tail recursion</h2>
+<div class="box intuition"><span class="t">Intuition</span>
+<p>Carry the “answer so far” as an extra argument, like a loop variable. When the list is empty, the accumulator <b>is</b> the
+answer. The recursive call is the <b>last</b> thing the function does — that is <b>tail recursion</b>: nothing waits on the stack,
+so it runs like a loop in constant stack space.</p>
+</div>
+<pre class="hs" data-title="Template">
+template :: [Int] -> Int
+template xs = go xs 0
+  where
+    go []     acc = acc
+    go (y:ys) acc = go ys (acc + y)
+</pre>
+
+<h3>myRev in O(n) — asked on both 2023 exams (10 p)</h3>
+<pre class="hs" data-file="Pack.hs" data-block="myRev"></pre>
+<pre class="ghci" data-file="Pack.hs">myRev "Hello"
+myRev [1,2,3]</pre>
+<p><b>Trace:</b> <code>go [1,2,3] []</code> → <code>go [2,3] [1]</code> → <code>go [3] [2,1]</code> → <code>go [] [3,2,1]</code>.
+One <code>:</code> per element ⇒ O(n). The accumulator works like a stack of plates: the first element ends up at the bottom.</p>
+<div class="box trap"><span class="t">Not O(n)</span>
+<pre class="hs" data-file="Pack.hs" data-block="slowRev"></pre>
+<p><code>++</code> copies its left list each time: \(1+2+\dots+n=O(n^2)\).</p>
+</div>
+
+<h3>Tail-recursive Fibonacci (2017 exam)</h3>
+<pre class="hs" data-file="Pack.hs" data-block="fib"></pre>
+<pre class="ghci" data-file="Pack.hs">fibs 10
+fibTail 30</pre>
+<p>Naive <code>fib n = fib (n-1) + fib (n-2)</code> is correct but takes exponential time (recomputes everything) and is not tail
+recursive.</p>
+
+<h3>Digits and numbers</h3>
+<pre class="hs" data-file="Pack.hs" data-block="listToInt"></pre>
+<pre class="hs" data-file="Pack.hs" data-block="intToList"></pre>
+<pre class="ghci" data-file="Pack.hs">listToInt [1,2,3]
+intToList 4071</pre>
+
+<h3>Run-length: compress and decompress (2023 exam, your last exam)</h3>
+<pre class="hs" data-file="Pack.hs" data-block="compressAcc"></pre>
+<pre class="hs" data-file="Pack.hs" data-block="compress" data-title="Alternative with takeWhile/dropWhile"></pre>
+<pre class="hs" data-file="Pack.hs" data-block="decompress"></pre>
+<pre class="hs" data-file="Pack.hs" data-block="decompressNoLib" data-title="Without library functions"></pre>
+<pre class="ghci" data-file="Pack.hs">compress2 "aaaabbcccb"
+decompress [('a',4),('b',2),('c',3),('b',1)]</pre>

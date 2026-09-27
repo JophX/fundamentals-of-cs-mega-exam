@@ -1,0 +1,82 @@
+<h1>18. Data types, type classes, laziness + problem bank <span class="tag pl">PL</span></h1>
+
+<h2>18.1 Algebraic data types</h2>
+<div class="box intuition"><span class="t">Intuition</span>
+<p><code>data</code> defines a new type by listing its possible <b>shapes</b>. Each shape has a <b>constructor</b> (capitalised)
+that may carry values. You take values apart with pattern matching — exactly like lists (which are themselves just
+<code>data List a = Nil | Cons a (List a)</code>).</p>
+</div>
+<pre class="hs" data-file="Types.hs" data-block="shape"></pre>
+<pre class="ghci" data-file="Types.hs">area (Circle 1)
+area (Rect 3 4)
+map area [Circle 1, Rect 2 5]</pre>
+
+<h3>Maybe — “a value, or nothing”</h3>
+<pre class="hs" data-file="Types.hs" data-block="maybe"></pre>
+<pre class="ghci" data-file="Types.hs">safeHead ([] :: [Int])
+safeHead [4,5]
+safeDiv 10 0
+lookupAge "bo" [("al", 30), ("bo", 25)]</pre>
+
+<h2>18.2 Recursive data types and type constructors</h2>
+<p>The syllabus names “recursive data types” and “type constructors”. <code>List</code> and <code>Tree</code> below are
+<b>type constructors</b>: they are not types by themselves but build a type from another (<code>Tree Int</code>,
+<code>Tree String</code>).</p>
+<pre class="hs" data-file="Types.hs" data-block="list"></pre>
+<pre class="ghci" data-file="Types.hs">lenL (Cons 'a' (Cons 'b' Nil))</pre>
+<pre class="hs" data-file="Types.hs" data-block="tree"></pre>
+<pre class="ghci" data-file="Types.hs">fromList [5,3,8,1]
+inorder (fromList [5,3,8,1,4])
+member 4 (fromList [5,3,8,1,4])
+size (fromList [5,3,8,1,4])
+depth (fromList [5,3,8,1,4])</pre>
+<p>Recipe for trees = same as lists: one equation per constructor; recurse into sub-trees.</p>
+
+<h3>An expression tree and its evaluator (an interpreter in 6 lines)</h3>
+<pre class="hs" data-file="Types.hs" data-block="expr"></pre>
+<pre class="ghci" data-file="Types.hs">eval (Add (Num 2) (Mul (Num 3) (Num 4)))</pre>
+
+<h2>18.3 Type classes (ad hoc polymorphism)</h2>
+<p>A type class is a set of types that support certain operations — like a Java interface. <code>Eq</code>, <code>Ord</code>,
+<code>Show</code>, <code>Num</code> are built in; <code>deriving (Show, Eq)</code> generates instances automatically.</p>
+<pre class="hs" data-file="Types.hs" data-block="class"></pre>
+<pre class="ghci" data-file="Types.hs">describe True
+describe (Rect 1 2)</pre>
+
+<h2>18.4 An ADT in Haskell (information hiding via modules)</h2>
+<pre class="hs" data-file="Types.hs" data-block="stack"></pre>
+<p>In a real module you export <code>module Stack (Stack, empty, push, pop, top, isEmpty) where</code> — the type
+<code>Stack</code> without its constructor. Clients can’t see or build the list inside: that is <b>information hiding</b>.</p>
+<pre class="ghci" data-file="Types.hs">top (push 3 (push 2 empty))
+isEmpty empty</pre>
+
+<h2>18.5 Laziness</h2>
+<p>Haskell evaluates an expression only when its value is needed (<b>lazy / non-strict</b> evaluation, call-by-need). So infinite
+lists are fine as long as you use only a finite part (this is the lecture’s <code>squares</code> example).</p>
+<pre class="hs" data-file="Types.hs" data-block="lazy"></pre>
+<pre class="ghci" data-file="Types.hs">take 5 squares
+16 `elem` takeWhile (<= 16) squares
+take 10 fibsLazy</pre>
+
+<h2>18.6 Problem bank (verified answers)</h2>
+<p>Try each one yourself first. Then compare.</p>
+<pre class="hs" data-file="Drill.hs" data-block="d1"></pre>
+<pre class="hs" data-file="Drill.hs" data-block="d2"></pre>
+<pre class="hs" data-file="Drill.hs" data-block="d3"></pre>
+<pre class="hs" data-file="Drill.hs" data-block="d5"></pre>
+<pre class="hs" data-file="Drill.hs" data-block="d6"></pre>
+<pre class="hs" data-file="Drill.hs" data-block="d7"></pre>
+<pre class="hs" data-file="Drill.hs" data-block="d8"></pre>
+<pre class="ghci" data-file="Drill.hs">countOcc 'a' "banana"
+myLength "abcd"
+mapF (*10) [1,2]
+myMaximum [3,9,2]
+isPal "racecar"
+dedup [1,1,2,3,3,3,1]
+myAppend "ab" "cd"</pre>
+
+<div class="box trap"><span class="t">Reading type errors</span>
+<p>“Couldn’t match expected type <code>[a]</code> with actual type <code>a</code>” almost always means you wrote
+<code>xs ++ x</code> (element where a list was needed) — use <code>xs ++ [x]</code> or <code>x : xs</code>. “Non-exhaustive
+patterns” means you forgot a case (usually <code>[]</code>).</p>
+</div>

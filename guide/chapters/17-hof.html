@@ -1,0 +1,83 @@
+<h1>17. Higher-order functions: map, filter, fold, lambda <span class="tag pl">PL</span></h1>
+
+<div class="box intuition"><span class="t">Functions are values</span>
+<p>In Haskell a function can be <b>passed as an argument</b> and <b>returned as a result</b> (“first-class citizens”). A function
+that takes or returns a function is <b>higher-order</b>. <code>map</code>, <code>filter</code> and <code>fold</code> capture the
+three most common loops once and for all: <b>transform every element</b>, <b>keep some elements</b>, <b>combine all elements
+into one value</b>.</p>
+</div>
+
+<h2>17.1 Lambdas, currying, sections, composition</h2>
+<pre class="hs" data-file="HOF.hs" data-block="apply"></pre>
+<pre class="ghci" data-file="HOF.hs">applyTwice (\x -> x * 3) 2
+applyTwice (++ "!") "hi"
+(\x y -> x * y + 1) 3 4</pre>
+<ul>
+  <li><b>Lambda</b>: <code>\x -&gt; x * 3</code> is a function without a name.</li>
+  <li><b>Currying</b>: every function takes one argument at a time. <code>add3 :: Int -&gt; Int -&gt; Int -&gt; Int</code> really means
+    <code>Int -&gt; (Int -&gt; (Int -&gt; Int))</code>. So <code>add3 1</code> is a function waiting for two more
+    (<b>partial application</b>).</li>
+  <li><b>Sections</b>: <code>(+ 5)</code>, <code>(* 2)</code>, <code>(&gt; 3)</code>, <code>(`div` 2)</code> are operators with one
+    side filled in.</li>
+  <li><b>Composition</b>: <code>(f . g) x = f (g x)</code> — read right to left. <code>f $ x</code> = <code>f x</code> (saves parentheses).</li>
+</ul>
+<pre class="hs" data-file="HOF.hs" data-block="curry"></pre>
+<pre class="ghci" data-file="HOF.hs">:t add3 1
+(add3 1 2) 10
+map (add3 1 2) [10, 20]
+addFive 1
+filter (> 3) [1,5,2,8]</pre>
+<pre class="hs" data-file="HOF.hs" data-block="compose"></pre>
+<pre class="ghci" data-file="HOF.hs">countLongWords "the quick brown fox jumps"</pre>
+
+<h2>17.2 map and filter — write them yourself</h2>
+<pre class="hs" data-file="Pack.hs" data-block="map"></pre>
+<pre class="hs" data-file="Pack.hs" data-block="filter"></pre>
+<pre class="hs" data-file="HOF.hs" data-block="zipWith"></pre>
+<pre class="ghci" data-file="HOF.hs">myZipWith (+) [1,2,3] [10,20,30]
+myTakeWhile (< 4) [1,2,3,7,1]
+dropWhile (< 4) [1,2,3,7,1]</pre>
+
+<h2>17.3 Folds</h2>
+<div class="box intuition"><span class="t">Intuition</span>
+<p><code>foldl f z [x1,x2,x3] = f (f (f z x1) x2) x3</code> — start with <code>z</code>, eat the list from the <b>left</b>,
+accumulator first.<br>
+<code>foldr f z [x1,x2,x3] = f x1 (f x2 (f x3 z))</code> — replace each <code>:</code> by <code>f</code> and <code>[]</code>
+by <code>z</code>, element first.</p>
+</div>
+<pre class="hs" data-file="Pack.hs" data-block="foldl"></pre>
+<pre class="hs" data-file="Pack.hs" data-block="foldr"></pre>
+<pre class="ghci" data-file="Pack.hs">foldl (-) 0 [1,2,3]
+foldr (-) 0 [1,2,3]
+foldr (:) [] [1,2,3]
+foldl (\acc x -> x : acc) [] [1,2,3]</pre>
+<table class="wide">
+<tr><th>foldl (-) 0 [1,2,3]</th><th>foldr (-) 0 [1,2,3]</th></tr>
+<tr><td class="mono small">((0-1)-2)-3 = -6</td><td class="mono small">1-(2-(3-0)) = 2</td></tr>
+</table>
+<div class="box recipe"><span class="t">Which fold?</span>
+<ul>
+<li>Building a list in the same order (map-like): <b>foldr</b>.</li>
+<li>Running total / “reading left to right” (sum, count, listToInt, reverse): <b>foldl</b>.</li>
+<li>Works on infinite lists (lazily): only <b>foldr</b>.</li>
+</ul></div>
+
+<h3>Exam 2023-05-05 Problem 6 (10 p): explain and evaluate</h3>
+<pre class="hs" data-file="Pack.hs" data-block="foobar"></pre>
+<div class="box model"><span class="t">Answer</span>
+<p><b>foo x y</b> = <code>filter</code> keeps the elements <code>w</code> of <code>y</code> for which <code>x == w</code>: it
+returns all occurrences of <code>x</code> in <code>y</code>. <b>bar x y</b> = <code>foldl</code> with accumulator <code>w</code>
+starting at 0; for each element <code>q</code> it adds 1 if <code>q /= x</code>: it counts the elements <b>different</b> from
+<code>x</code>. The string has 12 characters, 4 of them <code>'c'</code>:</p>
+</div>
+<pre class="ghci" data-file="Pack.hs">foo 'c' "aabcccaacbba"
+bar 'c' "aabcccaacbba"</pre>
+
+<h2>17.4 Pipelines — how Haskell programmers really write</h2>
+<pre class="hs" data-file="HOF.hs" data-block="pipeline"></pre>
+<pre class="ghci" data-file="HOF.hs">sumOfSquaresOfEvens [1..10]</pre>
+<pre class="ghci">map (\(c, n) -> replicate n c) [('a',2),('b',3)]
+concat ["ab", "cd"]
+concatMap (\(c, n) -> replicate n c) [('a',2),('b',3)]
+any even [1,3,5]
+all odd [1,3,5]</pre>

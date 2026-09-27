@@ -1,0 +1,41 @@
+<h1>20. Control structures and subprograms <span class="tag pl">PL</span></h1>
+
+<h2>20.1 Control structures (lecture 10)</h2>
+<p>An imperative language is mostly <code>var = expr;</code>. To be <b>Turing complete</b> it needs two more things:
+<b>conditions</b> (simplest: <code>if</code>) and <b>jumps</b> (simplest and most powerful: <code>goto</code>). Structured
+programming replaces <code>goto</code> with readable forms:</p>
+<ul>
+  <li><b>Selection</b>: nested <code>if-then-else</code> (always use blocks — the dangling-else problem), <code>elif</code>;
+    multi-way <code>switch/case</code> (with or without <code>break</code>/fall-through, default case); <b>pattern matching</b>
+    (Haskell, ML).</li>
+  <li><b>Logical loops</b>: <code>while (e) …</code> (pre-test), <code>do … while (e)</code> (post-test, runs at least once);
+    control with <code>break</code> (leave the loop) and <code>continue</code> (skip to the next iteration).</li>
+  <li><b>Counter loops</b> and <b>iterators</b>: <code>for x in fruit</code> iterates over a collection (list, tree…) instead of
+    an index — simpler and more flexible.</li>
+  <li><b>Guarded commands</b> (Dijkstra): <code>if g1 -&gt; s1 [] g2 -&gt; s2 fi</code> picks <b>any</b> true guard
+    (nondeterministically; error if none). <code>do … od</code> repeats until no guard is true. The lecture’s example sorts four
+    variables by swapping any out-of-order neighbours until none is — the order of swaps doesn’t matter. Used to reason about
+    correctness and concurrency.</li>
+</ul>
+
+<h2>20.2 Subprograms</h2>
+<ul>
+  <li>Process abstraction: <b>procedures</b> do something (change state), <b>functions</b> return a value, <b>methods</b> are
+    procedures/functions belonging to objects/classes.</li>
+  <li>A header defines name, parameters and result type.</li>
+  <li><b>Design issues</b> (slide): when/how are parameter types checked? Nested subprograms allowed? Subprograms as parameters?
+    Overloading (same name, different parameter types)? Generic subprograms (one definition for many types)? Side effects
+    allowed? What can be returned, and how many values?</li>
+  <li><b>Co-routines</b>: not master/slave — two routines pass control back and forth, each resuming where it left off (several
+    entry points). Used for quasi-concurrency, generators, pipelines.</li>
+</ul>
+<pre class="code python" data-lang="python" data-src="verify/coroutine.py"></pre>
+<pre class="run" data-cmd="python3 verify/coroutine.py" data-show="python3 coroutine.py"></pre>
+
+<h3>Parameters in Python (lecture examples, run in Python 3)</h3>
+<pre class="code python" data-lang="python" data-src="verify/params.py"></pre>
+<pre class="run" data-cmd="python3 verify/params.py" data-show="python3 params.py"></pre>
+<p>Positional vs <b>keyword</b> parameters, <b>default</b> values, <b>variable number</b> of arguments (<code>*args</code> → tuple,
+<code>**kwargs</code> → dictionary).</p>
+<p><b>Activation records.</b> Each call pushes an activation record (return address, link to caller’s record, parameters, local
+variables) on the run-time stack; it is popped at return. That’s why recursion works: each call has its own locals.</p>

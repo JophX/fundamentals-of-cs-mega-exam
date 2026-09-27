@@ -1,0 +1,40 @@
+<h1>24. Functional and logic languages <span class="tag pl">PL</span></h1>
+
+<h2>24.1 Functional languages</h2>
+<p>Family: LISP → Scheme, ML, Haskell, Erlang. Defining feature: <b>no side effects</b> — a function’s result depends only on its
+arguments. The lecture’s <code>member</code> in two languages:</p>
+<pre class="code text">; Scheme
+(DEFINE (member a lst)
+  (COND ((NULL? lst) '())
+        ((EQ? a (CAR lst)) #T)
+        (ELSE (member a (CDR lst)))))
+
+(* ML *)
+fun member a []      = false
+  | member a (b::l)  = a = b orelse member a l</pre>
+<p>In Haskell: <code>member a [] = False; member a (b:l) = a == b || member a l</code>. Haskell is <b>purely</b> functional, handles
+I/O in a controlled way, and has <b>non-strict (lazy) semantics</b>: <code>squares = [n*n | n &lt;- [0..]]</code> is an infinite
+list that is only computed as far as needed.</p>
+<div class="box def"><span class="t">Advantages (slide)</span>
+<p>Programs are easier to <b>prove correct</b> and to <b>transform</b> (referential transparency); functions are
+<b>first-class citizens</b>; simpler syntax and semantics; natural for many problems; easy to parallelise (no shared state).
+Disadvantages: less efficient on conventional hardware, I/O and state are awkward, unfamiliar. Many imperative languages have
+adopted functional features: lambdas / functions as parameters in Java, JavaScript, Python, Ruby, C#.</p>
+</div>
+
+<h2>24.2 Logic programming (Prolog)</h2>
+<div class="box intuition"><span class="t">Intuition</span>
+<p>You don’t tell the computer <i>how</i> to solve the problem. You state <b>facts</b> and <b>rules</b> about the problem domain,
+then ask whether a <b>goal</b> follows. A built-in <b>proof engine</b> searches for an answer (by unification and backtracking).
+Example: “a sorted list is a permutation of the old list in which every element is ≤ the next” — that’s the whole sort program.</p>
+</div>
+<pre class="code prolog" data-lang="prolog" data-src="verify/prolog.pl"></pre>
+<p>Queries (run in SWI-Prolog): “What does charlie study?”, “Who are kirke’s students?”, “Who teaches jack?”</p>
+<pre class="run" data-cmd="swipl -q -g &quot;forall(studies(charlie,W),(write(W),nl)), forall(professor(kirke,S),(write(S),nl)), forall(professor(P,jack),(write(P),nl)), halt.&quot; verify/prolog.pl" data-show="?- studies(charlie, What).   ?- professor(kirke, Students).   ?- professor(Who, jack)."></pre>
+<p>To answer <code>professor(kirke, S)</code>: find <code>teaches(kirke, C)</code> → <code>C = csc135</code>; then
+<code>studies(S, csc135)</code> → <code>S = charlie</code>, and on backtracking <code>S = olivia</code>. Matching patterns with
+variables is <b>unification</b>; trying the next alternative when one fails is <b>backtracking</b>.</p>
+<p><b>Limitations</b> (slide): efficiency (blind search can be very slow); the programmer must still think about the search order
+(order of rules matters, left recursion can loop forever); answers are only true/fail; <b>negation</b> is “not provable” (closed-world
+assumption), not logical negation. The <b>cut</b> <code>!</code> partly controls the search (stop backtracking). Applications:
+databases, expert systems, AI, natural language.</p>

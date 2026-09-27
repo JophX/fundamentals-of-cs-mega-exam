@@ -1,0 +1,55 @@
+<h1>26. The PL exams (5DV086), every question answered <span class="tag pl">PL</span></h1>
+
+<h2>26.1 Tentamen 2023-03-16</h2>
+<table class="wide">
+<tr><th>#</th><th>Question (translated)</th><th>Answer</th></tr>
+<tr><td>1 (10)</td><td>Which strings can G generate?</td><td><b>None of them.</b> L(G) = {aᵏ⁺¹bᵏ} ∪ {cb}. Ch. 7.3</td></tr>
+<tr><td>2 (10)</td><td>CFG for “equal a and b, every prefix ≥ as many a as b”</td><td>\(S\to aSbS\mid\varepsilon\). Ch. 7.3</td></tr>
+<tr><td>3 (6)</td><td>Precedence and associativity; how related?</td><td>Model answer Ch. 8</td></tr>
+<tr><td>4 (8)</td><td>Parts of an interpreter, tasks, data structures</td><td>Model answer Ch. 22</td></tr>
+<tr><td>5 (6)</td><td>Pass-by-reference vs pass-by-value, pros/cons</td><td>Model answer Ch. 20.3</td></tr>
+<tr><td>6 (10)</td><td>Write <code>compress</code></td><td>Ch. 16 (both versions)</td></tr>
+<tr><td>7 (10)</td><td>Write <code>myRev</code>, O(n), no library functions</td><td>Ch. 16</td></tr>
+</table>
+
+<h2>26.2 Tentamen 2023-05-05</h2>
+<table class="wide">
+<tr><th>#</th><th>Question</th><th>Answer</th></tr>
+<tr><td>1 (10)</td><td>CFG for \(\{a^nb^m\mid n\ne2m\}\)</td><td>Ch. 7.3 (both readings — say which one you answer)</td></tr>
+<tr><td>2–4, 7</td><td>same as above</td><td></td></tr>
+<tr><td>5 (6)</td><td>Why is <code>a = b + 4</code> assignment vs naming a value?</td><td>Model answer Ch. 19.3</td></tr>
+<tr><td>6 (10)</td><td>What do <code>foo</code>, <code>bar</code> do; evaluate them</td><td><code>"cccc"</code> and 8. Ch. 17.3</td></tr>
+</table>
+
+<h2>26.3 Your last exam (what you told me)</h2>
+<table class="wide">
+<tr><th>Topic</th><th>Where</th></tr>
+<tr><td>Convert to Chomsky normal form</td><td>Ch. 10 Part A</td></tr>
+<tr><td>CYK: show table, explain</td><td>Ch. 10 Part B</td></tr>
+<tr><td>Encapsulation / information hiding</td><td>Ch. 21</td></tr>
+<tr><td>Role of the parser</td><td>Ch. 22</td></tr>
+<tr><td>Write foldl; list to int</td><td>Ch. 17.3, Ch. 16</td></tr>
+<tr><td>Call by value vs reference</td><td>Ch. 20.3</td></tr>
+<tr><td>decompress</td><td>Ch. 16</td></tr>
+</table>
+<p>Pattern: the PL exam = <b>grammars (CFG design / CNF / CYK)</b> + <b>3 theory questions</b> + <b>2–3 Haskell functions</b>.</p>
+
+<h2>26.4 Practice exam (60 p, 36 to pass) — 4 hours, no aids</h2>
+<ol>
+  <li>(10 p) Construct a CFG for \(\{a^nb^mc^k\mid k=n+m\}\). Then show a leftmost derivation of <i>abcc</i>.</li>
+  <li>(10 p) Convert \(S\to aSb\mid bA\mid\lambda,\ A\to aA\mid a\) to Chomsky normal form.</li>
+  <li>(6 p) Explain static vs dynamic scoping with an example where they give different results.</li>
+  <li>(8 p) What is polymorphism? Describe three kinds with examples.</li>
+  <li>(6 p) What is the difference between a compiler and an interpreter? What does the lexer produce?</li>
+  <li>(10 p) Write <code>countRuns :: String -&gt; Int</code> that counts the number of maximal runs of equal characters
+    (<code>countRuns "aaabbca" = 4</code>), and <code>myFoldr</code>.</li>
+  <li>(10 p) Write <code>merge :: [Int] -&gt; [Int] -&gt; [Int]</code> merging two sorted lists, and use it to write merge sort.</li>
+</ol>
+<div class="box sol"><span class="t">Solutions</span>
+<p>1. \(S\to aSc\mid B,\ B\to bBc\mid\lambda\) (R5). \(S\Rightarrow aSc\Rightarrow aBc\Rightarrow abBcc\Rightarrow abcc\).</p>
+<p>2. Nullable: S. Remove λ: \(S\to aSb\mid ab\mid bA\), \(A\to aA\mid a\). No units. CNF: \(S\to UX\mid UT\mid TA,\ X\to ST,\ A\to UA\mid a,\ U\to a,\ T\to b\).</p>
+<p>3. Ch. 19.4 (the Python/bash example). 4. Ch. 21.3. 5. Ch. 22.</p>
+<p>6. <code>countRuns = length . compress</code> (using compress from Ch. 16), or directly: <code>countRuns [] = 0; countRuns (c:cs) = 1 + countRuns (dropWhile (== c) cs)</code>.
+<code>myFoldr</code> = foldr from Ch. 17.</p>
+<p>7. Ch. 16 (<code>merge</code>, <code>mergeSort</code>).</p>
+</div>

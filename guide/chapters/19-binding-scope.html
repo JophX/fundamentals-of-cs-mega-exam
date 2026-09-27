@@ -1,0 +1,89 @@
+<h1 class="part">Part IV<small>Programming-language concepts <br><span class="tag pl">PL</span> — the “explain” questions</small></h1>
+
+<h1>19. Names, binding, scope, variables and types <span class="tag pl">PL</span></h1>
+
+<div class="box exam"><span class="t">How to answer any “explain concept X” question</span>
+<p>(1) precise definition, (2) how it works / the mechanism, (3) a tiny example, (4) advantages and disadvantages, (5) how it
+differs from the related concept. Five sentences like that are a full-points answer.</p>
+</div>
+
+<h2>19.1 Paradigms in one table</h2>
+<table class="wide">
+<tr><th>Paradigm</th><th>Program is…</th><th>Languages</th><th>Key ideas</th></tr>
+<tr><td>Imperative</td><td>a sequence of commands that change state</td><td>C, Pascal, Fortran</td><td>variables, assignment, loops</td></tr>
+<tr><td>Object-oriented</td><td>objects sending messages</td><td>Smalltalk, Java, C++, Python</td><td>encapsulation, inheritance, dynamic binding</td></tr>
+<tr><td>Functional</td><td>expressions / function definitions</td><td>Lisp, Scheme, ML, Haskell, Erlang</td><td>no side effects, recursion, higher-order functions</td></tr>
+<tr><td>Logic</td><td>facts + rules; you ask queries</td><td>Prolog</td><td>say <i>what</i>, not <i>how</i>; the proof engine searches</td></tr>
+</table>
+
+<h2>19.2 Variables and binding</h2>
+<div class="box def"><span class="t">A variable has six attributes</span>
+<p><b>name</b>, <b>address</b> (where in memory), <b>value</b>, <b>type</b>, <b>lifetime</b> (when it exists in memory),
+<b>scope</b> (where in the program text it can be used).</p>
+</div>
+<div class="box def"><span class="t">Binding and binding time</span>
+<p>A <b>binding</b> is an association between a name and something (a value, a type, an address, an operation). <b>Binding
+time</b> is when it happens: language design (<code>*</code> means multiplication), implementation (size of <code>int</code>),
+compile time (type of a variable in Java), load time (address of a static variable), run time (value of a variable; address of a
+local). <b>Static</b> binding = before run time and doesn’t change; <b>dynamic</b> = during run time or can change.</p>
+</div>
+<table class="wide">
+<tr><th>Storage kind</th><th>Allocated</th><th>Example</th></tr>
+<tr><td>Static</td><td>before execution, whole run</td><td>globals, C <code>static</code></td></tr>
+<tr><td>Stack-dynamic</td><td>when its declaration is executed (function call), freed at return</td><td>local variables</td></tr>
+<tr><td>Explicit heap-dynamic</td><td>by explicit command</td><td><code>new</code>/<code>malloc</code>, freed by <code>delete</code> or GC</td></tr>
+<tr><td>Implicit heap-dynamic</td><td>when assigned</td><td>Python/JS values</td></tr>
+</table>
+<p><b>Memory layout</b> (lecture slide): stack (activation records: return address, saved stack pointer, parameters, locals)
+at the top growing down, free memory, heap growing up, global/static data and constants, program code.</p>
+
+<h2>19.3 “Variables” in functional vs imperative languages (2023-05-05 Problem 5, 6 p)</h2>
+<div class="box model"><span class="t">Model answer: why is <code>a = b + 4</code> “assignment” in imperative languages but “naming/binding a value” in functional ones?</span>
+<p>In an <b>imperative</b> language a variable is an abstraction of a <b>memory cell</b>: <code>a = b + 4</code> evaluates
+<code>b + 4</code> and <b>stores</b> the result in the cell named <code>a</code>, overwriting the previous contents. The value of
+<code>a</code> can change later (<code>a = a + 1</code> is meaningful), so the meaning of <code>a</code> depends on <i>when</i> you
+look — the program has <b>state</b> and assignment is a <b>side effect</b>.</p>
+<p>In a <b>pure functional</b> language there is no mutable state: <code>a = b + 4</code> is a <b>definition</b> — it binds the
+name <code>a</code> to the value of <code>b + 4</code>, like in mathematics, and that binding can never change within its scope.
+<code>a = a + 1</code> is not an update but a (recursive, non-terminating) definition. Because names always stand for the same
+value, any occurrence of <code>a</code> can be replaced by its value (<b>referential transparency</b>), which makes programs easier
+to reason about, test, parallelise and transform. Repetition is expressed by recursion instead of by changing loop variables. The
+difference is thus <b>mutable storage location</b> vs <b>immutable name for a value</b>.</p>
+</div>
+
+<h2>19.4 Scope</h2>
+<div class="box def"><span class="t">Definitions</span>
+<ul>
+  <li><b>Scope</b>: the part of the program text where a name is visible. <b>Lifetime</b>: the time during execution when the
+    variable exists. They differ: a C <code>static</code> local has local scope but lives for the whole run.</li>
+  <li><b>Static (lexical) scope</b>: a free name refers to the declaration in the nearest <b>enclosing block in the program
+    text</b>. Decided at compile time. (Almost all languages: C, Java, Python, Haskell.)</li>
+  <li><b>Dynamic scope</b>: a free name refers to the most recent binding in the <b>chain of active calls</b> at run time.
+    (Early Lisp, bash, Perl’s <code>local</code>.)</li>
+  <li><b>Block structure</b>: blocks can be nested, and inner declarations <b>shadow</b> outer ones with the same name.</li>
+</ul>
+</div>
+<p>The <b>same program</b> in a statically scoped language (Python) and a dynamically scoped one (bash):</p>
+<pre class="code python" data-lang="python" data-src="verify/scope.py"></pre>
+<pre class="run" data-cmd="python3 verify/scope.py" data-show="python3 scope.py      # static scope"></pre>
+<pre class="code bash" data-lang="bash" data-src="verify/scope.sh"></pre>
+<pre class="run" data-cmd="bash verify/scope.sh" data-show="bash scope.sh         # dynamic scope"></pre>
+<p>Python: <code>f</code> is defined at top level, so its <code>x</code> is the global one (1) — the text decides.
+Bash: <code>f</code> was called from <code>g</code>, whose <code>local x=2</code> is the most recent binding — the call chain decides.
+<b>Static</b>: readable, checkable at compile time, faster. <b>Dynamic</b>: flexible but hard to understand; can’t type-check
+statically; a function’s behaviour depends on who called it.</p>
+
+<h2>19.5 Types and type systems</h2>
+<table class="wide">
+<tr><th>Concept</th><th>Meaning</th></tr>
+<tr><td>Type system</td><td>rules that assign types to expressions and define which operations are allowed on which types</td></tr>
+<tr><td>Type checking</td><td>making sure operands have compatible types; a violation is a <b>type error</b></td></tr>
+<tr><td>Static typing</td><td>types known and checked at compile time (Java, C, Haskell). Errors found early, faster code.</td></tr>
+<tr><td>Dynamic typing</td><td>types belong to values and are checked at run time (Python, JS, Lisp). Flexible, errors later, slower.</td></tr>
+<tr><td>Strong typing</td><td>all type errors are detected (Haskell, Java nearly); <b>weak</b>: some slip through (C: casts, unions)</td></tr>
+<tr><td>Type inference</td><td>the compiler deduces types without annotations (Haskell, ML: Hindley–Milner)</td></tr>
+<tr><td>Coercion</td><td>automatic conversion (<code>1 + 2.5</code> in Java converts 1 to double); weakens error detection</td></tr>
+<tr><td>Type equivalence</td><td><b>name</b> equivalence (same declared type name) vs <b>structural</b> (same structure)</td></tr>
+</table>
+<p>The lecture example <code>def example(a,b): return a + b</code> works on numbers, strings and lists — dynamic typing plus
+overloaded <code>+</code> (“duck typing”).</p>

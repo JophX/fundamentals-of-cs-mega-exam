@@ -1,0 +1,116 @@
+<h1 class="part">Part III<small>Haskell from zero <br><span class="tag pl">PL</span> — 20 points on every exam</small></h1>
+
+<h1>15. Haskell basics: types, functions, lists <span class="tag pl">PL</span></h1>
+
+<div class="box intuition"><span class="t">The mindset</span>
+<p>In Java you write <b>instructions</b>: “set x to 0, loop, add…”. In Haskell you write <b>definitions</b>: “the sum of an
+empty list <i>is</i> 0; the sum of <code>x:xs</code> <i>is</i> <code>x</code> plus the sum of <code>xs</code>”. A function is like
+a maths function: same input ⇒ always the same output, and it changes nothing else (no side effects). There are no loops —
+recursion does that job. Nothing is ever modified — you build new values.</p>
+</div>
+
+<h2>15.1 Using GHCi</h2>
+<p>Run <code>ghci</code>, load a file with <code>:l file.hs</code>, reload with <code>:r</code>, ask a type with <code>:t</code>.
+Every <code>ghci&gt;</code> line in this guide is real output.</p>
+<pre class="ghci">2 + 3 * 4
+10 `div` 3
+10 `mod` 3
+7 / 2
+not (3 > 2) || True
+"abc" ++ "def"
+'h' : "ello"
+head [5,6,7]
+tail [5,6,7]
+length [5,6,7]
+[1..5]
+[x * 2 | x <- [1..5], odd x]</pre>
+
+<div class="box trap"><span class="t">Function application binds tightest</span>
+<p><code>f x + 1</code> means <code>(f x) + 1</code>. <code>f x y</code> is <code>f</code> applied to two arguments — no commas,
+no parentheses. To pass an expression, wrap it: <code>double (3 + 4)</code>, not <code>double 3 + 4</code>.</p>
+</div>
+
+<h2>15.2 Types</h2>
+<table class="wide">
+<tr><th>Type</th><th>Values</th></tr>
+<tr><td><code>Int</code>, <code>Integer</code></td><td>whole numbers (fixed size / unlimited)</td></tr>
+<tr><td><code>Double</code></td><td>decimals</td></tr>
+<tr><td><code>Bool</code></td><td><code>True</code>, <code>False</code></td></tr>
+<tr><td><code>Char</code></td><td><code>'a'</code> (single quotes)</td></tr>
+<tr><td><code>String</code></td><td><code>"abc"</code> — it is just <code>[Char]</code></td></tr>
+<tr><td><code>[a]</code></td><td>list: all elements the same type</td></tr>
+<tr><td><code>(a, b)</code></td><td>tuple: fixed size, types may differ</td></tr>
+<tr><td><code>a -&gt; b</code></td><td>function from a to b</td></tr>
+</table>
+<p>Lowercase type names like <code>a</code> are <b>type variables</b>: “any type”. <code>length :: [a] -&gt; Int</code> works
+for lists of anything (parametric polymorphism). A <b>constraint</b> like <code>Eq a =&gt;</code> means “any type that supports
+<code>==</code>”; <code>Ord a</code> supports <code>&lt;</code>; <code>Num a</code> supports <code>+</code>; <code>Show a</code>
+can be printed.</p>
+<pre class="ghci">:t 'a'
+:t "hi"
+:t (True, 'x')
+:t length
+:t (==)</pre>
+<p class="small muted">Note: modern GHC shows <code>length :: Foldable t =&gt; t a -&gt; Int</code> because it works on more
+containers than lists. For lists, read <code>t a</code> as <code>[a]</code>: <code>length :: [a] -&gt; Int</code>. On the exam,
+the list version is what is expected. The same applies to <code>sum</code>, <code>elem</code>, <code>foldr</code>, <code>foldl</code>.</p>
+
+<h2>15.3 Defining functions</h2>
+<pre class="hs" data-file="Basics.hs" data-block="first"></pre>
+<p>Read <code>add :: Int -&gt; Int -&gt; Int</code> as “takes an Int, then an Int, returns an Int”.</p>
+<pre class="ghci" data-file="Basics.hs">double 21
+add 3 4
+isTeen 15</pre>
+
+<h3>Guards: many-way if</h3>
+<pre class="hs" data-file="Basics.hs" data-block="guards"></pre>
+<pre class="ghci" data-file="Basics.hs">grade 75
+grade 12</pre>
+
+<h3>Pattern matching: define by cases on the shape of the input</h3>
+<pre class="hs" data-file="Basics.hs" data-block="patterns"></pre>
+<p>Patterns are tried <b>top to bottom</b>. <code>[x]</code> = exactly one element; <code>(x:y:_)</code> = at least two; <code>_</code>
+= “anything, I don’t care”.</p>
+<pre class="ghci" data-file="Basics.hs">describe []
+describe [7]
+describe [7,8,9]</pre>
+
+<h3>where, let, case</h3>
+<pre class="hs" data-file="Basics.hs" data-block="wherelet"></pre>
+<pre class="hs" data-file="Basics.hs" data-block="caseof"></pre>
+<pre class="ghci" data-file="Basics.hs">bmi 70 1.8
+sign (-3)</pre>
+
+<h3>Tuples</h3>
+<pre class="hs" data-file="Basics.hs" data-block="tuples"></pre>
+<pre class="ghci" data-file="Basics.hs">swapPair (1, "one")
+minMax [3,1,4,1,5]
+fst (1, 'a')
+snd (1, 'a')</pre>
+
+<h2>15.4 Lists: the one data structure you must master</h2>
+<div class="box def"><span class="t">How lists are built</span>
+<p>A list is either <b>empty</b> <code>[]</code> or an element <b>in front of</b> a list: <code>x : xs</code>.
+<code>[1,2,3]</code> is only shorthand for <code>1 : (2 : (3 : []))</code>. That is why every list function has two cases:
+<code>[]</code> and <code>(x:xs)</code>.</p>
+</div>
+<table class="wide">
+<tr><th>Function</th><th>Does</th><th>Cost</th></tr>
+<tr><td><code>x : xs</code></td><td>put in front</td><td>O(1)</td></tr>
+<tr><td><code>xs ++ ys</code></td><td>join</td><td>O(length xs)</td></tr>
+<tr><td><code>head</code>, <code>tail</code></td><td>first / all but first (crash on [])</td><td>O(1)</td></tr>
+<tr><td><code>length</code>, <code>last</code>, <code>xs !! n</code></td><td>walk the list</td><td>O(n)</td></tr>
+<tr><td><code>take n</code>, <code>drop n</code>, <code>splitAt n</code></td><td>first n / without first n / both</td><td>O(n)</td></tr>
+<tr><td><code>reverse</code>, <code>elem</code>, <code>sum</code>, <code>maximum</code></td><td>as named</td><td>O(n)</td></tr>
+<tr><td><code>replicate n x</code></td><td>n copies</td><td>O(n)</td></tr>
+<tr><td><code>zip</code>, <code>unzip</code></td><td>pairs up / splits pairs</td><td>O(n)</td></tr>
+<tr><td><code>words</code>, <code>unwords</code>, <code>lines</code></td><td>split/join text</td><td>O(n)</td></tr>
+</table>
+<pre class="ghci">take 2 [1,2,3,4]
+drop 2 [1,2,3,4]
+splitAt 2 "hello"
+replicate 3 'z'
+zip [1,2,3] "abc"
+words "the cat sat"
+[1,2,3] !! 0
+null []</pre>

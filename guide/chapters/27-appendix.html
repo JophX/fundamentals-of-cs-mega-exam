@@ -1,0 +1,62 @@
+<h1>Appendix A. Cheat sheets</h1>
+<div class="cols2 small">
+<div class="box recipe"><span class="t">Automata &amp; regular</span>
+<ul><li>DFA 5-tuple; δ total. NFA: δ → sets, λ-moves. NFA→DFA: sets of states + λ-closure; final if contains a final.</li>
+<li>Regex: star &gt; concat &gt; union (+).</li>
+<li>Closed: ∪ ∩ complement concat star reverse difference. Complement needs a complete DFA.</li>
+<li>Pumping: w = xyz, |xy| ≤ n, |y| ≥ 1. Pick w from n; all splits; pump 0 or 2.</li>
+<li>Minimize: mark final/non-final pairs; repeat; merge unmarked.</li></ul></div>
+<div class="box recipe"><span class="t">Context-free</span>
+<ul><li>aSb matches pairs. ≠ = &lt; ∪ &gt;. “or” = S → S₁ | S₂.</li>
+<li>Balanced: S → aSbS | λ. Equal count: S → aSbS | bSaS | λ.</li>
+<li>CNF: λ → units → useless → terminals → split.</li>
+<li>CYK: V_ii from A→a; V_ij over all cuts k with A→BC; S ∈ V_1n ⇒ member.</li>
+<li>CF pumping: xuyvz, |uyv| ≤ n, |uv| ≥ 1, window anywhere.</li>
+<li>CFL closed: ∪, concat, star, ∩regular. Not: ∩, complement.</li></ul></div>
+<div class="box recipe"><span class="t">Computability</span>
+<ul><li>TM 7-tuple; halts when δ undefined.</li>
+<li>Regular ⊂ DCFL ⊂ CFL ⊂ (CSL) ⊂ Recursive ⊂ RE.</li>
+<li>L and L̄ RE ⇒ L recursive. Halting: RE, not recursive; its complement not RE.</li>
+<li>Reduce known-undecidable → new problem.</li>
+<li>NP: poly verifier / NTM. NP-complete: in NP + reduction from known NPC.</li></ul></div>
+<div class="box recipe"><span class="t">Haskell</span>
+<ul><li>Signature, base case, recursive case, trace.</li>
+<li>Accumulator: go xs acc; go [] acc = acc.</li>
+<li>foldl f acc (x:xs) = foldl f (f acc x) xs</li>
+<li>foldr f acc (x:xs) = f x (foldr f acc xs)</li>
+<li>x : xs is O(1); xs ++ ys is O(|xs|).</li>
+<li>listToInt: acc*10 + d. decompress: replicate n c ++ rest.</li></ul></div>
+<div class="box recipe"><span class="t">PL concepts</span>
+<ul><li>Encapsulation = grouping in one unit. Information hiding = internals inaccessible.</li>
+<li>Polymorphism: subtype, parametric, ad hoc.</li>
+<li>Lexer → tokens; parser → AST (+ precedence); executor → environments, call stack, heap.</li>
+<li>Value = copy; reference = alias; result; value-result; name.</li>
+<li>Static scope = text; dynamic = call chain.</li>
+<li>Semaphore wait/signal; monitor; messages; transactional memory.</li></ul></div>
+</div>
+
+<h1>Appendix B. Swedish–English glossary (PL exam is in Swedish)</h1>
+<table class="wide small">
+<tr><th>Svenska</th><th>English</th><th>Svenska</th><th>English</th></tr>
+<tr><td>uppgift</td><td>problem / question</td><td>poäng</td><td>points</td></tr>
+<tr><td>konstruera</td><td>construct</td><td>kontextfri grammatik</td><td>context-free grammar</td></tr>
+<tr><td>generera</td><td>generate</td><td>sträng / språk</td><td>string / language</td></tr>
+<tr><td>icketerminal / terminal</td><td>non-terminal / terminal</td><td>startsymbol</td><td>start symbol</td></tr>
+<tr><td>regel</td><td>rule / production</td><td>tomma strängen</td><td>the empty string</td></tr>
+<tr><td>prefix</td><td>prefix</td><td>minst lika många</td><td>at least as many</td></tr>
+<tr><td>hälften</td><td>half</td><td>dubbelt så många</td><td>twice as many</td></tr>
+<tr><td>beskriv kortfattat</td><td>describe briefly</td><td>förklara</td><td>explain</td></tr>
+<tr><td>precedens / associativitet</td><td>precedence / associativity</td><td>tolk / interpretator</td><td>interpreter</td></tr>
+<tr><td>kompilator</td><td>compiler</td><td>datastruktur</td><td>data structure</td></tr>
+<tr><td>tilldelning</td><td>assignment</td><td>binda ett värde till ett namn</td><td>bind a value to a name</td></tr>
+<tr><td>sidoeffekt</td><td>side effect</td><td>skillnad</td><td>difference</td></tr>
+<tr><td>för- och nackdelar</td><td>advantages and disadvantages</td><td>värdeanrop / referensanrop</td><td>call by value / by reference</td></tr>
+<tr><td>inkapsling</td><td>encapsulation</td><td>informationsdöljande</td><td>information hiding</td></tr>
+<tr><td>arv</td><td>inheritance</td><td>dynamisk bindning</td><td>dynamic binding</td></tr>
+<tr><td>skriv en funktion</td><td>write a function</td><td>hjälpfunktion</td><td>helper function</td></tr>
+<tr><td>inbyggda funktioner</td><td>built-in functions</td><td>tidskomplexitet, linjär</td><td>time complexity, linear</td></tr>
+<tr><td>vänder på listor</td><td>reverses lists</td><td>svansrekursiv</td><td>tail-recursive</td></tr>
+<tr><td>upprepningar</td><td>repetitions</td><td>returvärde</td><td>return value</td></tr>
+<tr><td>jämnlöpande / samtidighet</td><td>concurrent / concurrency</td><td>avbrott / undantag</td><td>interrupt / exception</td></tr>
+<tr><td>räckvidd</td><td>scope</td><td>livslängd</td><td>lifetime</td></tr>
+</table>

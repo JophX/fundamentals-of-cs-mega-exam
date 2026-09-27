@@ -1,0 +1,47 @@
+<h1 class="part">Part V<small>Real exams solved, practice exams, cheat sheets</small></h1>
+
+<h1>25. The FCS exam (5DV037), every question answered <span class="tag fcs">FCS</span></h1>
+<p>Do it yourself first with a 4-hour timer, then compare.</p>
+
+<h3>Q1 (6 p) True/false — −0.5 for each wrong answer</h3>
+<table class="wide">
+<tr><th>Statement</th><th>Answer</th><th>Reason</th></tr>
+<tr><td>Starts with a / ends with c / odd number of b’s — regular</td><td>True</td><td>union of three regular languages (Ch. 3 regex)</td></tr>
+<tr><td>L CF non-regular, L′ regular ⇒ L ∪ L′ not regular</td><td>False</td><td>L′ = Σ*</td></tr>
+<tr><td>L CF non-regular, L′ regular ⇒ L ∩ L′ not regular</td><td>False</td><td>L′ = ∅</td></tr>
+<tr><td>P = NP ⇒ poly-time algorithm for SAT</td><td>True</td><td>SAT ∈ NP = P</td></tr>
+<tr><td>It can be correct to say a TM M is decidable</td><td>False</td><td>languages/problems are decidable, not machines</td></tr>
+<tr><td>Set of encoded TMs is RE</td><td>True</td><td>even recursive: a TM checks the encoding</td></tr>
+</table>
+<p><b>Q2</b> (5 p) closure: model answer in Ch. 5.1. <b>Q3</b> (8 p) hierarchy table: Ch. 12.4.</p>
+<p><b>Q4</b> (8 p): as printed, the language is context-free, so it can’t be proved non-CF — see Ch. 11 for what to write, and the
+proof technique for languages that really are non-CF (\(a^nb^nc^n\)).</p>
+<p><b>Q5</b> (8 p) CNF: <b>Yes</b>, it is in CNF. CYK: <code>abcab</code> ∈ L(G). Full table in Ch. 10, Part B.</p>
+<p><b>Q6</b> (6 p) \(M_{gf}\): Ch. 12.1. <b>Q7</b> (6 p) NTM vs DTM: Ch. 12.2.</p>
+<p><b>Q8☆</b> ◇-EQUATION: Ch. 14.3. <b>Q9☆</b> infinite union: <b>not</b> necessarily regular, Ch. 5.4. <b>Q10☆</b> NP closure: Ch. 14.4.</p>
+
+<h2>25.1 Practice exam (new questions)</h2>
+<ol>
+  <li>(6 p) True/false: (a) Every regular language is context-free. (b) The complement of a CFL is CF. (c) If \(L\) is RE and
+    \(\overline L\) is RE then \(L\) is recursive. (d) \(\{a^nb^n\}\cap a^*b^*\) is regular. (e) NFAs accept more languages than DFAs.
+    (f) If A ≤ₚ B and B ∈ P then A ∈ P.</li>
+  <li>(6 p) Give a DFA for strings over {a,b} that contain <i>ab</i> and have even length.</li>
+  <li>(6 p) Convert the NFA \(p_0\xrightarrow{a,b}p_0,\ p_0\xrightarrow{b}p_1,\ p_1\xrightarrow{a}p_2\) (final \(p_2\)) to a DFA.</li>
+  <li>(8 p) Prove \(\{a^nb^m\mid n&gt;m\}\) is not regular.</li>
+  <li>(8 p) Convert \(S\to aSb\mid SS\mid\lambda\) to CNF and run CYK on <code>aabb</code>.</li>
+  <li>(8 p) Prove \(\{a^nb^nc^n\}\) is not context-free.</li>
+  <li>(6 p) Show that the problem “does TM M ever write the symbol 1 on input w?” is undecidable.</li>
+</ol>
+<div class="box sol"><span class="t">Solutions</span>
+<p>1. (a) T (b) F (c) T (d) F — it equals \(\{a^nb^n\}\) (e) F (f) T.</p>
+<p>2. Product of “seen ab” (3 states: none / last was a / seen) and parity (2 states): 6 states, final = (seen, even).</p>
+<p>3. Language: ends in <i>ba</i>. DFA states \(\{p_0\},\{p_0,p_1\},\{p_0,p_2\}\): \(\{p_0\}\xrightarrow{a}\{p_0\}\),
+\(\{p_0\}\xrightarrow{b}\{p_0,p_1\}\), \(\{p_0,p_1\}\xrightarrow{a}\{p_0,p_2\}\), \(\{p_0,p_1\}\xrightarrow{b}\{p_0,p_1\}\),
+\(\{p_0,p_2\}\xrightarrow{a}\{p_0\}\), \(\{p_0,p_2\}\xrightarrow{b}\{p_0,p_1\}\); final \(\{p_0,p_2\}\).</p>
+<p>4. \(w=a^{n+1}b^n\); \(y=a^j\); \(i=0\) gives \(a^{n+1-j}b^n\) with \(n+1-j\le n\): not in L.</p>
+<p>5. Nullable S. Remove λ: \(S\to aSb\mid ab\mid SS\) (and \(S\to S\), dropped). CNF: \(S\to AX\mid AB\mid SS,\ X\to SB,\ A\to a,\ B\to b\).
+CYK on aabb: row1 A,A,B,B; row2 ∅,S,∅; row3 ∅ (a|abb: A·∅; aa|bb: ∅), X (abb = ab|b: S·B → X); row4: a|abb: A·X → S. S ∈ top ⇒ accepted.</p>
+<p>6. Ch. 11 Example 1.</p>
+<p>7. Reduce halting: given M, w, build M′ that simulates M using a tape alphabet without 1 (rename 1 to a new symbol), and when M
+would halt, writes 1. M′ writes 1 on w ⇔ M halts on w.</p>
+</div>
