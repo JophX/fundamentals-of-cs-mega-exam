@@ -1,40 +1,45 @@
-<h1>24. Functional and logic languages <span class="tag pl">PL</span></h1>
+<h1>24. Two other ways to think: functional and logic languages <span class="tag pl">PL</span></h1>
 
-<h2>24.1 Functional languages</h2>
-<p>Family: LISP → Scheme, ML, Haskell, Erlang. Defining feature: <b>no side effects</b> — a function’s result depends only on its
-arguments. The lecture’s <code>member</code> in two languages:</p>
+<h2>24.1 The functional family</h2>
+<p>You’ve spent all of Part III inside Haskell, so you already know the functional way of thinking. Here it is in a sentence: a program
+is a set of <b>function definitions</b>, and a function’s result depends <b>only on its arguments</b> — no hidden state, no side
+effects. The family tree: LISP (1958!) → Scheme, ML, Haskell, Erlang.</p>
+<p>Here is the same function — “is <code>a</code> in the list?” — in three of them. Notice they all say the same thing: an empty list
+contains nothing; otherwise, check the first element, or look in the rest.</p>
 <pre class="code text">; Scheme
 (DEFINE (member a lst)
-  (COND ((NULL? lst) '())
+  (COND ((NULL? lst) #F)
         ((EQ? a (CAR lst)) #T)
         (ELSE (member a (CDR lst)))))
 
 (* ML *)
-fun member a []      = false
-  | member a (b::l)  = a = b orelse member a l</pre>
-<p>In Haskell: <code>member a [] = False; member a (b:l) = a == b || member a l</code>. Haskell is <b>purely</b> functional, handles
-I/O in a controlled way, and has <b>non-strict (lazy) semantics</b>: <code>squares = [n*n | n &lt;- [0..]]</code> is an infinite
-list that is only computed as far as needed.</p>
-<div class="box def"><span class="t">Advantages (slide)</span>
-<p>Programs are easier to <b>prove correct</b> and to <b>transform</b> (referential transparency); functions are
-<b>first-class citizens</b>; simpler syntax and semantics; natural for many problems; easy to parallelise (no shared state).
-Disadvantages: less efficient on conventional hardware, I/O and state are awkward, unfamiliar. Many imperative languages have
-adopted functional features: lambdas / functions as parameters in Java, JavaScript, Python, Ruby, C#.</p>
+fun member a []     = false
+  | member a (b::l) = a = b orelse member a l
+
+-- Haskell
+member a []    = False
+member a (b:l) = a == b || member a l</pre>
+<p>Haskell goes further than most: it is <b>purely</b> functional and <b>lazy</b> — nothing is computed until it’s needed, which is why
+an infinite list like <code>[n*n | n &lt;- [0..]]</code> is perfectly fine.</p>
+<div class="box def"><span class="t">Why people love functional languages</span>
+<p>Programs are easier to <b>prove correct</b> and to <b>transform</b> (a name always means the same value); functions are
+<b>first-class</b> (pass them around like data); the syntax and meaning are small and clean; and with no shared changing state, parallel
+execution is much safer. <b>Downsides</b>: on ordinary hardware they can be slower, and input/output and state are awkward. The ideas
+have spread everywhere: Java, JavaScript, Python, Ruby and C# all have lambdas and pass functions as parameters.</p>
 </div>
 
-<h2>24.2 Logic programming (Prolog)</h2>
-<div class="box intuition"><span class="t">Intuition</span>
-<p>You don’t tell the computer <i>how</i> to solve the problem. You state <b>facts</b> and <b>rules</b> about the problem domain,
-then ask whether a <b>goal</b> follows. A built-in <b>proof engine</b> searches for an answer (by unification and backtracking).
-Example: “a sorted list is a permutation of the old list in which every element is ≤ the next” — that’s the whole sort program.</p>
-</div>
+<h2>24.2 Logic programming: say what, not how</h2>
+<p>Every language so far makes you describe <b>how</b> to compute something. Logic programming flips that. You describe <b>what is
+true</b> — facts and rules — and then ask questions. A built-in search engine works out the answer.</p>
+<p>Think about sorting. In Java you write the steps of an algorithm. In a logic language you could say: “<i>a sorted version of a list is a
+rearrangement of it in which every element is ≤ the next</i>” — and that description <i>is</i> the program.</p>
+<p>Here’s a small Prolog program. Facts first, then one rule: “X is a professor of Y if X teaches some course C and Y studies C”.</p>
 <pre class="code prolog" data-lang="prolog" data-src="verify/prolog.pl"></pre>
-<p>Queries (run in SWI-Prolog): “What does charlie study?”, “Who are kirke’s students?”, “Who teaches jack?”</p>
-<pre class="run" data-cmd="swipl -q -g &quot;forall(studies(charlie,W),(write(W),nl)), forall(professor(kirke,S),(write(S),nl)), forall(professor(P,jack),(write(P),nl)), halt.&quot; verify/prolog.pl" data-show="?- studies(charlie, What).   ?- professor(kirke, Students).   ?- professor(Who, jack)."></pre>
-<p>To answer <code>professor(kirke, S)</code>: find <code>teaches(kirke, C)</code> → <code>C = csc135</code>; then
-<code>studies(S, csc135)</code> → <code>S = charlie</code>, and on backtracking <code>S = olivia</code>. Matching patterns with
-variables is <b>unification</b>; trying the next alternative when one fails is <b>backtracking</b>.</p>
-<p><b>Limitations</b> (slide): efficiency (blind search can be very slow); the programmer must still think about the search order
-(order of rules matters, left recursion can loop forever); answers are only true/fail; <b>negation</b> is “not provable” (closed-world
-assumption), not logical negation. The <b>cut</b> <code>!</code> partly controls the search (stop backtracking). Applications:
-databases, expert systems, AI, natural language.</p>
+<p>Now we ask three questions — what does charlie study? who are kirke’s students? who teaches jack?</p>
+<pre class="run" data-cmd="swipl -q -g &quot;forall(studies(charlie,W),(write(W),nl)), forall(professor(kirke,S),(write(S),nl)), forall(professor(P,jack),(write(P),nl)), halt.&quot; verify/prolog.pl"></pre>
+<p>How did it find kirke’s students? It looked for <code>teaches(kirke, C)</code> and found <code>C = csc135</code>. Then it looked for
+<code>studies(S, csc135)</code> and found charlie — and when asked for more, it <b>backtracked</b> and found olivia. Matching patterns with
+variables like this is called <b>unification</b>.</p>
+<p><b>The catches</b>: the blind search can be very slow; the order you write rules in still matters (a badly placed recursive rule can
+loop forever); answers are only “true” or “fail”; and “not” means “can’t be proven”, which isn’t the same as “false”. The <b>cut</b>
+(<code>!</code>) lets the programmer prune the search. Logic languages shine in databases, expert systems and AI.</p>

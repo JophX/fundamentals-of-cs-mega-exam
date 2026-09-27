@@ -28,7 +28,7 @@ grammar in CNF. (If \(\lambda\in L(G)\), the CNF grammar generates \(L(G)\setmin
 <tr><td>\(A\to ab\)</td><td>✘</td><td>two terminals</td></tr>
 </table>
 
-<h2>1.1 The recipe (Linz order: λ → units → useless → shape)</h2>
+<h2>1.1 The recipe (always in this order: λ → units → useless → shape)</h2>
 <div class="box recipe"><span class="t">Recipe: converting to CNF — always in this order</span>
 <ol>
   <li><b>Remove λ-productions.</b>
@@ -161,7 +161,3 @@ variable that <i>only</i> produces \(a\) is required.</p>
 </ul>
 </div>
 
-<h3>Proof that these answers are right</h3>
-<p>Each grammar below was compared with the original on every non-empty string (up to the length shown) using a
-general parser, and checked to be in CNF:</p>
-<pre class="run" data-cmd="python3 verify/pack_cnf.py --check" data-show="python3 verify/pack_cnf.py --check"></pre>

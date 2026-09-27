@@ -1,70 +1,76 @@
-<h1>13. Decidability, countability, the halting problem <span class="tag fcs">FCS</span></h1>
+<h1>13. What no machine can do <span class="tag fcs">FCS</span></h1>
 
-<h2>13.1 Recursive vs recursively enumerable</h2>
-<div class="box def"><span class="t">Definitions</span>
+<p>You’d think a machine powerful enough to run any program could answer any well-defined yes/no question. This chapter shows
+that’s false — and not for some exotic question, but for a very practical one: <b>“will this program ever stop?”</b></p>
+
+<h2>13.1 Two kinds of “solving”</h2>
+<p>A Turing machine that answers questions can behave in two ways, and the difference is everything:</p>
 <ul>
-  <li>\(L\) is <b>recursively enumerable (RE)</b> if some TM accepts exactly \(L\): on \(w\in L\) it halts and accepts; on
-    \(w\notin L\) it rejects <b>or runs forever</b>. (A <b>recognizer</b>.)</li>
-  <li>\(L\) is <b>recursive (decidable)</b> if some TM accepts \(L\) and <b>halts on every input</b>. (A <b>decider</b>.)</li>
-  <li>A <b>problem</b> is decidable if the language of its yes-instances is recursive.</li>
+  <li>A <b>decider</b> always halts: “yes” or “no”, every time. A language with a decider is <b>recursive</b> (= <b>decidable</b>).</li>
+  <li>A <b>recognizer</b> halts with “yes” on every yes-instance, but on a no-instance it may say “no” — or <b>run forever</b>.
+    A language with a recognizer is <b>recursively enumerable (RE)</b>.</li>
 </ul>
+<div class="box intuition"><span class="t">Why the difference matters</span>
+<p>If a recognizer has been running for an hour, you don’t know whether the answer is “no” or “not yet”. A decider never leaves you
+hanging.</p>
 </div>
-<div class="box thm"><span class="t">Key facts</span>
-<ul>
-  <li>Recursive ⊂ RE (strict). Recursive languages are closed under complement (swap accept/reject of the decider).</li>
-  <li><b>If \(L\) and \(\overline L\) are both RE, then \(L\) is recursive</b>: run both recognizers in parallel (one step each);
-    one of them must accept.</li>
-  <li>So \(\overline H\) (the complement of the halting problem) is <b>not</b> RE.</li>
-</ul>
-</div>
-<div class="box trap"><span class="t">FCS Q1 true/false traps</span>
-<ul>
-  <li>“It can be correct to say that a Turing machine M is decidable.” — <b>False</b>. Languages/problems are decidable; a
-    <i>machine</i> is a decider (halts always) or not. (Expected answer: false.)</li>
-  <li>“The set of suitably encoded Turing machines is RE.” — <b>True</b> (even recursive: a TM can check whether a string is a
-    valid encoding).</li>
-</ul>
+<p>One neat consequence: if a language <b>and</b> its complement are both RE, the language is decidable. Run both recognizers side by
+side, one step each; one of them must eventually say yes — and then you know the answer.</p>
+
+<div class="box trap"><span class="t">True/false traps</span>
+<p>“It can be correct to say that a Turing machine M is decidable” — <b>false</b>: <i>languages</i> or <i>problems</i> are decidable;
+a machine is a decider or not. “The set of (encoded) Turing machines is RE” — <b>true</b>: a machine can check whether a string is a
+valid encoding.</p>
 </div>
 
-<h2>13.2 Countability and diagonalization</h2>
-<div class="box intuition"><span class="t">Intuition</span>
-<p>There are only <b>countably many</b> TMs (each is a finite string, and strings can be listed by length). But there are
-<b>uncountably many</b> languages (all subsets of \(\Sigma^*\)). So most languages have no TM at all.</p>
+<h2>13.2 There are more problems than programs</h2>
+<p>Before the halting problem, a simpler shock. Machines are finite descriptions — strings — so we can list them all: machine 1,
+machine 2, machine 3… (<b>countably many</b>). But how many languages are there? Let’s try to list them too and see what goes wrong:</p>
+<div class="box intuition"><span class="t">Cantor’s diagonal trick</span>
+<p>Suppose someone claims they’ve listed every language: \(L_1, L_2, L_3,\dots\). List all strings too: \(w_1,w_2,w_3,\dots\). Now build a
+new language \(D\) by going down the diagonal and doing the <b>opposite</b>: put \(w_i\) in \(D\) exactly when \(w_i\) is <b>not</b> in \(L_i\).</p>
+<p>Is \(D\) on the list? It can’t be \(L_1\) — they disagree about \(w_1\). It can’t be \(L_2\) — they disagree about \(w_2\). It can’t be any
+\(L_i\). So the list was incomplete. No list of languages can ever be complete: there are <b>uncountably</b> many.</p>
 </div>
-<div class="box thm"><span class="t">Cantor: \(2^{\Sigma^*}\) is uncountable</span>
-<p>Suppose the languages could be listed \(L_1,L_2,L_3,\dots\) and list the strings \(w_1,w_2,w_3,\dots\). Define
-\(D=\{w_i\mid w_i\notin L_i\}\). For each \(i\), \(D\) differs from \(L_i\) on the string \(w_i\) (flip the diagonal). So \(D\)
-is not in the list — contradiction. Hence there are languages that are <b>not RE</b>.</p>
-</div>
+<p>So there are more languages than machines — most languages have <b>no machine at all</b>. That’s abstract, though. Let’s find a
+real one.</p>
 
 <h2>13.3 The halting problem</h2>
-<div class="box thm"><span class="t">Theorem</span>
-<p>\(H=\{\langle M\rangle w \mid M \text{ halts on } w\}\) is RE but <b>not recursive</b>.</p>
-<p><b>RE:</b> the universal TM simulates \(M\) on \(w\) and accepts if it halts.</p>
-<p><b>Not recursive (proof by contradiction):</b> suppose a TM \(H_D\) decides it. Build \(D\): on input \(\langle M\rangle\), run
-\(H_D\) on \(\langle M\rangle\langle M\rangle\); if it says “halts”, loop forever; if it says “doesn’t halt”, halt. Now run \(D\)
-on \(\langle D\rangle\): \(D\) halts ⇔ \(H_D\) says \(D\) doesn’t halt on \(\langle D\rangle\) ⇔ \(D\) doesn’t halt.
-Contradiction. So no such \(H_D\).</p>
+<p><b>Question:</b> given a machine \(M\) and an input \(w\), does \(M\) halt on \(w\)?</p>
+<p>It is <b>RE</b>: just run \(M\) on \(w\) (with the universal machine), and say yes if it halts. But is it <b>decidable</b>? Suppose it
+were — suppose there is a perfect machine \(H\) that always correctly answers “does \(M\) halt on \(w\)?”. Watch what we can build with
+it:</p>
+<div class="box thm"><span class="t">The proof — a machine that contradicts itself</span>
+<p>Build a troublemaker \(D\). On input \(\langle M\rangle\) (a machine’s description), \(D\) asks \(H\): “does \(M\) halt when given its
+own description?” Then \(D\) does the <b>opposite</b>: if \(H\) says “halts”, \(D\) loops forever; if \(H\) says “loops”, \(D\) halts.</p>
+<p>Now feed \(D\) its own description. Does \(D\) halt on \(\langle D\rangle\)?</p>
+<ul><li>If it halts, then \(H\) said “\(D\) loops” — so \(H\) was wrong.</li>
+<li>If it loops, then \(H\) said “\(D\) halts” — wrong again.</li></ul>
+<p>Either way \(H\) is wrong. So a perfect \(H\) cannot exist: <b>the halting problem is undecidable</b>. (And since it is RE but not
+decidable, its complement is not even RE.)</p>
 </div>
+<p>Notice it’s the diagonal trick again: \(D\) is built to disagree with every machine on that machine’s own description.</p>
 
-<h2>13.4 Reductions</h2>
-<div class="box recipe"><span class="t">Recipe: proving problem B is undecidable</span>
+<h2>13.4 Reductions: spreading the impossibility</h2>
+<p>Once one problem is known to be impossible, we can show others are impossible <b>without starting from scratch</b>. The argument
+goes: “if I could solve <i>your</i> problem, I could use it to solve the halting problem — and that’s impossible, so I can’t solve yours
+either.”</p>
+<div class="box recipe"><span class="t">Recipe: proving problem B undecidable</span>
 <ol>
-  <li>Pick a known undecidable problem A (usually halting).</li>
-  <li>Assume B is decidable by a decider \(M_B\).</li>
-  <li>Show how to use \(M_B\) to decide A: given an instance of A, <b>construct</b> (by an algorithm that always halts) an
-    instance of B whose answer is the same.</li>
-  <li>Then A would be decidable — contradiction.</li>
+<li>Assume B has a decider.</li>
+<li>Take any halting question “does \(M\) halt on \(w\)?”. Show how to <b>transform</b> it (by an algorithm that always finishes) into a
+B-question with the <b>same answer</b>.</li>
+<li>Then B’s decider would decide halting. Contradiction.</li>
 </ol>
-<p>Direction matters: reduce the <b>known hard</b> problem <b>to</b> the new one.</p>
+<p>Direction matters: you transform the <b>known impossible</b> problem <b>into</b> the new one.</p>
 </div>
-<h3>Example: the state-entry problem</h3>
-<p>“Given \(M\), \(w\), and a state \(q\): does \(M\) ever enter \(q\) on \(w\)?” Reduce halting: given \(\langle M\rangle, w\),
-build \(M'\): add a new state \(q_{new}\); wherever \(M\) would halt (\(\delta(p,a)\) undefined), make \(M'\) go to \(q_{new}\).
-Then \(M'\) enters \(q_{new}\) on \(w\) ⇔ \(M\) halts on \(w\). A decider for state-entry would decide halting. So state-entry
-is undecidable.</p>
-<h3>Example: blank-tape halting</h3>
-<p>Given \(M, w\), build \(M_w\): starting on a blank tape, it first writes \(w\), then runs \(M\). \(M_w\) halts on blank ⇔
-\(M\) halts on \(w\). So blank-tape halting is undecidable.</p>
-<p><b>Rice’s theorem</b> (general version): every non-trivial property of the <i>language</i> of a TM (“is \(L(M)\) empty?”,
-“finite?”, “regular?”) is undecidable.</p>
+<p><b>Example: “does \(M\) ever enter state \(q\) on input \(w\)?”</b> Given \(M, w\), build \(M'\): a copy of \(M\) with one extra state
+\(q_{new}\), and wherever \(M\) would halt, \(M'\) instead goes to \(q_{new}\). Then \(M'\) enters \(q_{new}\) ⇔ \(M\) halts. So a solver for
+state-entry would solve halting — impossible.</p>
+<p><b>Example: “does \(M\) halt when started on a blank tape?”</b> Given \(M, w\), build \(M_w\): it first writes \(w\) on the tape, then
+behaves like \(M\). \(M_w\) halts on blank ⇔ \(M\) halts on \(w\).</p>
+<p>In fact almost every interesting question about what programs do — “is its language empty?”, “finite?”, “regular?” — is undecidable
+(<b>Rice’s theorem</b>). This is why no compiler can perfectly detect all infinite loops.</p>
+
+<p><b>Where we’re going next.</b> Among the problems we <i>can</i> solve, some take a blink and some would take longer than the age of
+the universe. Measuring that difference is complexity theory.</p>

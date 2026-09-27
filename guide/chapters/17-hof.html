@@ -1,5 +1,8 @@
 <h1>17. Higher-order functions: map, filter, fold, lambda <span class="tag pl">PL</span></h1>
 
+<p>By now you may have noticed you keep writing the same shape of recursion: walk down a list, do something to each element, or
+keep some elements, or combine them all. Programmers hate repeating themselves — so functional languages capture those shapes
+<b>once</b>, as functions that take <i>other functions</i> as arguments. This is where Haskell starts to feel powerful.</p>
 <div class="box intuition"><span class="t">Functions are values</span>
 <p>In Haskell a function can be <b>passed as an argument</b> and <b>returned as a result</b> (“first-class citizens”). A function
 that takes or returns a function is <b>higher-order</b>. <code>map</code>, <code>filter</code> and <code>fold</code> capture the

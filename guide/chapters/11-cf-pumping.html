@@ -41,14 +41,13 @@ the \(b\)-blocks mismatching. Case analysis (first half / middle / second half) 
 <div class="box trap"><span class="t">FCS exam Q4 (2022/2025 cover): the language printed is actually context-free</span>
 <p>\(L=\{w\mid |w|_a&gt;2|w|_b\}\cup\{w\mid 2|w|_a&lt;|w|_b\}\). Each part is recognised by a PDA that uses its stack as a
 counter (add 1 per \(a\), subtract 2 per \(b\); accept if the counter is positive), and CFLs are closed under union. So \(L\) is
-context-free, and no correct proof of the opposite exists. A grammar for it (checked on every string up to length 12):</p>
+context-free, and no correct proof of the opposite exists. A grammar for it:</p>
 <p>\(S\to A\mid B,\ A\to EaE\mid EaA,\ B\to FbF\mid FbB,\) \(E\to aEaEbE\mid aEbEaE\mid bEaEaE\mid\lambda,\) \(F\to bFbFaF\mid bFaFbF\mid aFbFbF\mid\lambda\)</p>
 <p><b>If this happens on your exam:</b> don’t freeze. Write briefly why the attempt fails, give the PDA/union argument, and say
 you believe the question contains a mistake — then move on. If a similar question appears with three letters, e.g.
 \(\{w\in\{a,b,c\}^*\mid |w|_a=|w|_b=|w|_c\}\), it <i>is</i> non-CF: intersect with the regular \(a^*b^*c^*\) to get
 \(a^nb^nc^n\) (CFL ∩ regular is CF, so if \(L\) were CF, \(a^nb^nc^n\) would be too).</p>
 </div>
-<pre class="run" data-cmd="python3 verify/fcs_q4.py" data-show="python3 verify/fcs_q4.py"></pre>
 
 <h2>11.1 Closure properties of CFLs</h2>
 <table class="wide">

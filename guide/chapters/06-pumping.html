@@ -1,49 +1,66 @@
-<h1>6. The pumping lemma for regular languages <span class="tag fcs">FCS</span></h1>
+<h1>6. Proving a language is NOT regular: the pumping lemma <span class="tag fcs">FCS</span></h1>
 
-<div class="box intuition"><span class="t">Intuition: the pigeonhole principle</span>
-<p>A DFA with \(n\) states reading a string of length ≥ \(n\) visits \(n+1\) states — so some state repeats. The part of the
-string read between the two visits is a <b>loop</b>. You can go around that loop 0 times, twice, 100 times, and the DFA ends
-in the same place. So every long string in a regular language has a piece \(y\) near the start that can be <b>pumped</b>.</p>
-<p>We use it <b>backwards</b>: find a language where pumping breaks the string — then it can’t be regular.</p>
+<p>It’s easy to show a language <i>is</i> regular: build the machine. But how do you show that <b>no</b> machine exists — not one
+you failed to find, but one that <i>cannot</i> exist? You need a property every regular language has, and then show your language
+doesn’t have it.</p>
+
+<h2>6.1 Where the property comes from</h2>
+<div class="box intuition"><span class="t">The pigeonhole idea</span>
+<p>Take a DFA with, say, 5 states. Feed it a string of length 5 or more. Reading 5 letters it passes through 6 states — but
+there are only 5. So <b>some state repeats</b>. (Six pigeons, five holes: two pigeons share a hole.)</p>
+<p>The letters read between the two visits to that state form a <b>loop</b> in the machine. Now here’s the key: the machine
+can’t tell how many times it went around that loop. Go around zero times, twice, a hundred times — it ends up in the same place
+at the end, so it gives the same verdict.</p>
+<p>So in every long enough accepted string there’s a piece near the start — call it \(y\) — that you can <b>pump</b>: delete it,
+or repeat it, and the string stays in the language.</p>
 </div>
 
-<div class="box thm"><span class="t">The lemma (as given in the exam appendix)</span>
-<p>If \(L\) is regular, there is \(n\ge 1\) such that every \(w\in L\) with \(|w|\ge n\) can be written \(w=xyz\) with
-\(|xy|\le n\) and \(|y|\ge 1\), such that \(xy^iz\in L\) for <b>all</b> \(i\ge 0\).</p>
+<p>Written formally (you get this on the exam’s definition sheet):</p>
+<div class="box thm"><span class="t">Pumping lemma for regular languages</span>
+<p>If \(L\) is regular, there is a number \(n\) such that every \(w\in L\) with \(|w|\ge n\) can be split as \(w=xyz\) with
+\(|xy|\le n\), \(|y|\ge1\), and \(xy^iz\in L\) for <b>every</b> \(i\ge0\).</p>
 </div>
+<p>(\(n\) is the number of states; \(|xy|\le n\) because the repeat happens within the first \(n\) letters; \(|y|\ge1\) because a
+loop reads at least one letter.)</p>
 
-<div class="box recipe"><span class="t">Recipe: proving L is NOT regular — it’s a game</span>
+<h2>6.2 Using it: think of it as a game</h2>
+<p>To prove \(L\) is <b>not</b> regular, you play a game against an opponent who claims it is — and you show you can always win:</p>
 <ol>
-  <li><b>Assume</b> \(L\) is regular. Let \(n\) be the pumping constant. (The opponent picks \(n\) — you don’t know it.)</li>
-  <li><b>You pick</b> a string \(w\in L\) with \(|w|\ge n\), <b>depending on \(n\)</b>. Choose it so that the first \(n\) letters are
-    all the same letter — then \(y\) is trapped there.</li>
-  <li><b>The opponent</b> splits \(w=xyz\) with \(|xy|\le n\), \(|y|\ge1\). You must handle <b>every</b> possible split.</li>
-  <li><b>You pick</b> an \(i\) (usually 0 or 2) so that \(xy^iz\notin L\).</li>
-  <li>Contradiction ⇒ \(L\) is not regular.</li>
+  <li><b>Opponent</b>: “It’s regular, and my pumping number is \(n\).” (You don’t know \(n\) — work with the letter.)</li>
+  <li><b>You</b>: pick a string \(w\) in \(L\) of length at least \(n\). <b>This is your big move.</b> Choose it so the first
+    \(n\) letters are all the same — then the opponent’s \(y\) is trapped there.</li>
+  <li><b>Opponent</b>: splits \(w=xyz\) any way they like, as long as \(|xy|\le n\), \(|y|\ge1\). You must beat <b>every</b>
+    possible split.</li>
+  <li><b>You</b>: pick how many times to pump (\(i=0\) or \(i=2\) usually) so the result falls out of \(L\).</li>
+  <li>You won ⇒ contradiction ⇒ \(L\) is not regular.</li>
 </ol>
-</div>
 
-<h3>Example 1: \(L=\{a^kb^k\mid k\ge0\}\)</h3>
-<p>Assume regular, constant \(n\). Pick \(w=a^nb^n\in L\), \(|w|=2n\ge n\). Any split with \(|xy|\le n\) has \(xy\) inside the
-first \(n\) letters, which are all \(a\)’s, so \(y=a^j\) with \(j\ge1\). Pump \(i=2\): \(xy^2z=a^{n+j}b^n\). It has more \(a\)’s
-than \(b\)’s, so it is not in \(L\). Contradiction; \(L\) is not regular.</p>
+<h3>The classic: \(\{a^kb^k\mid k\ge0\}\)</h3>
+<p>Assume \(L\) is regular with pumping number \(n\). Choose \(w=a^nb^n\) — it’s in \(L\) and has length \(2n\ge n\). Whatever
+split the opponent chooses, \(|xy|\le n\) means \(x\) and \(y\) sit inside the first \(n\) letters, which are all <i>a</i>’s. So
+\(y=a^j\) for some \(j\ge1\). Pump with \(i=2\): \(xy^2z=a^{n+j}b^n\) — more a’s than b’s, not in \(L\). Contradiction, so \(L\) is
+not regular.</p>
+<p>Read that proof again and notice how little there is to it. The choice \(w=a^nb^n\) did all the work: it forced \(y\) to be only
+a’s.</p>
 
-<h3>Example 2: \(L=\{ww^R\}\) (even palindromes)</h3>
-<p>Pick \(w=a^nbba^n\). \(y=a^j\) inside the first block. \(i=0\): \(a^{n-j}bba^n\) is not a palindrome. Not regular.</p>
-
-<h3>Example 3: \(L=\{a^{k^2}\}\)</h3>
-<p>Pick \(w=a^{n^2}\). \(1\le|y|=j\le n\). \(i=2\): length \(n^2+j\), and \(n^2<n^2+j\le n^2+n<(n+1)^2\). Strictly between two
-consecutive squares, so not a square. Not regular.</p>
-
-<h3>Example 4: \(\{w\mid |w|_a=|w|_b\}\)</h3>
-<p>Pick \(w=a^nb^n\) again (it’s in \(L\)); same argument as Example 1. <i>Alternative trick:</i> if \(L\) were regular, then
-\(L\cap a^*b^*=\{a^nb^n\}\) would be regular (closure under ∩) — contradiction.</p>
-
-<div class="box trap"><span class="t">Where people lose points</span>
+<h3>More, same pattern</h3>
 <ul>
-  <li>Choosing a specific number like \(w=a^5b^5\). The string must depend on \(n\).</li>
-  <li>Choosing the split yourself (“let \(y=a\)”). You must argue for <b>all</b> splits.</li>
-  <li>Using the lemma to prove a language <b>is</b> regular. It can’t do that (it is only a necessary condition).</li>
-  <li>Forgetting to say “contradiction, so \(L\) is not regular” at the end.</li>
+  <li>\(\{ww^R\}\): choose \(w=a^nbba^n\). \(y\) is a’s from the first block; \(i=0\) makes the halves unequal — not a palindrome.</li>
+  <li>\(\{a^nb^m\mid n&gt;m\}\): choose \(w=a^{n+1}b^n\); \(i=0\) removes at least one a, leaving #a ≤ #b.</li>
+  <li>\(\{a^{k^2}\}\): choose \(w=a^{n^2}\); \(i=2\) gives length between \(n^2\) and \(n^2+n&lt;(n+1)^2\) — not a square.</li>
+  <li>\(\{w\mid |w|_a=|w|_b\}\): a shortcut! If it were regular, so would be its intersection with the regular \(a^*b^*\) — but that’s
+    \(\{a^nb^n\}\). Closure properties can prove non-regularity too.</li>
+</ul>
+
+<div class="box trap"><span class="t">How these proofs lose points</span>
+<ul>
+  <li>Picking a concrete number like \(w=a^5b^5\). Your string must use \(n\).</li>
+  <li>Choosing the split yourself (“let \(y=a\)”). The opponent chooses; you must handle all splits.</li>
+  <li>Trying to use the lemma to prove a language <b>is</b> regular. It can’t — it only rules things out.</li>
+  <li>Forgetting the last sentence: “contradiction, so \(L\) is not regular.”</li>
 </ul>
 </div>
+
+<p><b>Where we’re going next.</b> So finite memory can’t count. How much memory do we need to add to match a’s with b’s — and
+brackets with brackets? Surprisingly little: a stack. And the way to <i>describe</i> such languages is one of the most useful
+tools in all of computer science: the grammar.</p>

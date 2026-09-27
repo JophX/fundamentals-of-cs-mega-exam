@@ -1,5 +1,7 @@
 <h1>16. Recursion and accumulators <span class="tag pl">PL</span></h1>
 
+<p>No loops. So how do you do something for every element of a list? This chapter answers that, and it’s the most important
+chapter of Part III: once recursion “clicks”, every Haskell exam question becomes a variation on two patterns you’ll learn here.</p>
 <div class="box intuition"><span class="t">How to think recursively (“trust the recursion”)</span>
 <p>To write <code>mySum (x:xs)</code>, <b>pretend <code>mySum xs</code> already works</b>. If <code>mySum [2,3]</code> is 5,
 then <code>mySum [1,2,3]</code> is <code>1 + 5</code>. You only have to answer two questions: <b>what’s the answer for the

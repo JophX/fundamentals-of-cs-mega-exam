@@ -1,143 +1,162 @@
-<h1>7. Context-free grammars <span class="tag both">BOTH</span></h1>
+<h1>7. Grammars: describing things that nest <span class="tag both">BOTH</span></h1>
 
-<div class="box intuition"><span class="t">Intuition: rules for rewriting</span>
-<p>A grammar is a set of <b>rewrite rules</b>. Start with the symbol \(S\) and keep replacing a variable (capital letter) by
-the right side of one of its rules, until only letters (terminals) remain. Every string you can reach this way is in the
-language.</p>
-<p>What grammars can do and automata can’t: <b>matching things that are far apart</b>. The rule \(S\to aSb\) puts an
-\(a\) on the left and a \(b\) on the right <i>at the same time</i> — that’s how you get “the same number of a’s and b’s”.
-That’s also how programming languages match <code>(</code> with <code>)</code> and <code>{</code> with <code>}</code>.</p>
+<p>Think about brackets in code: <code>{ if (x) { while (y) { … } } }</code>. Every opening bracket needs its partner, and they
+nest inside each other. We just proved finite machines can’t handle this. So how do programming languages describe their own
+syntax? With a <b>grammar</b>. This chapter is worth more points than any other on the PL exam — so let’s take it slowly.</p>
+
+<h2>7.1 A grammar is a set of rewrite rules</h2>
+<div class="box intuition"><span class="t">The game</span>
+<p>You start with one symbol, \(S\). You have rules like \(S\to aSb\) (“you may replace \(S\) by \(aSb\)”). You keep replacing
+capital letters using the rules until only small letters are left. Every string you can end up with is in the language.</p>
+</div>
+<p>Let’s play with the grammar \(S\to aSb\mid\lambda\) (the bar \(|\) means “or”: two rules, \(S\to aSb\) and \(S\to\lambda\)):</p>
+<p style="text-align:center">\(S \Rightarrow aSb \Rightarrow aaSbb \Rightarrow aaaSbbb \Rightarrow aaabbb\)</p>
+<p>Look at what happened. Each time we used \(S\to aSb\), an <i>a</i> appeared on the left <b>and</b> a <i>b</i> on the right,
+<b>at the same time</b>. The a’s and b’s are created in pairs, wrapped around the middle. So the counts are always equal:
+this grammar generates exactly \(\{a^nb^n\}\) — the language no finite machine could handle!</p>
+<p>That’s the superpower of grammars in one sentence: <b>a rule can put things on both sides at once</b>, which is exactly
+how you match partners that are far apart — a’s with b’s, <code>(</code> with <code>)</code>, <code>begin</code> with
+<code>end</code>.</p>
+
+<div class="box def"><span class="t">Definition — context-free grammar</span>
+<p>\(G=(V,T,S,P)\) — written \(G=(N,\Sigma,R,S)\) on the PL exam: <b>variables</b> (non-terminals, capital letters),
+<b>terminals</b> (the alphabet, small letters), a <b>start variable</b> \(S\), and <b>productions</b> \(A\to x\) where the left
+side is a <b>single variable</b>. “Context-free” means you may rewrite \(A\) whatever is around it.</p>
+<p>The language \(L(G)\) is all terminal strings you can derive from \(S\).</p>
 </div>
 
-<h2>7.1 Definitions</h2>
-<div class="box def"><span class="t">Context-free grammar</span>
-<p>\(G=(V,T,S,P)\) (Linz) or \(G=(N,\Sigma,R,S)\) (the PL exam): \(V\)/\(N\) = variables (non-terminals), \(T\)/\(\Sigma\) =
-terminals, \(S\) = start variable, \(P\)/\(R\) = productions of the form \(A\to x\) where \(A\) is <b>one variable</b> and
-\(x\) is any string of variables and terminals. “Context-free” = you may replace \(A\) no matter what surrounds it.</p>
-<p>\(L(G)=\{w\in T^*\mid S\Rightarrow^* w\}\). A language is <b>context-free</b> if some CFG generates it.</p>
-</div>
-<ul>
-  <li><b>Derivation</b>: a sequence of rewrites \(S\Rightarrow aSb\Rightarrow aaSbb\Rightarrow aabb\).</li>
-  <li><b>Leftmost derivation</b>: always rewrite the <b>leftmost</b> variable. <b>Rightmost</b>: always the rightmost.</li>
-  <li><b>Derivation (parse) tree</b>: root \(S\); each rewrite \(A\to x\) gives \(A\) children = the symbols of \(x\); the
-    leaves read left to right give the string.</li>
-  <li><b>Ambiguous grammar</b>: some string has <b>two different parse trees</b> (equivalently, two different leftmost
-    derivations).</li>
-</ul>
-
-<h3>Example: derivations and a tree</h3>
-<p>Grammar \(S\to aSbS\mid\lambda\), string \(abab\). Leftmost derivation:
-\(S\Rightarrow aSbS\Rightarrow abS\Rightarrow abaSbS\Rightarrow ababS\Rightarrow abab\).</p>
+<h2>7.2 Derivations and trees</h2>
+<p>A <b>derivation</b> is the sequence of rewrites. When there are several variables to choose from, a <b>leftmost
+derivation</b> always rewrites the leftmost one. Example with \(S\to aSbS\mid\lambda\) and the string \(abab\):</p>
+<p style="text-align:center">\(S\Rightarrow aSbS\Rightarrow abS\Rightarrow abaSbS\Rightarrow ababS\Rightarrow abab\)</p>
+<p>The same thing drawn as a <b>parse tree</b> — each rewrite becomes a node with its children:</p>
 <div class="dot">digraph{node[shape=plaintext fontname="Helvetica"]; edge[arrowhead=none];
 S0[label="S"]; a1[label="a"]; S1[label="S"]; b1[label="b"]; S2[label="S"]; l1[label="λ"];
 a2[label="a"]; S3[label="S"]; b2[label="b"]; S4[label="S"]; l3[label="λ"]; l4[label="λ"];
 S0->a1; S0->S1; S0->b1; S0->S2; S1->l1; S2->a2; S2->S3; S2->b2; S2->S4; S3->l3; S4->l4;}</div>
+<p>Read the leaves left to right and you get the string. <b>This tree is what a parser builds from your code</b> — hold on to that
+picture, it comes back in Chapter 22.</p>
 
-<h2>7.2 The grammar recipe book</h2>
-<p>Almost every “construct a CFG” exam question is a combination of these patterns. <b>All of them were checked by computer on
-every string up to length 10–12.</b></p>
-
-<div class="box recipe"><span class="t">The core trick: build from the outside in</span>
-<p>If two things must be <b>equal in number</b> and they are on <b>opposite sides</b>, generate them together with a rule like
-\(S\to aSb\). Whatever is “in the middle” gets its own variable.</p>
+<h2>7.3 How to design a grammar — think from the outside in</h2>
+<p>Designing grammars feels hard only until you learn to see a few shapes. Here is the way of thinking I want you to practise:</p>
+<div class="box recipe"><span class="t">The method</span>
+<ol>
+  <li>Write 3 members and 3 non-members (Chapter 1’s habit).</li>
+  <li>Look for things that must <b>match in number</b>. If they are on opposite sides, create them together with one rule:
+    \(S\to aSb\).</li>
+  <li>Whatever sits in the middle, or is free, gets its own variable.</li>
+  <li>“or” in the description = separate alternatives \(S\to S_1\mid S_2\). “followed by” = \(S\to S_1S_2\).</li>
+  <li>Test: shortest member (λ?), two longer members, one non-member.</li>
+</ol>
 </div>
+
+<p>Let’s grow a family of grammars, each a small change of the last. Watch how the idea evolves:</p>
+
+<h3>Step 1 — exactly matched: \(a^nb^n\)</h3>
+<p>\(S\to aSb\mid\lambda\). One a, one b, at the same time.</p>
+
+<h3>Step 2 — a different ratio: \(a^nb^{2n}\)</h3>
+<p>Every a needs <i>two</i> b’s. So create them together: \(S\to aSbb\mid\lambda\). (And \(a^{2n}b^n\) is \(S\to aaSb\mid\lambda\).)</p>
+
+<h3>Step 3 — “at most”: \(a^nb^m\) with \(n\le m\)</h3>
+<p>Now there may be <i>extra</i> b’s. Matched pairs as before, plus a rule that adds a lone b:
+\(S\to aSb\mid Sb\mid\lambda\).</p>
+
+<h3>Step 4 — “not equal”: \(a^nb^m\) with \(n\ne m\)</h3>
+<p>This is the one people freeze on. The secret: <b>“not equal” means “more a’s OR more b’s”</b>. So build the matched part from
+the outside, and put <b>at least one</b> extra letter in the middle:</p>
+<p style="text-align:center">\(S\to aSb\mid A\mid B\qquad A\to aA\mid a\qquad B\to bB\mid b\)</p>
+<p>\(A\) is “one or more a’s”, \(B\) is “one or more b’s”. Try \(aaab\): \(S\Rightarrow aSb\Rightarrow aAb\Rightarrow aaAb\Rightarrow aaab\). ✔
+And \(ab\)? You’d need to end with \(A\) or \(B\), which always add at least one letter, so equal counts are impossible. ✔</p>
+
+<h3>Step 5 — three letters: \(a^nb^mc^{n+m}\)</h3>
+<p>The c’s must match the a’s <i>and</i> the b’s. Match a’s with the outer c’s first, then b’s with the inner c’s:
+\(S\to aSc\mid B,\ B\to bBc\mid\lambda\).</p>
+
+<h3>Step 6 — mirror images: palindromes</h3>
+<p>The first and last letters must be the same: \(S\to aSa\mid bSb\mid a\mid b\mid\lambda\).</p>
+
+<h3>Step 7 — order doesn’t matter: \(|w|_a=|w|_b\)</h3>
+<p>Now \(ba\) and \(abba\) are allowed. Idea: the first letter must be “paid back” by an opposite letter somewhere later:
+\(S\to aSbS\mid bSaS\mid\lambda\).</p>
 
 <table class="wide">
-<tr><th>#</th><th>Language</th><th>Grammar</th><th>Idea</th></tr>
-<tr><td>R1</td><td>\(a^nb^n\)</td><td>\(S\to aSb\mid\lambda\)</td><td>one a and one b at a time</td></tr>
-<tr><td>R2</td><td>\(a^nb^{2n}\)</td><td>\(S\to aSbb\mid\lambda\)</td><td>each a brings two b’s</td></tr>
-<tr><td>R2′</td><td>\(a^{2n}b^n\)</td><td>\(S\to aaSb\mid\lambda\)</td><td>two a’s per b</td></tr>
-<tr><td>R3</td><td>\(a^nb^m,\ n\le m\)</td><td>\(S\to aSb\mid Sb\mid\lambda\)</td><td>matched pairs + extra b’s</td></tr>
-<tr><td>R3′</td><td>\(a^nb^m,\ n&lt;m\)</td><td>\(S\to aSb\mid B,\ B\to bB\mid b\)</td><td>at least one extra b in the middle</td></tr>
-<tr><td>R4</td><td>\(a^nb^m,\ n\ne m\)</td><td>\(S\to aSb\mid A\mid B,\ A\to aA\mid a,\ B\to bB\mid b\)</td><td>≠ means “&gt; or &lt;”: extra a’s <i>or</i> extra b’s in the middle</td></tr>
-<tr><td>R5</td><td>\(a^nb^mc^{n+m}\)</td><td>\(S\to aSc\mid B,\ B\to bBc\mid\lambda\)</td><td>a’s pair with the outer c’s, b’s with the inner c’s</td></tr>
-<tr><td>R5′</td><td>\(a^nb^{n+m}c^m\)</td><td>\(S\to AB,\ A\to aAb\mid\lambda,\ B\to bBc\mid\lambda\)</td><td>split into \(a^nb^n\) followed by \(b^mc^m\)</td></tr>
-<tr><td>R6</td><td>\(a^ib^jc^k,\ i=j \text{ or } j=k\)</td><td>\(S\to AC\mid B\); \(A\to aAb\mid\lambda\), \(C\to cC\mid\lambda\); \(B\to aB\mid D\), \(D\to bDc\mid\lambda\)</td><td><b>“or” = union</b>: \(S\to S_1\mid S_2\)</td></tr>
-<tr><td>R7</td><td>palindromes</td><td>\(S\to aSa\mid bSb\mid a\mid b\mid\lambda\)</td><td>same letter on both ends</td></tr>
-<tr><td>R8</td><td>balanced: \(|w|_a=|w|_b\), every prefix has #a ≥ #b</td><td>\(S\to aSbS\mid\lambda\)</td><td>first a matched with “its” b</td></tr>
-<tr><td>R9</td><td>\(|w|_a=|w|_b\) (any order)</td><td>\(S\to aSbS\mid bSaS\mid\lambda\)</td><td>first letter is matched with an opposite letter</td></tr>
-<tr><td>R10</td><td>\(|w|_a\ge|w|_b\)</td><td>\(S\to T\mid TaS,\ T\to aTbT\mid bTaT\mid\lambda\)</td><td>balanced pieces with extra a’s between</td></tr>
-<tr><td>R11</td><td>everything, \((a+b)^*\)</td><td>\(S\to aS\mid bS\mid\lambda\)</td><td>regular languages are also CF</td></tr>
+<tr><th>Language</th><th>Grammar</th></tr>
+<tr><td>\(a^nb^n\)</td><td>\(S\to aSb\mid\lambda\)</td></tr>
+<tr><td>\(a^nb^{2n}\)</td><td>\(S\to aSbb\mid\lambda\)</td></tr>
+<tr><td>\(a^nb^m,\ n\le m\)</td><td>\(S\to aSb\mid Sb\mid\lambda\)</td></tr>
+<tr><td>\(a^nb^m,\ n&lt;m\)</td><td>\(S\to aSb\mid B,\ B\to bB\mid b\)</td></tr>
+<tr><td>\(a^nb^m,\ n\ne m\)</td><td>\(S\to aSb\mid A\mid B,\ A\to aA\mid a,\ B\to bB\mid b\)</td></tr>
+<tr><td>\(a^nb^mc^{n+m}\)</td><td>\(S\to aSc\mid B,\ B\to bBc\mid\lambda\)</td></tr>
+<tr><td>\(a^ib^jc^k,\ i=j\) or \(j=k\)</td><td>\(S\to AC\mid B\); \(A\to aAb\mid\lambda\), \(C\to cC\mid\lambda\); \(B\to aB\mid D\), \(D\to bDc\mid\lambda\)</td></tr>
+<tr><td>palindromes</td><td>\(S\to aSa\mid bSb\mid a\mid b\mid\lambda\)</td></tr>
+<tr><td>balanced brackets (a = “(”, b = “)”)</td><td>\(S\to aSbS\mid\lambda\)</td></tr>
+<tr><td>\(|w|_a=|w|_b\), any order</td><td>\(S\to aSbS\mid bSaS\mid\lambda\)</td></tr>
 </table>
-<pre class="run" data-cmd="python3 verify/ch07_cfg.py" data-show="python3 verify/ch07_cfg.py"></pre>
+<p class="small muted">Every grammar in this table was checked by computer against its description on all strings up to length 10–12.</p>
 
-<div class="box recipe"><span class="t">Combining patterns</span>
-<ul>
-  <li><b>Union</b> (“… or …”): \(S\to S_1\mid S_2\), build \(S_1\), \(S_2\) separately.</li>
-  <li><b>Concatenation</b> (“… followed by …”): \(S\to S_1S_2\).</li>
-  <li><b>Repetition</b>: \(S\to S_1S\mid\lambda\).</li>
-  <li><b>“Not equal”</b>: split into “less than” ∪ “greater than”.</li>
-  <li><b>Anything in between</b>: a variable like \(X\to aX\mid bX\mid\lambda\).</li>
-</ul>
-</div>
+<h2>7.4 The real exam questions, solved slowly</h2>
 
-<h2>7.3 The PL exam questions, solved slowly</h2>
-<h3>2023-03-16 / 2023-05-05 Problem 2 (10 p, asked twice)</h3>
-<p>\(L_1\) = strings over \(\{a,b\}\) with <b>(I)</b> exactly as many \(a\) as \(b\) and <b>(II)</b> every prefix has at least as
-many \(a\) as \(b\). Examples: \(\varepsilon, ab, aabb, aababbab\).</p>
-<p><b>Understand it first.</b> Read \(a\) as “(” and \(b\) as “)”. Then (I)+(II) says: the parentheses are <b>balanced</b>.
-\(aababbab\) = <code>(()())()</code>.</p>
-<p><b>Build it.</b> A non-empty balanced string starts with “(”. That “(” is closed by some “)”. What is between them is balanced,
-and what comes after is balanced. So \(w = a\,u\,b\,v\) with \(u,v\in L_1\):</p>
+<h3>“Equally many a and b, and every prefix has at least as many a as b” (10 p — asked twice)</h3>
+<p>This looks scary. It isn’t. Read <i>a</i> as “(” and <i>b</i> as “)”. “Every prefix has at least as many ( as )” means you never
+close a bracket that wasn’t opened. “Equally many” means everything gets closed. So this is just <b>correctly balanced
+brackets</b>: \(aababbab\) = <code>(()())()</code>.</p>
+<p>Now think about any non-empty balanced string. It starts with “(”. That bracket is closed by some “)”. Between them: a balanced
+string. After it: another balanced string. So:</p>
 <div class="box model"><span class="t">Answer</span>
 <p>\(S\to aSbS\mid\varepsilon\)</p>
-<p>Check: \(S\Rightarrow aSbS\Rightarrow abS\Rightarrow ab\). \(aabb\): \(S\Rightarrow aSbS\Rightarrow aaSbSbS\Rightarrow^* aabb\).
-\(ba\) cannot be produced since every rule starts with \(a\). Also correct: \(S\to SS\mid aSb\mid\varepsilon\) (but ambiguous).</p>
+<p>Check: \(S\Rightarrow aSbS\Rightarrow abS\Rightarrow ab\). ✔ \(aabb\): \(S\Rightarrow aSbS\Rightarrow aaSbSbS\Rightarrow aabSbS\Rightarrow aabbS\Rightarrow aabb\). ✔
+\(ba\): every rule that produces letters starts with \(a\), so impossible. ✔</p>
 </div>
 
-<h3>2023-05-05 Problem 1 (10 p): \(L=\{a^nb^m\mid n\ne 2m\}\)</h3>
-<div class="box trap"><span class="t">The exam contradicts itself</span>
-<p>The formula says \(n\ne 2m\) (#a ≠ 2·#b). The Swedish sentence says “antalet a inte är exakt hälften av antalet b”
-(#a is not half of #b, i.e. \(m\ne2n\)). On the exam: <b>write which one you answer</b> (“I follow the formula”), or answer both.</p>
+<h3>\(\{a^nb^m\mid n\ne 2m\}\) (10 p)</h3>
+<div class="box trap"><span class="t">Read carefully — this exam contradicted itself</span>
+<p>The formula says \(n\ne2m\): the number of a’s is not <b>twice</b> the number of b’s. The Swedish sentence under it said the
+number of a’s is not <b>half</b> the number of b’s, which is \(m\ne2n\). If that happens to you: write one line saying which
+reading you answer, then answer it.</p>
 </div>
-<p><b>Plan (formula reading).</b> The strings with \(n=2m\) are exactly R2′: \(E\to aaEb\mid\lambda\). “≠” means \(n&gt;2m\) or \(n&lt;2m\):</p>
+<p>Same trick as step 4: “not equal” = “too many” or “too few”. The <i>equal</i> case is \(E\to aaEb\mid\lambda\) (two a’s per b).</p>
 <ul>
-  <li>\(n&gt;2m\): an \(E\)-string with at least one extra \(a\) in front: \(A\to aA\mid aE\).</li>
-  <li>\(n&lt;2m\): every \(b\) comes with 0, 1 or 2 \(a\)’s, and at least one \(b\) comes with fewer than 2:
-    \(B\to aaBb\mid aUb\mid Ub\), with \(U\to aaUb\mid aUb\mid Ub\mid\lambda\) (\(U\) = “each b with at most 2 a’s”).</li>
+  <li><b>Too many a’s</b> (\(n&gt;2m\)): an equal string with at least one extra a in front: \(A\to aA\mid aE\).</li>
+  <li><b>Too few a’s</b> (\(n&lt;2m\)): each b brings 0, 1 or 2 a’s — and at least one b brings fewer than 2:
+    \(B\to aaBb\mid aUb\mid Ub\), where \(U\to aaUb\mid aUb\mid Ub\mid\lambda\) (“each b with at most two a’s”).</li>
 </ul>
-<div class="box model"><span class="t">Answer (formula: \(n\ne2m\))</span>
+<div class="box model"><span class="t">Answer (formula reading, \(n\ne 2m\))</span>
 <p>\(S\to A\mid B\quad A\to aA\mid aE\quad E\to aaEb\mid\lambda\quad B\to aaBb\mid aUb\mid Ub\quad U\to aaUb\mid aUb\mid Ub\mid\lambda\)</p></div>
-<div class="box model"><span class="t">Answer (sentence: \(m\ne2n\))</span>
+<div class="box model"><span class="t">Answer (sentence reading, \(m\ne 2n\))</span>
 <p>\(S\to A\mid B\quad A\to Ab\mid Eb\quad E\to aEbb\mid\lambda\quad B\to aBbb\mid aUb\mid aU\quad U\to aUbb\mid aUb\mid aU\mid\lambda\)</p></div>
-<pre class="run" data-cmd="python3 verify/pl_exam_grammars.py | head -4" data-show="both readings + Problem 2, every string up to length 14"></pre>
 
-<h3>2023-03-16 Problem 1 (10 p): which strings does G generate?</h3>
-<p>\(S\to SB\mid aA\mid cCb,\ A\to aAb\mid\varepsilon,\ B\to BB\mid C,\ C\to\varepsilon\). Candidates:
-ε, abcb, aabcb, cbab, abc, acb, aaabbbbcccbb, aaabbbbccbbcc, ccbbbaab.</p>
-<div class="box recipe"><span class="t">Recipe: first find what each variable generates, bottom-up</span>
-<ol>
-  <li>\(C\to\varepsilon\) only: \(C\) generates only \(\varepsilon\).</li>
-  <li>\(B\to BB\mid C\): only ever \(\varepsilon\).</li>
-  <li>\(A\to aAb\mid\varepsilon\): \(a^kb^k\).</li>
-  <li>\(S\to SB\) adds nothing (B is ε). \(S\to aA\) gives \(a^{k+1}b^k\). \(S\to cCb\) gives \(cb\).</li>
-</ol>
-<p>So \(L(G)=\{a^{k+1}b^k\mid k\ge0\}\cup\{cb\}\) = \(\{a, aab, aaabb,\dots\}\cup\{cb\}\).</p>
-</div>
-<div class="box model"><span class="t">Answer</span><p><b>None</b> of the nine strings is generated. Every string of \(L(G)\) is either \(cb\) or a’s followed by one fewer b’s — no candidate has that form. (Verified by a parser.)</p></div>
-<pre class="run" data-cmd="python3 verify/pl_exam_grammars.py | tail -11" data-show="membership check"></pre>
-
-<h2>7.4 Ambiguity</h2>
-<p>\(E\to E+E\mid E*E\mid a\) is ambiguous: \(a+a*a\) has two trees, one meaning \(a+(a*a)\), one \((a+a)*a\).
-A compiler needs <b>one</b> meaning, so we rewrite the grammar with levels (Chapter 8). Another classic is the
-<b>dangling else</b>: in <code>if c1 then if c2 then s1 else s2</code>, which <code>if</code> owns the <code>else</code>?
-(Rule in most languages: the nearest one.)</p>
-<div class="box def"><span class="t">To show a grammar is ambiguous</span>
-<p>Give <b>one string</b> and <b>two different leftmost derivations</b> (or two trees) for it. That’s a complete answer.</p>
+<h3>“Which of these strings can G generate?” (10 p)</h3>
+<p>\(S\to SB\mid aA\mid cCb,\ A\to aAb\mid\varepsilon,\ B\to BB\mid C,\ C\to\varepsilon\). Nine candidate strings.</p>
+<p>Don’t start trying strings. First ask of every variable: <b>what can this produce?</b> Start from the bottom:</p>
+<ul>
+  <li>\(C\) can only become \(\varepsilon\). Nothing else.</li>
+  <li>\(B\to BB\mid C\): any number of C’s — which are all nothing. So \(B\) also only gives \(\varepsilon\).</li>
+  <li>\(A\to aAb\mid\varepsilon\): that’s \(a^kb^k\).</li>
+  <li>So \(S\to SB\) adds nothing, \(S\to aA\) gives \(a\cdot a^kb^k=a^{k+1}b^k\), and \(S\to cCb\) gives just \(cb\).</li>
+</ul>
+<div class="box model"><span class="t">Answer</span>
+<p>\(L(G)=\{a^{k+1}b^k\mid k\ge0\}\cup\{cb\}=\{a, aab, aaabb,\dots\}\cup\{cb\}\). <b>None</b> of the nine strings has that shape
+(ε, abcb, aabcb, cbab, abc, acb, aaabbbbcccbb, aaabbbbccbbcc, ccbbbaab), so G generates <b>none of them</b>.</p>
+<p>It feels wrong to answer “none” — trust your analysis. That’s the whole point of the question.</p>
 </div>
 
-<div class="box recipe"><span class="t">Always test your grammar before moving on (1 minute)</span>
-<ol><li>Can it produce the <b>shortest</b> member (often ε)? Should it?</li>
-<li>Derive 2 members from the examples.</li>
-<li>Try to produce 1 non-member — make sure you can’t.</li></ol>
+<h2>7.5 Ambiguity — when one string has two meanings</h2>
+<p>Consider \(E\to E+E\mid E*E\mid a\). The string \(a+a*a\) has <b>two</b> different parse trees: one where the \(+\) is on top
+(meaning \(a+(a*a)\)), one where the \(*\) is on top (meaning \((a+a)*a\)). A grammar with such a string is <b>ambiguous</b>.</p>
+<p>For a programming language this is a disaster: <code>2+3*4</code> would mean both 14 and 20. How languages fix it is the
+subject of the next chapter. To <b>prove</b> a grammar ambiguous on the exam: give one string and two different parse trees (or two
+different leftmost derivations).</p>
+
+<div class="box try"><span class="t">Your turn</span>
+<ol><li>\(\{a^nb^mc^n\mid n,m\ge0\}\) &nbsp; 2. \(\{a^nb^m\mid m\le n\le2m\}\) &nbsp;
+3. Odd-length strings whose middle letter is \(a\).</li></ol>
+</div>
+<div class="box sol"><span class="t">Answers</span>
+<p>1. \(S\to aSc\mid B,\ B\to bB\mid\lambda\) — a’s wrap c’s, free b’s in the middle.
+2. \(S\to aSb\mid aaSb\mid\lambda\) — each b takes one or two a’s.
+3. \(S\to XSX\mid a,\ X\to a\mid b\) — any letter on each side, the centre is \(a\).</p>
 </div>
 
-<div class="box try"><span class="t">Practice</span>
-<ol><li>\(\{a^nb^mc^n\mid n,m\ge0\}\) &nbsp; 2. \(\{a^nb^m\mid m\le n\le 2m\}\) &nbsp; 3. \(\{w\in\{a,b\}^*\mid w \text{ has odd length and middle letter } a\}\)
-&nbsp; 4. Show \(S\to SS\mid aSb\mid\lambda\) is ambiguous.</li></ol>
-</div>
-<div class="box sol"><span class="t">Solutions</span>
-<p>1. \(S\to aSc\mid B,\ B\to bB\mid\lambda\). &nbsp; 2. \(S\to aSb\mid aaSb\mid\lambda\) (each b takes 1 or 2 a’s).
-&nbsp; 3. \(S\to XSX\mid a,\ X\to a\mid b\). &nbsp; 4. \(\lambda\): \(S\Rightarrow\lambda\) and \(S\Rightarrow SS\Rightarrow S\Rightarrow\lambda\);
-or \(abab\) via \(S\Rightarrow SS\) split in different ways (e.g. \(SS\Rightarrow SSS\) first).</p>
-</div>
+<p><b>Where we’re going next.</b> Ambiguity isn’t just a theory problem — every programming language must decide what
+<code>2 + 3 * 4</code> means. That decision is called precedence, and it’s built right into the grammar.</p>

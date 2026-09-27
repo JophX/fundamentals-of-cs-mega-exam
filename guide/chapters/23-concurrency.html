@@ -1,45 +1,57 @@
-<h1>23. Concurrency, exceptions and events <span class="tag pl">PL</span></h1>
+<h1>23. Doing several things at once — and when things go wrong <span class="tag pl">PL</span></h1>
 
 <h2>23.1 Concurrency</h2>
-<div class="box intuition"><span class="t">Intuition</span>
-<p>Several things happen at the same time. <b>Truly concurrent</b> = several physical processors. <b>Logically concurrent</b> =
-one processor switching between tasks (simulating several). Levels: machine instructions, expressions/statements, subprograms,
-whole programs. Our focus: many different things happening at once and <b>communicating</b> (not squeezing out performance, HPC).</p>
-</div>
-<p><b>Why:</b> reality is parallel (modelling); better <b>responsiveness</b> (a GUI thread keeps reacting while work goes on);
-using several cores/processors/machines.</p>
-<p><b>The problem:</b> concurrent tasks must share data and resources. If one thread changes data another is using, the result
-depends on timing — a <b>race condition</b>. Example: two threads do <code>count = count + 1</code> (read, add, write); if both
-read 5 before either writes, both write 6 and one increment is lost. So we need <b>synchronisation</b>: <b>mutual exclusion</b>
-(only one at a time in a <b>critical section</b>) and <b>cooperation</b> (wait until another task has produced something).</p>
-<table class="wide">
-<tr><th>Mechanism</th><th>How it works</th><th>Pros / cons</th></tr>
-<tr><td><b>Semaphore</b></td><td>a counter with two atomic operations. <b>wait</b>: if counter &gt; 0, decrement and continue, else
-block. <b>signal</b>: if no one waits, increment; otherwise wake one blocked process.</td><td>simple, minimal code; but the
-programmer is responsible for everything (forget a signal ⇒ deadlock; forget a wait ⇒ race)</td></tr>
-<tr><td><b>Monitor</b></td><td>a language construct: shared data + the operations on it; only one thread can be executing inside
-at a time; condition wait/signal inside. Like Java <code>synchronized</code>.</td><td>safer, mutual exclusion automatic; may lock too
-much (less parallelism)</td></tr>
-<tr><td><b>Message passing</b></td><td>tasks send messages (letters, mailbox); synchronous (rendezvous, Ada) or asynchronous</td><td>easy
-to understand, no shared memory, works across machines; costs speed and resources</td></tr>
-<tr><td><b>Transactional memory</b></td><td>a block of instructions is atomic like a database transaction; if it can’t complete,
-earlier steps are rolled back</td><td>simple for the programmer; overhead, not everywhere available</td></tr>
-</table>
-<p><b>Deadlock</b>: tasks wait for each other forever (A holds X, wants Y; B holds Y, wants X). <b>Starvation</b>: a task never gets
-its turn.</p>
+<p>Your phone plays music while you type a message and an app downloads in the background. Several things are happening at once.
+Sometimes truly at once (several processor cores), sometimes only apparently (one core switching between tasks very quickly). Either
+way, we call it <b>concurrency</b>.</p>
+<p>Why bother? Because the world is concurrent (a program that models it naturally is too), because it keeps programs
+<b>responsive</b> (the interface keeps reacting while the heavy work happens in another thread), and because modern machines have many
+cores to use.</p>
 
-<h2>23.2 Exception handling</h2>
-<p>Kinds of error: truly unexpected (memory/disk failure), unexpected but possible (overflow, division by zero), expected (end of
-file). Hardware or software detects it and raises an <b>exception</b>: try to recover, or terminate.</p>
-<p>You <i>could</i> check return values and flags everywhere, but the code becomes messy. Modern languages use
-<b>try–catch(–finally)</b>: clearer code, you think explicitly about which errors can occur, and you can handle an error at the
-level that knows what to do — an exception not caught locally <b>propagates</b> up the call chain to the nearest matching
-handler.</p>
-<p><b>Design questions</b> (slide): how is an exception raised; can it carry parameters/information; can it be handled at different
-levels and how does propagation work; where should errors be handled; how is the right handler chosen among several; is there
-<code>finally</code> (cleanup that always runs)?</p>
+<h3>The problem: sharing</h3>
+<p>If concurrent tasks never talked to each other, there’d be no problem. The trouble starts when they <b>share data</b>. Picture two
+threads each doing <code>count = count + 1</code>, which is really three steps: read, add, write.</p>
+<table class="center">
+<tr><th>Thread A</th><th>Thread B</th><th>count</th></tr>
+<tr><td>reads 5</td><td></td><td>5</td></tr>
+<tr><td></td><td>reads 5</td><td>5</td></tr>
+<tr><td>writes 6</td><td></td><td>6</td></tr>
+<tr><td></td><td>writes 6</td><td>6</td></tr>
+</table>
+<p>Two increments, but <code>count</code> went up by one. The result depends on timing — a <b>race condition</b>. It might work a
+thousand times and fail on the thousand-and-first. So languages need ways to <b>synchronise</b>: make sure only one task at a time is in
+a <b>critical section</b> (mutual exclusion), and let tasks wait for each other (cooperation).</p>
+
+<h3>The four tools</h3>
+<table class="wide">
+<tr><th>Tool</th><th>How it works</th><th>Trade-off</th></tr>
+<tr><td><b>Semaphore</b></td><td>A counter with two atomic operations. <b>wait</b>: if the counter is above zero, decrease it and go on;
+otherwise block. <b>signal</b>: if someone is blocked, wake one; otherwise increase the counter.</td><td>Tiny and simple — but the
+programmer must get every wait/signal right. One mistake: deadlock or a race.</td></tr>
+<tr><td><b>Monitor</b></td><td>A language construct that wraps shared data with its operations, and guarantees only one thread is inside
+at a time (like Java’s <code>synchronized</code>).</td><td>Much safer; but can lock more than necessary, reducing parallelism.</td></tr>
+<tr><td><b>Message passing</b></td><td>Tasks don’t share memory at all; they send each other messages, like letters (synchronously or
+not).</td><td>Easy to understand, works across machines; costs speed and resources.</td></tr>
+<tr><td><b>Transactional memory</b></td><td>Mark a block as a transaction: it either completes entirely, or is rolled back, as in a database.</td><td>Easy for the programmer; overhead, not available everywhere.</td></tr>
+</table>
+<p>Two failure words to know: <b>deadlock</b> — A holds X and waits for Y, B holds Y and waits for X; both wait forever.
+<b>Starvation</b> — a task that never gets its turn.</p>
+
+<h2>23.2 Exceptions: when things go wrong</h2>
+<p>Things go wrong in three flavours: the truly unexpected (disk failure), the unexpected-but-possible (division by zero, overflow),
+and the expected (end of file). You <i>could</i> handle all of them by checking return values after every call — but code full of
+<code>if (error) …</code> is hard to read. So modern languages use <b>try–catch</b>:</p>
+<ul>
+  <li>the normal code is written cleanly inside <code>try</code>;</li>
+  <li>when an error occurs, an exception is <b>raised</b> (thrown) and normal execution stops;</li>
+  <li>if the current function has no matching <code>catch</code>, the exception <b>propagates</b> up the chain of callers until one does
+    — so errors can be handled at whichever level knows what to do about them;</li>
+  <li><code>finally</code> runs cleanup code no matter what.</li>
+</ul>
+<p>Designers have to decide: can exceptions carry information? how is the right handler chosen when there are several? where should
+handling happen? what happens if nobody catches it?</p>
 
 <h2>23.3 Events</h2>
-<p>An <b>event</b> is not an error but a way of programming: something happens (a click, a key, a timer) and a registered
-<b>handler</b> is called. Events resemble exceptions (both come from hardware signals and interrupt vectors) and messages between
-threads. Java’s listener model is typical.</p>
+<p>An <b>event</b> is a cousin of an exception that isn’t about errors: a button is clicked, a key is pressed, a timer fires, and a
+<b>handler</b> you registered earlier is called. Instead of the program deciding when to look for input, the input calls the program.
+That’s how every graphical interface works.</p>

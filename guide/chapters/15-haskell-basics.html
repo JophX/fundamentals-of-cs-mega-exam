@@ -2,6 +2,10 @@
 
 <h1>15. Haskell basics: types, functions, lists <span class="tag pl">PL</span></h1>
 
+<p>Everything so far has been about machines that change state step by step — sticky notes, stacks, tapes, memory boxes. Now
+we meet a way of programming that throws that idea away completely. In Haskell nothing ever changes. There are no loops and no
+variables you can update. It sounds impossible to program like that — and the first few hours it feels strange — but it turns out
+to be a clean and powerful way to think, and it’s 20 points on your exam. Let’s take it gently, from zero.</p>
 <div class="box intuition"><span class="t">The mindset</span>
 <p>In Java you write <b>instructions</b>: “set x to 0, loop, add…”. In Haskell you write <b>definitions</b>: “the sum of an
 empty list <i>is</i> 0; the sum of <code>x:xs</code> <i>is</i> <code>x</code> plus the sum of <code>xs</code>”. A function is like

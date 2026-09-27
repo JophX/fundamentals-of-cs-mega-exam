@@ -1,4 +1,9 @@
 <h1>21. Abstraction, ADTs and object-orientation <span class="tag pl">PL</span></h1>
+<p>Programs get big. A real system has millions of lines, written by hundreds of people, and nobody can hold it all in their head.
+So how does anyone build anything? The same way you use a car without understanding its engine: through <b>abstraction</b>. You get a
+steering wheel and pedals — a small, clear interface — and everything behind it is somebody else’s problem. This chapter is about the
+language features that let programmers build those “steering wheels” for their code, and it’s where your exam asks you to
+<i>explain</i> things precisely. Precision is exactly what cost points last time, so we’ll be careful with every word.</p>
 
 <div class="box intuition"><span class="t">The idea in plain words</span>
 <p>Think of a <b>medicine capsule</b>. <b>Encapsulation</b> is putting the ingredients <i>together in one
@@ -9,7 +14,7 @@ you can only use it the intended way (swallow it = call its public operations).<
 (encapsulation) but anyone can still write <code>s.data = []</code> (no real hiding).</p>
 </div>
 
-<h2>21.1 Definitions (these are the lecture’s own words, expanded)</h2>
+<h2>21.1 The two definitions, precisely</h2>
 <div class="box def"><span class="t">Encapsulation</span>
 <p>An abstract data type is specified as <b>one syntactic unit</b> (class, module, package) that contains the
 <b>representation</b> of the data <i>together with</i> the <b>operations</b> on it. Other parts of the program can use the
@@ -93,7 +98,7 @@ definition, the mechanism, an example, the advantages, and the difference from t
 have exactly that structure — use it for <i>every</i> “explain the concept X” question.</p>
 </div>
 
-<h2>21.4 The formal ADT specification (lecture 11)</h2>
+<h2>21.4 Describing a type by what it does, not how</h2>
 <pre class="code text">ADT stack is elem + boolean +
 operations:  empty : -> stack          push : stack × elem -> stack
              pop   : stack -> stack     top  : stack -> elem       isEmpty : stack -> boolean
@@ -102,10 +107,10 @@ equations:   isEmpty(empty) = true      isEmpty(push(s,e)) = false
              top(push(s,e)) = e         top(empty) = error</pre>
 <p>The equations say <b>what</b> the operations do, with no word about arrays or lists — that is data abstraction. A program must
 also contain implementation details; the ADT idea combines the high-level description with an implementation hidden inside a unit.
-The lecture shows the same stack in Modula-2 (definition module = interface, implementation module = hidden), Java
+The same stack can be written in Modula-2 (definition module = interface, implementation module = hidden), Java
 (<code>private</code> fields), ML (<code>abstype … with … end</code>) and Python (class, but nothing truly hidden).</p>
 
-<h2>21.5 Object-oriented programming (lecture 11)</h2>
+<h2>21.5 Object-oriented programming: the big design questions</h2>
 <ul>
   <li><b>Core ideas</b>: data at the centre, encapsulation, inheritance, dynamic binding, modelling. Objects send and answer
     <b>messages</b>; classes vs instances; class methods (static) vs instance methods.</li>

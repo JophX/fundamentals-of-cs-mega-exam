@@ -1,41 +1,44 @@
-<h1>20. Control structures and subprograms <span class="tag pl">PL</span></h1>
+<h1>20. Control flow and subprograms <span class="tag pl">PL</span></h1>
 
-<h2>20.1 Control structures (lecture 10)</h2>
-<p>An imperative language is mostly <code>var = expr;</code>. To be <b>Turing complete</b> it needs two more things:
-<b>conditions</b> (simplest: <code>if</code>) and <b>jumps</b> (simplest and most powerful: <code>goto</code>). Structured
-programming replaces <code>goto</code> with readable forms:</p>
+<h2>20.1 The minimum you need to compute anything</h2>
+<p>Here’s a surprising fact. An imperative language that has only assignment (<code>x = expression</code>) can’t compute much. Add just
+two things — a way to <b>choose</b> (<code>if</code>) and a way to <b>jump</b> (<code>goto</code>) — and it can compute anything a Turing
+machine can. Everything else — <code>while</code>, <code>for</code>, <code>switch</code> — is there to make programs <i>readable</i>,
+because raw <code>goto</code> turns code into spaghetti.</p>
 <ul>
-  <li><b>Selection</b>: nested <code>if-then-else</code> (always use blocks — the dangling-else problem), <code>elif</code>;
-    multi-way <code>switch/case</code> (with or without <code>break</code>/fall-through, default case); <b>pattern matching</b>
-    (Haskell, ML).</li>
-  <li><b>Logical loops</b>: <code>while (e) …</code> (pre-test), <code>do … while (e)</code> (post-test, runs at least once);
-    control with <code>break</code> (leave the loop) and <code>continue</code> (skip to the next iteration).</li>
-  <li><b>Counter loops</b> and <b>iterators</b>: <code>for x in fruit</code> iterates over a collection (list, tree…) instead of
-    an index — simpler and more flexible.</li>
-  <li><b>Guarded commands</b> (Dijkstra): <code>if g1 -&gt; s1 [] g2 -&gt; s2 fi</code> picks <b>any</b> true guard
-    (nondeterministically; error if none). <code>do … od</code> repeats until no guard is true. The lecture’s example sorts four
-    variables by swapping any out-of-order neighbours until none is — the order of swaps doesn’t matter. Used to reason about
-    correctness and concurrency.</li>
+  <li><b>Choosing</b>: <code>if-then-else</code> (use blocks <code>{ }</code> — otherwise nested ifs are ambiguous, the “dangling else”),
+    <code>switch</code>/<code>case</code> (in C you need <code>break</code>, or execution falls through to the next case), and
+    <b>pattern matching</b> in Haskell.</li>
+  <li><b>Repeating</b>: <code>while</code> checks first; <code>do … while</code> runs the body at least once. <code>break</code> leaves the
+    loop, <code>continue</code> skips to the next round. <b>Iterators</b> (<code>for fruit in basket</code>) loop over a collection without
+    an index — simpler and harder to get wrong.</li>
+  <li><b>Guarded commands</b> are an unusual, elegant idea: you list several (condition → action) pairs, and <b>any</b> one whose
+    condition is true may be chosen. A loop of them keeps going until no condition holds. Example: “while some neighbours are in the
+    wrong order, swap them” — it sorts, whatever order you pick the swaps in. The point is to express only what matters for
+    correctness.</li>
 </ul>
 
-<h2>20.2 Subprograms</h2>
-<ul>
-  <li>Process abstraction: <b>procedures</b> do something (change state), <b>functions</b> return a value, <b>methods</b> are
-    procedures/functions belonging to objects/classes.</li>
-  <li>A header defines name, parameters and result type.</li>
-  <li><b>Design issues</b> (slide): when/how are parameter types checked? Nested subprograms allowed? Subprograms as parameters?
-    Overloading (same name, different parameter types)? Generic subprograms (one definition for many types)? Side effects
-    allowed? What can be returned, and how many values?</li>
-  <li><b>Co-routines</b>: not master/slave — two routines pass control back and forth, each resuming where it left off (several
-    entry points). Used for quasi-concurrency, generators, pipelines.</li>
-</ul>
-<pre class="code python" data-lang="python" data-src="verify/coroutine.py"></pre>
-<pre class="run" data-cmd="python3 verify/coroutine.py" data-show="python3 coroutine.py"></pre>
+<h2>20.2 Subprograms: abstraction for actions</h2>
+<p>A subprogram (function, procedure, method) lets you give a name to a piece of work and reuse it — so you think “sort the list”, not
+the twenty lines that do it. That’s <b>process abstraction</b>, the partner of the data abstraction in Chapter 21. Small vocabulary:
+a <b>procedure</b> does something (changes state), a <b>function</b> returns a value, a <b>method</b> belongs to an object.</p>
+<p>Every call pushes an <b>activation record</b> onto the stack — the return address, the parameters and the local variables — and pops
+it at return. That’s why a recursive function can call itself a thousand times without the calls trampling each other: each has its own
+record.</p>
+<p>Language designers must decide lots of things about subprograms: How are argument types checked? Can functions be nested inside
+functions? Can a function be passed as an argument (as in Haskell’s <code>map</code>)? Can two functions share a name if their parameter
+types differ (<b>overloading</b>)? Can one definition work for many types (<b>generics</b>)? May functions have side effects? How many
+values can they return?</p>
 
-<h3>Parameters in Python (lecture examples, run in Python 3)</h3>
+<h3>Flexible parameters</h3>
+<p>Python shows several parameter features in one place — keyword arguments, default values, and a variable number of arguments:</p>
 <pre class="code python" data-lang="python" data-src="verify/params.py"></pre>
-<pre class="run" data-cmd="python3 verify/params.py" data-show="python3 params.py"></pre>
-<p>Positional vs <b>keyword</b> parameters, <b>default</b> values, <b>variable number</b> of arguments (<code>*args</code> → tuple,
-<code>**kwargs</code> → dictionary).</p>
-<p><b>Activation records.</b> Each call pushes an activation record (return address, link to caller’s record, parameters, local
-variables) on the run-time stack; it is popped at return. That’s why recursion works: each call has its own locals.</p>
+<pre class="run" data-cmd="python3 verify/params.py"></pre>
+
+<h3>Coroutines: two functions taking turns</h3>
+<p>Normally a function call is master and servant: the caller waits until the callee is completely finished. A <b>coroutine</b> is
+different — two routines pass control back and forth, each <b>resuming where it left off</b>. Python generators are exactly this:</p>
+<pre class="code python" data-lang="python" data-src="verify/coroutine.py"></pre>
+<pre class="run" data-cmd="python3 verify/coroutine.py"></pre>
+<p>The producer pauses at <code>yield</code>, the consumer uses the item, then the producer continues from where it stopped. It feels
+like two things running at once, on one processor.</p>

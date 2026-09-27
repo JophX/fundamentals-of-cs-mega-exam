@@ -1,101 +1,93 @@
-<h1 class="part">Part I<small>The shared foundation — languages, automata, regular expressions, grammars <br><span class="tag both">BOTH</span> exams</small></h1>
+<h1 class="part">Part I<small>Machines that read — the foundation of both exams <br><span class="tag both">BOTH</span></small></h1>
 
-<h1>1. Strings, languages and the notation you must be able to read</h1>
+<h1>1. The language of languages <span class="tag both">BOTH</span></h1>
 
-<div class="box intuition"><span class="t">The one idea behind both courses</span>
-<p>A <b>language</b> is nothing mysterious: it is just a <b>set of strings</b>. “All strings of a’s and b’s with an
-even number of b’s” is a language. “All syntactically correct Java programs” is a language. The whole of formal
-language theory asks two questions: <i>how do I describe such a set with a finite recipe</i> (a grammar, a regular
-expression, a machine), and <i>how powerful does the recipe have to be</i>?</p>
-</div>
-
-<h2>1.1 Alphabets and strings</h2>
-<div class="box def"><span class="t">Definition</span>
+<p>Before we build any machine, we need to agree on what a machine is <i>for</i>. Here is the simplest possible job:
+someone hands you a string of symbols, and you must answer <b>yes</b> or <b>no</b>.</p>
 <ul>
-  <li>An <b>alphabet</b> \(\Sigma\) is a finite, non-empty set of symbols, e.g. \(\Sigma = \{a, b\}\).</li>
-  <li>A <b>string</b> (word) over \(\Sigma\) is a finite sequence of symbols: \(abba\).</li>
-  <li>The <b>empty string</b> has no symbols. Linz (the FCS book) writes it \(\lambda\); the PL exam and Sipser
-    write it \(\varepsilon\). <b>They are the same thing.</b></li>
-  <li>\(|w|\) is the length of \(w\): \(|abba| = 4\), \(|\lambda| = 0\).</li>
-  <li>\(|w|_a\) is the number of \(a\)’s in \(w\): \(|abba|_a = 2\), \(|abba|_b = 2\).</li>
-  <li>\(w^R\) is \(w\) reversed: \((abc)^R = cba\).</li>
-  <li>\(a^n\) means \(n\) copies of \(a\): \(a^3 = aaa\), \(a^0 = \lambda\).</li>
+  <li>Is <code>x1 = 3.14;</code> a correctly formed Java statement? Yes/no.</li>
+  <li>Is <code>((a+b)*c</code> correctly bracketed? Yes/no.</li>
+  <li>Is <code>abba</code> a palindrome? Yes/no.</li>
 </ul>
+<p>Every one of these questions is secretly the same question: <b>is this string in the set of “good” strings?</b> That set is
+what we call a <b>language</b>. That’s the whole idea. Not English, not Java — just <i>a set of strings</i>. Everything in both
+courses is about describing such sets and building machines that decide membership in them.</p>
+
+<h2>1.1 The building blocks</h2>
+<p>An <b>alphabet</b> \(\Sigma\) is the set of symbols we’re allowed to use — like the keys on a keyboard. We’ll usually use
+\(\Sigma=\{a,b\}\) because two symbols are enough to show every interesting idea, and small examples are easier to think about.</p>
+<p>A <b>string</b> is a finite sequence of symbols: \(abba\), \(b\), \(aaaa\). And there is one very special string: the
+<b>empty string</b>, with no symbols at all. It’s written \(\lambda\) (lambda) in the FCS course and \(\varepsilon\) (epsilon) on
+the PL exam. Same thing, two names.</p>
+
+<div class="box intuition"><span class="t">Why does the empty string matter so much?</span>
+<p>Because it’s the easiest thing to forget. Is the empty file a valid program? Is “no brackets at all” balanced? Many exam
+answers are wrong only because they forgot to decide whether \(\lambda\) belongs. Think of \(\lambda\) as the number 0 of strings:
+gluing it onto anything changes nothing, \(\lambda w = w\).</p>
 </div>
 
-<p><b>Concatenation</b> just glues strings: if \(u = ab\) and \(v = ba\) then \(uv = abba\). Note that
-\(\lambda w = w\lambda = w\) — the empty string is the “do nothing” of concatenation, like 0 for addition.</p>
-
-<p><b>Prefix, suffix, substring.</b> \(u\) is a <i>prefix</i> of \(w\) if \(w = uv\) for some \(v\). The PL exam
-explains it for you: the prefixes of \(abca\) are \(\varepsilon, a, ab, abc, abca\). A <i>suffix</i> is the same from
-the other end; a <i>substring</i> is any contiguous piece.</p>
-
-<h2>1.2 Languages and operations on them</h2>
-<div class="box def"><span class="t">Definition</span>
-<ul>
-  <li>\(\Sigma^*\) = the set of <b>all</b> strings over \(\Sigma\), including \(\lambda\).
-    For \(\Sigma=\{a,b\}\): \(\Sigma^* = \{\lambda, a, b, aa, ab, ba, bb, aaa, \dots\}\).</li>
-  <li>\(\Sigma^+ = \Sigma^* \setminus \{\lambda\}\) (all non-empty strings).</li>
-  <li>A <b>language</b> over \(\Sigma\) is any subset \(L \subseteq \Sigma^*\).</li>
-</ul>
-</div>
-<p>Because languages are sets, all set operations work: union \(L_1 \cup L_2\), intersection \(L_1\cap L_2\),
-difference \(L_1 \setminus L_2\), complement \(\overline{L} = \Sigma^* \setminus L\). Two extra operations only make
-sense for languages:</p>
-<ul>
-  <li><b>Concatenation</b>: \(L_1L_2 = \{uv \mid u\in L_1, v\in L_2\}\). Example: \(\{a,ab\}\{b\} = \{ab, abb\}\).</li>
-  <li><b>Star (Kleene closure)</b>: \(L^* = \{\lambda\}\cup L\cup LL\cup LLL\cup\cdots\) — glue together any number
-    (including zero) of strings from \(L\). Example: \(\{ab\}^* = \{\lambda, ab, abab, ababab,\dots\}\).</li>
-</ul>
-
-<div class="box trap"><span class="t">Trap: three different “empty” things</span>
-<p>\(\emptyset\) is the empty <i>language</i> (no strings at all). \(\{\lambda\}\) is a language containing
-exactly one string, the empty one. \(\lambda\) itself is a <i>string</i>. So \(|\emptyset| = 0\) but
-\(|\{\lambda\}| = 1\). Also \(\emptyset^* = \{\lambda\}\) (zero pieces glued together is the empty string).</p>
-</div>
-
-<h2>1.3 Reading set-builder notation (the exams are full of it)</h2>
-<p>\(\{\, w \in \{a,b\}^* \mid \text{condition} \,\}\) reads “all strings \(w\) made of a’s and b’s such that
-the condition holds”. Practise translating until it is automatic:</p>
+<p>A few pieces of notation you’ll see constantly — each one is simple:</p>
 <table class="wide">
-<tr><th>Notation</th><th>In words</th><th>Some members</th><th>Some non-members</th></tr>
-<tr><td>\(\{a^nb^n \mid n\ge 0\}\)</td><td>some a’s followed by <i>the same number</i> of b’s</td><td>\(\lambda, ab, aabb\)</td><td>\(aab, ba, abab\)</td></tr>
-<tr><td>\(\{a^nb^m \mid n\ne 2m\}\)</td><td>a’s then b’s, and #a is <i>not</i> twice #b</td><td>\(a, b, ab, aaab\)</td><td>\(\lambda, aab, aaaabb\)</td></tr>
-<tr><td>\(\{w \mid |w|_a = |w|_b\}\)</td><td>equally many a’s and b’s, <i>any order</i></td><td>\(\lambda, ab, ba, abba\)</td><td>\(a, aab\)</td></tr>
-<tr><td>\(\{ww^R \mid w\in\{a,b\}^*\}\)</td><td>even-length palindromes</td><td>\(\lambda, aa, abba\)</td><td>\(aba, ab\)</td></tr>
-<tr><td>\(\{a^{n^2}\mid n\ge 0\}\)</td><td>a’s, where the count is a perfect square</td><td>\(\lambda, a, a^4, a^9\)</td><td>\(aa, aaa\)</td></tr>
-<tr><td>\(\{w \mid |w|_a &gt; 2|w|_b\}\)</td><td>more than twice as many a’s as b’s</td><td>\(a, aaab, aaba\)</td><td>\(\lambda, aab\)</td></tr>
+<tr><th>Notation</th><th>Means</th><th>Example</th></tr>
+<tr><td>\(|w|\)</td><td>length of \(w\)</td><td>\(|abba|=4,\ |\lambda|=0\)</td></tr>
+<tr><td>\(|w|_a\)</td><td>how many \(a\)’s are in \(w\)</td><td>\(|abba|_a=2\)</td></tr>
+<tr><td>\(a^n\)</td><td>\(n\) copies of \(a\)</td><td>\(a^3=aaa,\ a^0=\lambda\)</td></tr>
+<tr><td>\(uv\)</td><td>\(u\) followed by \(v\) (concatenation)</td><td>\(u=ab, v=ba\): \(uv=abba\)</td></tr>
+<tr><td>\(w^R\)</td><td>\(w\) reversed</td><td>\((abc)^R=cba\)</td></tr>
+<tr><td>prefix</td><td>a beginning piece</td><td>prefixes of \(abc\): \(\lambda, a, ab, abc\)</td></tr>
 </table>
-<p>Notice the difference between \(a^nb^n\) (order is forced: all a’s first) and \(|w|_a=|w|_b\) (order is free).
-Mixing those two up is a classic way to build the wrong grammar.</p>
 
-<div class="box exam"><span class="t">Exam habit</span>
-<p>Before you build anything for a language, <b>write down 3 members and 3 non-members</b>, including the
-shortest ones (is \(\lambda\) in it?). This takes 30 seconds and catches most misunderstandings.</p>
-</div>
-
-<h2>1.4 Proof words you will need</h2>
+<h2>1.2 Languages are sets — so we can combine them</h2>
+<p>\(\Sigma^*\) (“sigma star”) is the set of <b>all</b> strings over the alphabet, including \(\lambda\):
+\(\{\lambda, a, b, aa, ab, ba, bb, aaa,\dots\}\). A language is just some subset of it — the strings we call “good”.</p>
+<p>Since languages are sets, you can take unions, intersections and complements, exactly as in any maths course. Two more
+operations are special to languages, and you should picture them rather than memorise them:</p>
 <ul>
-  <li><b>“Closed under X”</b>: doing X to languages in the class always gives a language in the class.
-    “Regular languages are closed under union” = the union of two regular languages is always regular.</li>
-  <li><b>Proof by contradiction</b>: assume the opposite, derive something impossible. All pumping-lemma proofs
-    and the halting-problem proof work like this.</li>
-  <li><b>Proof by construction</b>: show something exists by building it (e.g. build a DFA for the union).</li>
-  <li><b>Countable</b>: can be listed as item 1, item 2, item 3, … (Chapter 13). \(\Sigma^*\) is countable:
-    list strings by length, then alphabetically.</li>
-  <li>\(\mathbb{N} = \{0, 1, 2, \dots\}\) in this course (the pumping lemma appendix says “for all \(i\in\mathbb{N}\)
-    (including 0)”).</li>
+  <li><b>Concatenation</b> \(L_1L_2\): pick one string from \(L_1\), one from \(L_2\), glue them. Every combination.
+    \(\{a,ab\}\{b\}=\{ab,abb\}\).</li>
+  <li><b>Star</b> \(L^*\): glue together <i>any number</i> of strings from \(L\) — including zero of them, which gives
+    \(\lambda\). \(\{ab\}^*=\{\lambda, ab, abab, ababab,\dots\}\). Think of it as “repeat as often as you like”.</li>
 </ul>
 
-<div class="box try"><span class="t">Check yourself</span>
+<div class="box trap"><span class="t">Three kinds of “nothing”</span>
+<p>\(\emptyset\) is a language with <b>no strings</b> (an empty bag). \(\{\lambda\}\) is a language with <b>one</b> string, the
+empty one (a bag containing an empty envelope). \(\lambda\) is a <b>string</b> (the empty envelope itself). They are different, and
+examiners love checking whether you know it.</p>
+</div>
+
+<h2>1.3 Learning to read the exam’s notation</h2>
+<p>Exam questions describe languages in <b>set-builder notation</b>: \(\{\,w \mid \text{condition}\,\}\) means “all strings
+\(w\) for which the condition holds.” The single most useful habit I can give you:</p>
+
+<div class="box recipe"><span class="t">The 30-second habit that saves points</span>
+<p>Before you build anything for a language, write down <b>three strings that are in it</b> and <b>three that are not</b> —
+starting with the shortest ones, and always deciding about \(\lambda\). If you can’t do this, you don’t understand the question
+yet, and nothing you build will be right.</p>
+</div>
+
+<p>Let’s practise on languages that really appear on the exams. Cover the right-hand columns and try first.</p>
+<table class="wide">
+<tr><th>Language</th><th>In words</th><th>In it</th><th>Not in it</th></tr>
+<tr><td>\(\{a^nb^n\mid n\ge0\}\)</td><td>a block of a’s, then <b>the same number</b> of b’s</td><td>\(\lambda, ab, aabb\)</td><td>\(aab, ba, abab\)</td></tr>
+<tr><td>\(\{a^nb^m\mid n\ne 2m\}\)</td><td>a’s then b’s, and #a is <b>not</b> twice #b</td><td>\(a, b, ab, aaab\)</td><td>\(\lambda, aab, aaaabb\)</td></tr>
+<tr><td>\(\{w\mid |w|_a=|w|_b\}\)</td><td>equally many a’s and b’s, <b>in any order</b></td><td>\(\lambda, ba, abba\)</td><td>\(a, aab\)</td></tr>
+<tr><td>\(\{ww^R\}\)</td><td>a string followed by its mirror image</td><td>\(\lambda, aa, abba\)</td><td>\(aba, ab\)</td></tr>
+</table>
+<p>Look closely at the first and third rows. \(a^nb^n\) <i>forces the order</i> — all a’s first. \(|w|_a=|w|_b\) doesn’t care
+about order at all: \(ba\) is fine. Confusing those two is one of the most common reasons a grammar answer gets zero.</p>
+
+<div class="box try"><span class="t">Your turn</span>
 <ol>
-  <li>Is \(\lambda \in \{a^nb^m \mid n\ne 2m\}\)?</li>
-  <li>List all strings of \(\{a,b\}^*\) of length 2.</li>
-  <li>What is \(\{a, b\}\{\lambda, a\}\)?</li>
-  <li>What is \(|aabab|_b\)?</li>
+  <li>Is \(\lambda\) in \(\{a^nb^m\mid n\ne 2m\}\)?</li>
+  <li>Write all strings in \(\{a,b\}^*\) of length 2.</li>
+  <li>What is \(\{a,b\}\{\lambda,a\}\)?</li>
+  <li>Give three members of \(\{w\mid w \text{ has an odd number of } b\text{’s}\}\).</li>
 </ol>
 </div>
 <div class="box sol"><span class="t">Answers</span>
-<p>1. No: \(\lambda = a^0b^0\) and \(0 = 2\cdot 0\). &nbsp; 2. \(aa, ab, ba, bb\). &nbsp;
-3. \(\{a, aa, b, ba\}\). &nbsp; 4. 2.</p>
+<p>1. No — \(\lambda=a^0b^0\) and \(0=2\cdot0\), so the condition fails. 2. \(aa,ab,ba,bb\). 3. \(\{a,aa,b,ba\}\).
+4. For example \(b\), \(ab\), \(bbb\) — any string where the number of \(b\)’s is odd.</p>
 </div>
+
+<p><b>Where we’re going next.</b> We now know what a language is. The next question is the one that drives the whole course:
+<i>what is the simplest machine that can decide whether a string belongs to a language?</i> Let’s build it.</p>

@@ -17,8 +17,7 @@ Useless: none. Shapes with \(U\to a\), \(T\to b\): \(S\to AB\mid UB\mid TTA\mid 
 break \(TTA\) with \(W\to TA\) and \(UUT\) with \(V\to UT\):</p>
 <div class="box model"><span class="t">Answer 3</span>
 <p>\(S\to AB\mid UB\mid TW\mid TT\quad A\to UV\quad V\to UT\quad B\to TW\mid TT\quad W\to TA\quad U\to a\quad T\to b\)</p>
-<p><i>The classic slip:</i> forgetting to copy \(bbA\) into \(S\) when removing \(S\to B\) (the checker caught exactly this
-mistake in the first draft of this answer).</p></div>
+<p><i>The classic slip:</i> forgetting to copy \(bbA\) into \(S\) when removing \(S\to B\).</p></div>
 
 <p><b>4.</b> No λ. Unit \(S\to A\): copy \(bA\), \(b\) into \(S\): \(S\to aSb\mid bA\mid b\), \(A\to bA\mid b\).
 Shapes with \(U\to a\), \(T\to b\), \(X\to ST\):</p>
@@ -27,8 +26,6 @@ Shapes with \(U\to a\), \(T\to b\), \(X\to ST\):</p>
 <p><b>5.</b> \(S\to ASA\) could only vanish if \(S\) itself were already nullable (circular — never established), and
 \(S\to aB\) contains the terminal \(a\), which can never vanish.</p>
 
-<p>All CNF answers are machine-checked against the original grammars:</p>
-<pre class="run" data-cmd="python3 verify/pack_drill.py --check" data-show="python3 verify/pack_drill.py --check"></pre>
 
 <h2>B. CYK</h2>
 <p><b>6.</b></p>
@@ -110,4 +107,3 @@ first brings the count back to zero. Between them is a balanced string (\(S\)), 
 <p>\(S\to aSb\mid A\mid B\qquad A\to aA\mid a\qquad B\to bB\mid b\). Why: \(aSb\) builds the equal part from the outside
 in; in the middle we must put <b>at least one</b> extra \(a\) (\(A\)) or at least one extra \(b\) (\(B\)). λ is correctly
 excluded since \(A\), \(B\) never give λ.</p></div>
-<pre class="run" data-cmd="python3 verify/pack_drill.py --check | tail -2" data-show="grammar check, every string up to length 14"></pre>

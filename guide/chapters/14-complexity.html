@@ -1,9 +1,15 @@
-<h1>14. Complexity: P, NP and NP-completeness <span class="tag fcs">FCS</span></h1>
+<h1>14. Fast and slow: P, NP and NP-completeness <span class="tag fcs">FCS</span></h1>
 
-<div class="box intuition"><span class="t">Intuition</span>
-<p>Decidability asks “can it be solved at all?”. Complexity asks “can it be solved <b>fast</b>?”. <b>P</b> = problems we can
-<i>solve</i> quickly. <b>NP</b> = problems where a proposed solution can be <i>checked</i> quickly (sudoku: hard to solve, easy
-to check). Whether P = NP is the famous open problem.</p>
+<p>Think about a sudoku. <b>Solving</b> a hard one can take you an hour of trial and error. But if a friend hands you a filled-in
+grid and says “I solved it”, <b>checking</b> takes a minute: every row, column and box has 1–9. Checking is easy; finding seems hard.</p>
+<p>That gap is the heart of this chapter. We’re no longer asking <i>can</i> a machine solve it (Chapter 13) — we’re asking <i>how
+fast</i>. And the rough line between “fast” and “hopeless” is: does the time grow like a <b>polynomial</b> (\(n^2\), \(n^3\)) or like an
+<b>exponential</b> (\(2^n\))? With \(n=100\), \(n^3\) is a million steps — nothing. \(2^{100}\) is more steps than there are atoms in… well,
+you’ll be waiting a while.</p>
+<div class="box intuition"><span class="t">The two classes in one sentence each</span>
+<p><b>P</b>: problems you can <b>solve</b> in polynomial time. <b>NP</b>: problems where a proposed solution can be <b>checked</b> in
+polynomial time — like the sudoku. Every P problem is in NP (if you can solve it, you can check an answer by solving it). Whether
+P = NP — whether every easy-to-check problem is also easy-to-solve — is the most famous open question in computer science.</p>
 </div>
 
 <h2>14.1 Definitions</h2>
@@ -38,6 +44,11 @@ are NP-complete by chains of reductions (SAT \(\le_p\) 3SAT \(\le_p\) CLIQUE).</
 </ol>
 </div>
 
+<div class="box intuition"><span class="t">NP-complete = “the hardest problems in NP”</span>
+<p>A reduction \(A\le_p B\) says “if I can solve B fast, I can solve A fast” — B is at least as hard as A. An NP-complete problem is one
+that every NP problem reduces to. So if <b>any single</b> NP-complete problem had a fast algorithm, <b>every</b> NP problem would, and
+P = NP. That’s why proving a problem NP-complete is taken as strong evidence that it has no fast algorithm.</p>
+</div>
 <h2>14.2 SAT → 3SAT → CLIQUE, briefly</h2>
 <p><b>SAT → 3SAT:</b> convert to CNF with new variables (to avoid blow-up), then split long clauses:
 \((l_1\lor l_2\lor l_3\lor l_4)\) → \((l_1\lor l_2\lor y)\land(\lnot y\lor l_3\lor l_4)\).</p>
@@ -45,7 +56,7 @@ are NP-complete by chains of reductions (SAT \(\le_p\) 3SAT \(\le_p\) CLIQUE).</
 in different clauses and are not contradictory (\(x\) vs \(\lnot x\)). The formula is satisfiable iff the graph has a clique of
 size \(k\) (pick one true literal per clause).</p>
 
-<h2>14.3 FCS ☆ Q8: ◇-EQUATION is NP-complete</h2>
+<h2>14.3 A ☆ exam question: ◇-EQUATION is NP-complete</h2>
 <p>\(\diamond\) is NAND: \(0\diamond0=0\diamond1=1\diamond0=1\), \(1\diamond1=0\).</p>
 <div class="box model"><span class="t">Model answer</span>
 <p><b>In NP.</b> Certificate: an assignment of 0/1 to the variables (size ≤ input). Check: evaluate both sides bottom-up, one
@@ -58,9 +69,8 @@ operation per \(\diamond\) — linear time — and compare.</p>
 <p>For every assignment, \(T(\varphi)\) has the same value as \(\varphi\). So \(\varphi\) is satisfiable ⇔ some assignment makes
 \(T(\varphi)=1\) ⇔ the equation has a solution. Hence SAT \(\le_p\) ◇-EQUATION, which is therefore NP-complete.</p>
 </div>
-<pre class="run" data-cmd="python3 verify/fcs_diamond.py" data-show="checked on the exam example and 3000 random formulas"></pre>
 
-<h2>14.4 FCS ☆ Q10: NP is closed under ∪ and ∩</h2>
+<h2>14.4 A ☆ exam question: NP is closed under ∪ and ∩</h2>
 <div class="box model"><span class="t">Model answer</span>
 <p><b>Definition:</b> NP is the class of languages \(L\) decided by a nondeterministic TM in polynomial time (as above).</p>
 <p>Let \(L_1,L_2\in\) NP, decided by NTMs \(N_1,N_2\) in times \(p_1(n), p_2(n)\).</p>

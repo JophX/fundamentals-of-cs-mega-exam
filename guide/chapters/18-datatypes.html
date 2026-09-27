@@ -1,5 +1,8 @@
 <h1>18. Data types, type classes, laziness + problem bank <span class="tag pl">PL</span></h1>
 
+<p>So far we’ve only used types Haskell gave us: numbers, characters, lists. Real programs need their own — shapes, trees,
+expressions, stacks. Haskell lets you invent a type in one line, and then work with it using the very same pattern matching and
+recursion you already know. By the end of this chapter you’ll have written a tree and a tiny interpreter.</p>
 <h2>18.1 Algebraic data types</h2>
 <div class="box intuition"><span class="t">Intuition</span>
 <p><code>data</code> defines a new type by listing its possible <b>shapes</b>. Each shape has a <b>constructor</b> (capitalised)
@@ -52,7 +55,7 @@ isEmpty empty</pre>
 
 <h2>18.5 Laziness</h2>
 <p>Haskell evaluates an expression only when its value is needed (<b>lazy / non-strict</b> evaluation, call-by-need). So infinite
-lists are fine as long as you use only a finite part (this is the lecture’s <code>squares</code> example).</p>
+lists are fine as long as you use only a finite part.</p>
 <pre class="hs" data-file="Types.hs" data-block="lazy"></pre>
 <pre class="ghci" data-file="Types.hs">take 5 squares
 16 `elem` takeWhile (<= 16) squares

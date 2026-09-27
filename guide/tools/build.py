@@ -137,7 +137,7 @@ def process_pre(m):
             fail(f"command failed: {cmd}\n{r.stdout}\n{r.stderr}")
         out = r.stdout.rstrip("\n")
         shown = a.get("data-show", cmd)
-        head = f'<span class="prompt">$ {html.escape(shown)}</span>\n' if "data-hidecmd" not in a else ""
+        head = ""
         return f'{cap}<pre class="code run">{head}{html.escape(out)}</pre>'
 
     if cls == "code":
@@ -224,6 +224,10 @@ def add_toc(body):
 
 def main():
     typecheck_all_hs()
+    r = subprocess.run(["bash", os.path.join(GUIDE, "verify", "all.sh")], capture_output=True, text=True)
+    print(r.stdout.strip().splitlines()[-1] if r.stdout.strip() else r.stderr)
+    if r.returncode != 0:
+        fail("verification failed:\n" + r.stdout)
     args = sys.argv[1:]
     name = "guide"
     chdir = os.path.join(GUIDE, "chapters")
