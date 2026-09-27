@@ -1,0 +1,72 @@
+<h1>5. Closure and decision properties of regular languages <span class="tag fcs">FCS</span></h1>
+
+<div class="box intuition"><span class="t">Intuition</span>
+<p>“Regular languages are closed under X” means: if you take regular languages and do X to them, the result is
+<b>always</b> regular again. To prove it you show <b>how to build a machine</b> (or regex) for the result from the machines
+for the inputs.</p>
+</div>
+
+<h2>5.1 The closure properties and their one-line proofs</h2>
+<table class="wide">
+<tr><th>Operation</th><th>Closed?</th><th>Construction (the proof)</th></tr>
+<tr><td>Union \(L_1\cup L_2\)</td><td>yes</td><td>regex \(r_1+r_2\); or product DFA with final = “\(p\in F_1\) or \(q\in F_2\)”</td></tr>
+<tr><td>Concatenation \(L_1L_2\)</td><td>yes</td><td>regex \(r_1r_2\); or NFA: λ-arrows from finals of \(M_1\) to the start of \(M_2\)</td></tr>
+<tr><td>Star \(L^*\)</td><td>yes</td><td>regex \(r^*\); or NFA with new start/final and λ-arrow back</td></tr>
+<tr><td>Complement \(\overline L\)</td><td>yes</td><td>take a <b>DFA</b> (complete, with trap state) and swap final and non-final states</td></tr>
+<tr><td>Intersection \(L_1\cap L_2\)</td><td>yes</td><td>product DFA with final = \(F_1\times F_2\); or \(\overline{\overline{L_1}\cup\overline{L_2}}\) (De Morgan)</td></tr>
+<tr><td>Difference \(L_1\setminus L_2\)</td><td>yes</td><td>\(L_1\cap\overline{L_2}\)</td></tr>
+<tr><td>Reversal \(L^R\)</td><td>yes</td><td>reverse all arrows, swap start and final (add a new start with λ to old finals)</td></tr>
+<tr><td>Homomorphism</td><td>yes</td><td>substitute a string for each letter in the regex</td></tr>
+</table>
+
+<div class="box trap"><span class="t">Complement needs a DFA</span>
+<p>Swapping final/non-final in an <b>NFA</b> does <i>not</i> give the complement (a string may have one accepting and one
+rejecting path). Convert to a complete DFA first. That is a classic exam point.</p>
+</div>
+
+<div class="box model"><span class="t">Model answer — FCS 2022 Q2 (5 p): “Argue that regular languages are closed under complement, intersection, concatenation and union”</span>
+<p>Let \(L_1, L_2\) be regular, with DFAs \(M_1 = (Q_1,\Sigma,\delta_1,q_1,F_1)\), \(M_2=(Q_2,\Sigma,\delta_2,q_2,F_2)\)
+and regular expressions \(r_1, r_2\).</p>
+<p><b>Union:</b> \(r_1 + r_2\) is a regular expression with \(L(r_1+r_2)=L_1\cup L_2\), so \(L_1\cup L_2\) is regular.
+<b>Concatenation:</b> likewise \(L(r_1r_2) = L_1L_2\).
+<b>Complement:</b> let \(M_1\) be complete (every state has a transition on every symbol; add a trap state if needed). The DFA
+\((Q_1,\Sigma,\delta_1,q_1,Q_1\setminus F_1)\) ends in exactly the same state as \(M_1\) on every input but accepts exactly
+when \(M_1\) rejects, so it accepts \(\overline{L_1}\).
+<b>Intersection:</b> the product DFA \((Q_1\times Q_2,\Sigma,\delta,(q_1,q_2),F_1\times F_2)\) with
+\(\delta((p,q),a)=(\delta_1(p,a),\delta_2(q,a))\) simulates both machines at once and accepts iff both accept, so it accepts
+\(L_1\cap L_2\). (Alternatively \(L_1\cap L_2=\overline{\overline{L_1}\cup\overline{L_2}}\) by De Morgan, using the previous two.)</p>
+</div>
+
+<h2>5.2 True/false facts (FCS Q1 style — −0.5 per wrong answer!)</h2>
+<table class="wide">
+<tr><th>Statement</th><th>Answer</th><th>Why</th></tr>
+<tr><td>L CF non-regular, L′ regular ⇒ \(L\cup L'\) is not regular</td><td><b>False</b></td><td>take \(L'=\Sigma^*\): \(L\cup\Sigma^*=\Sigma^*\) is regular</td></tr>
+<tr><td>L CF non-regular, L′ regular ⇒ \(L\cap L'\) is not regular</td><td><b>False</b></td><td>take \(L'=\emptyset\): the intersection is \(\emptyset\), regular</td></tr>
+<tr><td>Every finite language is regular</td><td>True</td><td>regex = union of its strings</td></tr>
+<tr><td>Every subset of a regular language is regular</td><td>False</td><td>\(\{a^nb^n\}\subseteq\Sigma^*\)</td></tr>
+<tr><td>The union of two non-regular languages is non-regular</td><td>False</td><td>\(L\cup\overline L=\Sigma^*\)</td></tr>
+<tr><td>A finite union of regular languages is regular</td><td>True</td><td>repeat the union construction</td></tr>
+<tr><td>An infinite union of regular languages is regular</td><td>False</td><td>see 5.4</td></tr>
+</table>
+<div class="box recipe"><span class="t">Recipe for “necessarily” statements</span>
+<p>“Necessarily” = always. To show <b>false</b>, find <b>one</b> counterexample — try the extreme languages first:
+\(\emptyset\), \(\{\lambda\}\), \(\Sigma^*\), a finite set.</p>
+</div>
+
+<h2>5.3 Decision properties</h2>
+<p>For regular languages (given as DFA/NFA/regex) all these are <b>decidable</b> (there’s an algorithm that always answers):</p>
+<ul>
+  <li><b>Membership</b> \(w\in L\)? Run the DFA.</li>
+  <li><b>Emptiness</b> \(L=\emptyset\)? Is any final state reachable from the start state? (graph search)</li>
+  <li><b>Finiteness</b> — is \(L\) infinite? Yes iff there is a <b>cycle</b> on some path from the start state to a final state
+    (remove states that can’t reach a final state, then look for a cycle among the rest).</li>
+  <li><b>Equivalence</b> \(L_1=L_2\)? Check \((L_1\setminus L_2)\cup(L_2\setminus L_1)=\emptyset\), or compare minimal DFAs.</li>
+</ul>
+
+<h2>5.4 The ☆ question: infinite unions (FCS 2022 Q9)</h2>
+<div class="box model"><span class="t">Model answer: “\(L_N=\bigcup_{n\in N}L_n\) with each \(L_n\) regular — necessarily regular?”</span>
+<p><b>Disprove.</b> Let \(N=\mathbb N\) and \(L_n=\{a^nb^n\}\). Each \(L_n\) contains one string, so it is finite and
+therefore regular. But \(\bigcup_{n\in\mathbb N}L_n=\{a^nb^n\mid n\ge 0\}\), which is not regular (pumping lemma,
+Chapter 6). So an infinite union of regular languages need not be regular. (Closure under union only extends to <i>finite</i>
+unions, by induction.)</p>
+</div>

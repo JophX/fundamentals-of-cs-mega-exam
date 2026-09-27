@@ -1,0 +1,262 @@
+<h1>10. Chomsky normal form and the CYK algorithm <span class="tag both">BOTH</span></h1>
+<h2>Part A — Chomsky normal form</h2>
+
+<div class="box intuition"><span class="t">The idea in plain words</span>
+<p>A grammar in CNF is a grammar where <b>every rule is one of only two boring shapes</b>:</p>
+<p style="text-align:center">\(A \to BC\) &nbsp;(exactly two variables) &nbsp;&nbsp;or&nbsp;&nbsp; \(A\to a\) &nbsp;(exactly one terminal).</p>
+<p>Why would anyone want that? Because then every derivation tree is a <b>binary tree</b>, and a string of length
+\(n\) is always derived in exactly \(2n-1\) steps. That makes algorithms like CYK (Part B) possible. Converting to
+CNF does <b>not change the language</b> (except that λ disappears) — it only rewrites the rules into boring shapes.</p>
+</div>
+
+<div class="box def"><span class="t">Definition (write this on the exam)</span>
+<p>A context-free grammar is in <b>Chomsky normal form</b> if every production has the form
+\[A \to BC \qquad\text{or}\qquad A \to a\]
+where \(A, B, C\) are variables and \(a\) is a terminal. Every CFG \(G\) with \(\lambda\notin L(G)\) has an equivalent
+grammar in CNF. (If \(\lambda\in L(G)\), the CNF grammar generates \(L(G)\setminus\{\lambda\}\).)</p>
+</div>
+
+<h3>Checking whether a grammar is in CNF</h3>
+<p>Go through the rules one by one and mark anything that is not of those two shapes:</p>
+<table class="wide">
+<tr><th>Rule</th><th>CNF?</th><th>Why</th></tr>
+<tr><td>\(S\to AB\)</td><td>✔</td><td>two variables</td></tr>
+<tr><td>\(A\to a\)</td><td>✔</td><td>one terminal</td></tr>
+<tr><td>\(S\to aB\)</td><td>✘</td><td>terminal mixed with a variable</td></tr>
+<tr><td>\(S\to ABC\)</td><td>✘</td><td>three variables (too long)</td></tr>
+<tr><td>\(A\to B\)</td><td>✘</td><td>a <i>unit</i> production (single variable)</td></tr>
+<tr><td>\(A\to\lambda\)</td><td>✘</td><td>a λ-production</td></tr>
+<tr><td>\(A\to ab\)</td><td>✘</td><td>two terminals</td></tr>
+</table>
+
+<h3>10.A1 The recipe (Linz order: λ → units → useless → shape)</h3>
+<div class="box recipe"><span class="t">Recipe: converting to CNF — always in this order</span>
+<ol>
+  <li><b>Remove λ-productions.</b>
+    <ul>
+      <li>Find the <b>nullable</b> variables: \(A\) is nullable if \(A\to\lambda\), or \(A\to B_1\dots B_k\) where
+        all \(B_i\) are nullable. Repeat until nothing new.</li>
+      <li>For every rule, add <b>all versions where you leave out any combination of nullable variables</b>
+        (but never add \(A\to\lambda\)).</li>
+      <li>Delete all \(A\to\lambda\).</li>
+    </ul></li>
+  <li><b>Remove unit productions</b> (\(A\to B\)).
+    <ul>
+      <li>For every \(A\), find all \(B\) with \(A\Rightarrow^* B\) using <i>only</i> unit rules.</li>
+      <li>Give \(A\) a copy of every <b>non-unit</b> rule of each such \(B\).</li>
+      <li>Delete all unit rules (including \(A\to A\)).</li>
+    </ul></li>
+  <li><b>Remove useless variables</b>, in this order:
+    <ol type="a">
+      <li>non-<b>generating</b>: variables that can never finish into a terminal string (e.g. \(C\to cC\) only);</li>
+      <li>non-<b>reachable</b>: variables that can’t be reached from \(S\).</li>
+    </ol>
+    Delete every rule that mentions them.</li>
+  <li><b>Fix the shapes.</b>
+    <ol type="a">
+      <li>In every rule whose right side has length ≥ 2, replace each terminal \(a\) by a new variable
+        \(T_a\) and add \(T_a\to a\).</li>
+      <li>Break every right side with 3 or more variables into a chain:
+        \(A\to C_1C_2C_3\cdots C_n\) becomes \(A\to C_1D_1,\ D_1\to C_2D_2,\ \dots,\ D_{n-2}\to C_{n-1}C_n\).</li>
+    </ol></li>
+</ol>
+</div>
+
+<div class="box trap"><span class="t">Why the order matters</span>
+<p>Removing λ can <b>create</b> unit rules (e.g. \(S\to aSb\mid SS\) with nullable \(S\) gives \(S\to S\)).
+Removing units can <b>create</b> useless variables (a variable nobody uses any more). So: λ first, units second,
+useless third, shapes last. If you do it in another order you will have to repeat steps.</p>
+</div>
+
+<h3>10.A2 Worked example A — the exam’s own grammar \(S\to aSbS\mid\lambda\)</h3>
+<p>This is the grammar for the PL-exam language “equally many \(a\) and \(b\), every prefix has at least as many
+\(a\) as \(b\)”. Convert it to CNF.</p>
+
+<p><b>Step 1 — λ-productions.</b> Nullable: \(S\) (because \(S\to\lambda\)). The rule \(S\to aSbS\) contains two
+occurrences of \(S\), so we write all four combinations of keeping/dropping them:</p>
+<table class="center">
+<tr><th>keep 1st S?</th><th>keep 2nd S?</th><th>new rule</th></tr>
+<tr><td>yes</td><td>yes</td><td>\(S\to aSbS\)</td></tr>
+<tr><td>no</td><td>yes</td><td>\(S\to abS\)</td></tr>
+<tr><td>yes</td><td>no</td><td>\(S\to aSb\)</td></tr>
+<tr><td>no</td><td>no</td><td>\(S\to ab\)</td></tr>
+</table>
+<p>Delete \(S\to\lambda\). Result: \(S\to aSbS\mid abS\mid aSb\mid ab\).</p>
+
+<p><b>Step 2 — unit productions.</b> None (no rule of the form \(S\to X\)). <b>Step 3 — useless.</b> None.</p>
+
+<p><b>Step 4a — terminals.</b> Introduce \(A\to a\) and \(B\to b\):
+\(S\to ASBS\mid ABS\mid ASB\mid AB\).</p>
+<p><b>Step 4b — long right sides.</b></p>
+<ul>
+  <li>\(S\to ASBS\) (4 symbols) → \(S\to AX,\ X\to SW,\ W\to BS\).</li>
+  <li>\(S\to ABS\) (3 symbols) → \(S\to AY,\ Y\to BS\).</li>
+  <li>\(S\to ASB\) (3 symbols) → \(S\to AZ,\ Z\to SB\).</li>
+  <li>\(S\to AB\) is already fine.</li>
+</ul>
+<div class="box model"><span class="t">Final answer</span>
+<p>\(S\to AX\mid AY\mid AZ\mid AB\qquad X\to SW\qquad W\to BS\qquad Y\to BS\qquad Z\to SB\qquad A\to a\qquad B\to b\)</p>
+<p>Since \(\lambda\) was in the original language, the CNF grammar generates the same language minus \(\lambda\).
+(You may reuse \(W\) instead of introducing \(Y\) — both are correct.)</p>
+</div>
+
+<h3>10.A3 Worked example B — every step is needed</h3>
+<p>\(G:\quad S\to ASA\mid aB \qquad A\to B\mid S\qquad B\to b\mid\lambda\)</p>
+
+<p><b>Step 1 — λ-productions.</b></p>
+<ul>
+  <li>Nullable: \(B\) (since \(B\to\lambda\)); then \(A\) (since \(A\to B\) and \(B\) is nullable). Is \(S\)?
+    \(S\to ASA\) needs \(S\) itself nullable, \(S\to aB\) has a terminal. So <b>no</b>. Nullable \(=\{A,B\}\).</li>
+  <li>\(S\to ASA\): the two \(A\)’s may each be dropped: \(ASA,\ SA,\ AS,\ S\).</li>
+  <li>\(S\to aB\): drop \(B\): \(aB,\ a\).</li>
+  <li>\(A\to B\): dropping \(B\) would give \(A\to\lambda\) — never add that. \(A\to S\) unchanged.</li>
+  <li>Delete \(B\to\lambda\).</li>
+</ul>
+<p>Result: \(S\to ASA\mid SA\mid AS\mid S\mid aB\mid a\qquad A\to B\mid S\qquad B\to b\)</p>
+
+<p><b>Step 2 — unit productions.</b> The unit rules are \(S\to S\), \(A\to B\), \(A\to S\).</p>
+<ul>
+  <li>\(S\to S\): just delete it.</li>
+  <li>\(A\Rightarrow^* B\) and \(A\Rightarrow^* S\). So \(A\) gets all non-unit rules of \(B\) (\(b\)) and of \(S\)
+    (\(ASA, SA, AS, aB, a\)).</li>
+</ul>
+<p>Result: \(S\to ASA\mid SA\mid AS\mid aB\mid a\qquad A\to b\mid ASA\mid SA\mid AS\mid aB\mid a\qquad B\to b\)</p>
+
+<p><b>Step 3 — useless.</b> Everything generates a terminal string and is reachable. Nothing to remove.</p>
+
+<p><b>Step 4.</b> \(aB\) → \(UB\) with \(U\to a\). \(ASA\) → \(AX\) with \(X\to SA\).</p>
+<div class="box model"><span class="t">Final answer</span>
+<p>\(S\to AX\mid SA\mid AS\mid UB\mid a\)<br>
+\(A\to b\mid AX\mid SA\mid AS\mid UB\mid a\)<br>
+\(B\to b\qquad U\to a\qquad X\to SA\)</p>
+</div>
+
+<h3>10.A4 Worked example C — unit chains and useless variables</h3>
+<p>\(G:\quad S\to Aa\mid B\mid C\qquad A\to a\mid bA\qquad B\to A\mid bb\qquad C\to cC\)</p>
+<ol>
+  <li><b>λ:</b> no λ-rules. Skip.</li>
+  <li><b>Units:</b> \(S\to B\), \(S\to C\), \(B\to A\). Unit reachability: \(S\Rightarrow^* B, A, C\);
+    \(B\Rightarrow^* A\). So \(S\) gets \(bb\) (from \(B\)), \(a, bA\) (from \(A\)), \(cC\) (from \(C\));
+    \(B\) gets \(a, bA\). Now: \(S\to Aa\mid bb\mid a\mid bA\mid cC\), \(A\to a\mid bA\), \(B\to bb\mid a\mid bA\),
+    \(C\to cC\).</li>
+  <li><b>Useless:</b> (a) \(C\) is <b>not generating</b> — \(C\to cC\) never ends. Delete \(C\) and \(S\to cC\).
+    (b) \(B\) is now <b>unreachable</b> — nobody mentions \(B\). Delete it.
+    Now: \(S\to Aa\mid bb\mid a\mid bA\), \(A\to a\mid bA\).</li>
+  <li><b>Shapes:</b> \(V\to a\) and \(T\to b\): \(S\to AV\mid TT\mid a\mid TA\), \(A\to a\mid TA\).</li>
+</ol>
+<div class="box model"><span class="t">Final answer</span>
+<p>\(S\to AV\mid TT\mid a\mid TA\qquad A\to a\mid TA\qquad V\to a\qquad T\to b\)</p>
+<p>Note: you cannot reuse \(A\) for “\(\to a\)” here, because \(A\) also has the rule \(A\to TA\); a new
+variable that <i>only</i> produces \(a\) is required.</p>
+</div>
+
+<div class="box trap"><span class="t">The mistakes that cost points</span>
+<ul>
+  <li>Dropping <b>only one</b> combination of nullable symbols. With two nullable symbols in a rule there are up to
+    4 versions (with three, up to 8). Make the little table.</li>
+  <li>Adding \(A\to\lambda\) back by dropping everything.</li>
+  <li>Forgetting that a variable is nullable <i>indirectly</i> (\(A\to B\), \(B\to\lambda\)).</li>
+  <li>Removing a unit rule without copying the rules over (then the language shrinks).</li>
+  <li>Replacing a terminal by a variable that has other rules too (see example C).</li>
+  <li>Not saying anything about λ. One sentence: “λ ∈ L(G), so the CNF grammar generates L(G) − {λ}.”</li>
+</ul>
+</div>
+
+<h3>Proof that these answers are right</h3>
+<p>Each grammar below was compared with the original on every non-empty string (up to the length shown) using a
+general parser, and checked to be in CNF:</p>
+<pre class="run" data-cmd="python3 verify/pack_cnf.py --check" data-show="python3 verify/pack_cnf.py --check"></pre>
+<h2>Part B — The CYK algorithm</h2>
+
+<div class="box intuition"><span class="t">The idea in plain words</span>
+<p>Question: <i>can the grammar produce the string \(w\)?</i> CYK answers it bottom-up, like building a pyramid:</p>
+<ul>
+  <li>First, for every <b>single letter</b>: which variables can produce it? (Look for rules \(A\to a\).)</li>
+  <li>Then, for every piece of <b>length 2</b>: which variables can produce it? Because the grammar is in CNF, a
+    variable produces a piece only through a rule \(A\to BC\): \(B\) makes the left part, \(C\) makes the right
+    part. So <b>try every place to cut the piece in two</b>, and look up the two halves in the rows you already
+    have.</li>
+  <li>Then length 3, 4, … up to the whole string.</li>
+  <li>At the top: if the <b>start symbol</b> can produce the whole string, \(w\in L(G)\).</li>
+</ul>
+<p>That’s all. The grammar <b>must be in CNF</b> first (that’s why CNF and CYK always come together).</p>
+</div>
+
+<div class="box def"><span class="t">Definition (Linz notation — write this)</span>
+<p>Let \(w = a_1a_2\cdots a_n\). Define \(V_{ij}\) = the set of variables that derive the substring
+\(a_i\cdots a_j\). Then
+\[V_{ii} = \{A \mid A\to a_i\}\]
+\[V_{ij} = \bigcup_{k=i}^{j-1}\{A \mid A\to BC,\ B\in V_{ik},\ C\in V_{k+1,j}\}\]
+and \(w\in L(G) \iff S\in V_{1n}\). The running time is \(O(n^3)\).</p>
+</div>
+
+<div class="box recipe"><span class="t">Recipe for the exam</span>
+<ol>
+  <li>Check that the grammar is in CNF (say so explicitly — the exam often asks).</li>
+  <li>Draw a triangle: row 1 has \(n\) cells (one per letter), row 2 has \(n-1\), …, the top row has one cell.
+    Label each cell with its substring — this avoids mistakes.</li>
+  <li>Row 1: for each letter, write the variables with a rule \(X\to\) that letter.</li>
+  <li>Row \(\ell\): for each substring of length \(\ell\), for <b>every</b> cut into (left, right): take the pairs
+    \(B\in\) cell(left), \(C\in\) cell(right), and add every \(A\) with a rule \(A\to BC\). Write ∅ if nothing.</li>
+  <li>Top cell: contains \(S\)? Then write the conclusion sentence (below).</li>
+</ol>
+</div>
+
+<div class="box model"><span class="t">The “very briefly explain what the result means” sentence</span>
+<p>“Cell \(V_{ij}\) contains exactly the variables that can derive the substring from position \(i\) to \(j\).
+Since the start symbol \(S\) is in the top cell \(V_{1n}\), \(S\Rightarrow^* w\), so the string <b>is</b> in the
+language of the grammar.” (If \(S\notin V_{1n}\): “…so the string is <b>not</b> in the language.”)</p>
+<p>Bonus sentence for full points: “Following the entries back down (which cut produced \(S\)) gives a derivation
+tree.”</p>
+</div>
+
+<h3>10.B1 Worked example 1 — the real exam question (<code>abcab</code>)</h3>
+<p>Grammar: \(S\to SS\mid XY\mid XS'\), \(S'\to SY\), \(X\to a\), \(Y\to BC\mid BB\mid b\), \(B\to b\),
+\(C\to CC\mid c\).</p>
+<p><b>Is it in CNF?</b> Yes: every rule is either two variables (\(SS, XY, XS', SY, BC, BB, CC\)) or one terminal
+(\(a, b, c\)). (\(S'\) is just a variable name.) So the answer is “Yes”.</p>
+<p>Here is every cell with every cut tried (generated by the checker program — this is exactly the work you do on
+paper):</p>
+<pre class="run" data-cmd="python3 verify/cyk_explain.py &quot;S -> SS | XY | XS' ; S' -> SY ; X -> a ; Y -> BC | BB | b ; B -> b ; C -> CC | c&quot; abcab" data-show="CYK on abcab, every cut"></pre>
+<p>How to read one line: <code>abc|ab: {S}·{S} → {S}</code> means “cut <i>abcab</i> into <i>abc</i> and
+<i>ab</i>; \(S\) makes <i>abc</i>, \(S\) makes <i>ab</i>; the rule \(S\to SS\) combines them, so \(S\) makes
+<i>abcab</i>”.</p>
+<p>The table as you would draw it on the exam (bottom row = single letters):</p>
+<table class="center">
+<tr><td>len 5</td><td colspan="5">\(V_{15}=\{S\}\)</td></tr>
+<tr><td>len 4</td><td>\(V_{14}=\emptyset\)</td><td>\(V_{25}=\emptyset\)</td><td colspan="3"></td></tr>
+<tr><td>len 3</td><td>\(V_{13}=\{S\}\)</td><td>\(V_{24}=\emptyset\)</td><td>\(V_{35}=\emptyset\)</td><td colspan="2"></td></tr>
+<tr><td>len 2</td><td>\(V_{12}=\{S\}\)</td><td>\(V_{23}=\{Y\}\)</td><td>\(V_{34}=\emptyset\)</td><td>\(V_{45}=\{S\}\)</td><td></td></tr>
+<tr><td>len 1</td><td>\(V_{11}=\{X\}\)</td><td>\(V_{22}=\{B,Y\}\)</td><td>\(V_{33}=\{C\}\)</td><td>\(V_{44}=\{X\}\)</td><td>\(V_{55}=\{B,Y\}\)</td></tr>
+<tr><th></th><th>a</th><th>b</th><th>c</th><th>a</th><th>b</th></tr>
+</table>
+<p><b>Result:</b> \(S\in V_{15}\), so <code>abcab</code> ∈ L(G). Reading back: \(S\to SS\) with the first
+\(S\) deriving <i>abc</i> (via \(S\to XY\), \(X\to a\), \(Y\to BC\to bc\)) and the second deriving <i>ab</i>
+(via \(S\to XY\), \(X\to a\), \(Y\to b\)).</p>
+<div class="dot" data-caption="Derivation tree recovered from the table">digraph{node[shape=plaintext fontname="Helvetica"]; edge[arrowhead=none];
+S0[label="S"]; S1[label="S"]; S2[label="S"]; X1[label="X"]; Y1[label="Y"]; B1[label="B"]; C1[label="C"]; X2[label="X"]; Y2[label="Y"];
+a1[label="a"]; b1[label="b"]; c1[label="c"]; a2[label="a"]; b2[label="b"];
+S0->S1; S0->S2; S1->X1; S1->Y1; X1->a1; Y1->B1; Y1->C1; B1->b1; C1->c1; S2->X2; S2->Y2; X2->a2; Y2->b2;}</div>
+
+<h3>10.B2 Worked example 2 — a string that is <i>rejected</i> (length 5)</h3>
+<p>Grammar: the CNF grammar from Part A (for the language “balanced a/b, prefixes have ≥ as many a as b”):
+\(S\to AX\mid AY\mid AZ\mid AB\), \(X\to SW\), \(W\to BS\), \(Y\to BS\), \(Z\to SB\), \(A\to a\), \(B\to b\).
+String: <code>aabab</code>.</p>
+<pre class="run" data-cmd="python3 verify/cyk_explain.py &quot;S -> AX | AY | AZ | AB ; X -> SW ; W -> BS ; Y -> BS ; Z -> SB ; A -> a ; B -> b&quot; aabab" data-show="CYK on aabab"></pre>
+<p>\(S\notin V_{15}=\emptyset\), so <code>aabab</code> is <b>not</b> in the language. Sanity check: it has 3
+a’s and 2 b’s, so it can’t be balanced. ✔ (Always do such a sanity check if you can!)</p>
+
+<h3>10.B3 Worked example 3 — accepted, length 6</h3>
+<pre class="run" data-cmd="python3 verify/cyk_explain.py &quot;S -> AX | AY | AZ | AB ; X -> SW ; W -> BS ; Y -> BS ; Z -> SB ; A -> a ; B -> b&quot; abaabb" data-show="CYK on abaabb"></pre>
+<p>\(S\in V_{16}\): <code>abaabb</code> is in the language (it is \(ab\cdot aabb\)).</p>
+
+<div class="box trap"><span class="t">The mistakes that cost points</span>
+<ul>
+  <li><b>Not trying every cut.</b> A cell of length \(\ell\) has \(\ell-1\) cuts. Example 1’s top cell has 4 cuts,
+    and only the third one works.</li>
+  <li>Order matters: \(A\to BC\) needs \(B\) on the <b>left</b> part and \(C\) on the <b>right</b> part.</li>
+  <li>Forgetting that a cell can hold <b>several</b> variables (like \(\{B,Y\}\)) — try all of them.</li>
+  <li>Not writing the conclusion sentence. “Briefly explain what the result means” is worth points on its own.</li>
+  <li>Running CYK on a grammar that is not in CNF — convert first (Part A).</li>
+</ul>
+</div>

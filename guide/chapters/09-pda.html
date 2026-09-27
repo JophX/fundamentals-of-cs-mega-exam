@@ -1,0 +1,48 @@
+<h1>9. Pushdown automata <span class="tag fcs">FCS</span></h1>
+
+<div class="box intuition"><span class="t">Intuition: a finite automaton plus a stack</span>
+<p>A DFA can’t count without bound. Give it a <b>stack</b> (a pile of plates: you can only add or remove on top) and it can:
+for \(a^nb^n\), push one plate per \(a\), pop one per \(b\), and accept if the pile is back to the bottom exactly when the input
+ends. PDAs recognise <b>exactly the context-free languages</b> — the stack is what a parser uses to match brackets.</p>
+</div>
+
+<div class="box def"><span class="t">Definition (exam appendix): NPDA</span>
+<p>\(M=(Q,\Sigma,\Gamma,\delta,q_0,z,F)\): states, input alphabet, stack alphabet \(\Gamma\), transition function
+\(\delta: Q\times(\Sigma\cup\{\lambda\})\times\Gamma\to\) finite subsets of \(Q\times\Gamma^*\), start state, stack start symbol
+\(z\), final states.</p>
+<p>\((p, x)\in\delta(q, a, s)\) means: in state \(q\), reading \(a\) (or nothing if \(a=\lambda\)), with \(s\) on top of the stack:
+go to \(p\) and <b>replace \(s\) by the string \(x\)</b> (leftmost symbol of \(x\) becomes the new top). So:
+<b>pop</b> = replace by λ; <b>push</b> \(A\) = replace \(s\) by \(As\); <b>no change</b> = replace \(s\) by \(s\).</p>
+<p>Accepts \(w\) if some computation reads all of \(w\) and ends in a final state.</p>
+</div>
+
+<h3>Example: \(\{a^nb^n\mid n\ge0\}\)</h3>
+<table class="wide">
+<tr><th>Transition</th><th>Meaning</th></tr>
+<tr><td>\(\delta(q_0,a,z)=\{(q_0,Az)\}\), \(\delta(q_0,a,A)=\{(q_0,AA)\}\)</td><td>push an \(A\) for each \(a\)</td></tr>
+<tr><td>\(\delta(q_0,b,A)=\{(q_1,\lambda)\}\), \(\delta(q_1,b,A)=\{(q_1,\lambda)\}\)</td><td>pop an \(A\) for each \(b\); once b’s start, no more a’s</td></tr>
+<tr><td>\(\delta(q_0,\lambda,z)=\{(q_2,z)\}\), \(\delta(q_1,\lambda,z)=\{(q_2,z)\}\)</td><td>stack back at bottom ⇒ go to final \(q_2\)</td></tr>
+</table>
+<p>\(F=\{q_2\}\). Trace \(aabb\): \((q_0,aabb,z)\vdash(q_0,abb,Az)\vdash(q_0,bb,AAz)\vdash(q_1,b,Az)\vdash(q_1,\lambda,z)\vdash(q_2,\lambda,z)\) — accept.
+These triples (state, remaining input, stack) are <b>instantaneous descriptions</b>.</p>
+
+<h3>Example: even palindromes \(ww^R\) — uses nondeterminism</h3>
+<p>Push every letter; at some point <b>guess</b> “this is the middle” (a λ-move to a pop state); then pop and compare each
+letter with the top. A deterministic machine can’t know where the middle is — this language is CF but <b>not</b> deterministic CF.</p>
+
+<h2>9.1 CFG → PDA</h2>
+<div class="box recipe"><span class="t">Construction (the proof that every CFL has a PDA)</span>
+<p>One working state. Push \(S\). Then repeat: if the top is a <b>variable</b> \(A\), replace it (λ-move) by the right side of
+some rule \(A\to x\) (guess which); if the top is a <b>terminal</b>, it must match the next input letter — pop it and read.
+Accept when input is used up and the stack is empty (at \(z\)). The PDA simulates a leftmost derivation.</p>
+</div>
+
+<h2>9.2 Deterministic PDAs</h2>
+<ul>
+  <li>DPDA: at most one possible move in every situation (and no choice between a λ-move and a reading move).</li>
+  <li><b>DCFL</b> = languages of DPDAs. Regular ⊂ DCFL ⊂ CFL, both strict: \(a^nb^n\) is DCFL but not regular;
+    \(ww^R\) is CFL but not DCFL.</li>
+  <li>DCFLs are closed under <b>complement</b>; CFLs are not. Programming-language parsers (LR) work with DCFL-style grammars
+    because they must be fast (linear time).</li>
+  <li>Unlike finite automata, <b>NPDAs are strictly more powerful than DPDAs</b>.</li>
+</ul>

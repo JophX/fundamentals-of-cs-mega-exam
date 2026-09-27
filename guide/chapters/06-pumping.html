@@ -1,0 +1,49 @@
+<h1>6. The pumping lemma for regular languages <span class="tag fcs">FCS</span></h1>
+
+<div class="box intuition"><span class="t">Intuition: the pigeonhole principle</span>
+<p>A DFA with \(n\) states reading a string of length ≥ \(n\) visits \(n+1\) states — so some state repeats. The part of the
+string read between the two visits is a <b>loop</b>. You can go around that loop 0 times, twice, 100 times, and the DFA ends
+in the same place. So every long string in a regular language has a piece \(y\) near the start that can be <b>pumped</b>.</p>
+<p>We use it <b>backwards</b>: find a language where pumping breaks the string — then it can’t be regular.</p>
+</div>
+
+<div class="box thm"><span class="t">The lemma (as given in the exam appendix)</span>
+<p>If \(L\) is regular, there is \(n\ge 1\) such that every \(w\in L\) with \(|w|\ge n\) can be written \(w=xyz\) with
+\(|xy|\le n\) and \(|y|\ge 1\), such that \(xy^iz\in L\) for <b>all</b> \(i\ge 0\).</p>
+</div>
+
+<div class="box recipe"><span class="t">Recipe: proving L is NOT regular — it’s a game</span>
+<ol>
+  <li><b>Assume</b> \(L\) is regular. Let \(n\) be the pumping constant. (The opponent picks \(n\) — you don’t know it.)</li>
+  <li><b>You pick</b> a string \(w\in L\) with \(|w|\ge n\), <b>depending on \(n\)</b>. Choose it so that the first \(n\) letters are
+    all the same letter — then \(y\) is trapped there.</li>
+  <li><b>The opponent</b> splits \(w=xyz\) with \(|xy|\le n\), \(|y|\ge1\). You must handle <b>every</b> possible split.</li>
+  <li><b>You pick</b> an \(i\) (usually 0 or 2) so that \(xy^iz\notin L\).</li>
+  <li>Contradiction ⇒ \(L\) is not regular.</li>
+</ol>
+</div>
+
+<h3>Example 1: \(L=\{a^kb^k\mid k\ge0\}\)</h3>
+<p>Assume regular, constant \(n\). Pick \(w=a^nb^n\in L\), \(|w|=2n\ge n\). Any split with \(|xy|\le n\) has \(xy\) inside the
+first \(n\) letters, which are all \(a\)’s, so \(y=a^j\) with \(j\ge1\). Pump \(i=2\): \(xy^2z=a^{n+j}b^n\). It has more \(a\)’s
+than \(b\)’s, so it is not in \(L\). Contradiction; \(L\) is not regular.</p>
+
+<h3>Example 2: \(L=\{ww^R\}\) (even palindromes)</h3>
+<p>Pick \(w=a^nbba^n\). \(y=a^j\) inside the first block. \(i=0\): \(a^{n-j}bba^n\) is not a palindrome. Not regular.</p>
+
+<h3>Example 3: \(L=\{a^{k^2}\}\)</h3>
+<p>Pick \(w=a^{n^2}\). \(1\le|y|=j\le n\). \(i=2\): length \(n^2+j\), and \(n^2<n^2+j\le n^2+n<(n+1)^2\). Strictly between two
+consecutive squares, so not a square. Not regular.</p>
+
+<h3>Example 4: \(\{w\mid |w|_a=|w|_b\}\)</h3>
+<p>Pick \(w=a^nb^n\) again (it’s in \(L\)); same argument as Example 1. <i>Alternative trick:</i> if \(L\) were regular, then
+\(L\cap a^*b^*=\{a^nb^n\}\) would be regular (closure under ∩) — contradiction.</p>
+
+<div class="box trap"><span class="t">Where people lose points</span>
+<ul>
+  <li>Choosing a specific number like \(w=a^5b^5\). The string must depend on \(n\).</li>
+  <li>Choosing the split yourself (“let \(y=a\)”). You must argue for <b>all</b> splits.</li>
+  <li>Using the lemma to prove a language <b>is</b> regular. It can’t do that (it is only a necessary condition).</li>
+  <li>Forgetting to say “contradiction, so \(L\) is not regular” at the end.</li>
+</ul>
+</div>

@@ -1,0 +1,64 @@
+<h1>11. Pumping lemma for CFLs, and closure <span class="tag fcs">FCS</span></h1>
+
+<div class="box intuition"><span class="t">Intuition</span>
+<p>In a very tall parse tree, some variable must repeat on one path (finitely many variables — pigeonhole again). The subtree
+between the two occurrences can be repeated or removed. That pumps <b>two</b> pieces \(u\) and \(v\) <b>at the same time</b>
+(one on each side of the middle \(y\)). This is why CFLs can match <b>two</b> counts (\(a^nb^n\)) but not <b>three</b>
+(\(a^nb^nc^n\)).</p>
+</div>
+
+<div class="box thm"><span class="t">The lemma (exam appendix)</span>
+<p>If \(L\) is (infinite) context-free, there is \(n\) such that every \(w\in L\) with \(|w|\ge n\) can be written
+\(w=xuyvz\) with \(|uyv|\le n\), \(|uv|\ge1\), such that \(xu^iyv^iz\in L\) for all \(i\ge0\).</p>
+</div>
+
+<div class="box recipe"><span class="t">Recipe: proving L is NOT context-free</span>
+<ol>
+  <li>Assume \(L\) is CF with constant \(n\).</li>
+  <li>Choose \(w\in L\), \(|w|\ge n\), depending on \(n\) — usually blocks of length \(n\): \(a^nb^nc^n\).</li>
+  <li>The window \(uyv\) has length ≤ \(n\), so it <b>can touch at most two neighbouring blocks</b> — but it can be
+    <b>anywhere</b> (unlike the regular lemma). List the cases by which blocks \(u\) and \(v\) touch.</li>
+  <li>In each case choose \(i\) (0 or 2) that breaks membership.</li>
+  <li>All cases lead to contradiction ⇒ not CF.</li>
+</ol>
+</div>
+
+<h3>Example 1: \(\{a^kb^kc^k\}\)</h3>
+<p>Assume CF, constant \(n\). \(w=a^nb^nc^n\). Since \(|uyv|\le n\), \(uv\) can’t contain both \(a\)’s and \(c\)’s (the b-block of
+length \(n\) is between them). Case 1: \(uv\) has no \(c\). Then pumping \(i=0\) removes at least one \(a\) or \(b\) but no \(c\):
+the counts are no longer equal. Case 2: \(uv\) has no \(a\): symmetric, \(i=0\) leaves \(n\) a’s and fewer b’s or c’s.
+(Also if \(u\) or \(v\) contains two different letters, \(i=2\) puts letters out of order.) Contradiction — not CF.</p>
+
+<h3>Example 2: \(\{ww\mid w\in\{a,b\}^*\}\)</h3>
+<p>\(w=a^nb^na^nb^n\). The window touches at most two adjacent blocks. \(i=0\): if the window is in the first half, the first half
+loses letters but the second doesn’t; the string (if even length) is no longer of the form \(ww\) because its middle shifts into
+the \(b\)-blocks mismatching. Case analysis (first half / middle / second half) gives a contradiction each time. Not CF.
+(Note: \(\{ww^R\}\) <i>is</i> CF — mirror, not copy.)</p>
+
+<h3>Example 3: \(\{a^{k}\mid k \text{ prime}\}\), \(\{a^{k^2}\}\)</h3>
+<p>Over one letter, CF = regular, so these are not CF either (same proofs as Ch. 6 with \(|uv|\) in place of \(|y|\)).</p>
+
+<div class="box trap"><span class="t">FCS exam Q4 (2022/2025 cover): the language printed is actually context-free</span>
+<p>\(L=\{w\mid |w|_a&gt;2|w|_b\}\cup\{w\mid 2|w|_a&lt;|w|_b\}\). Each part is recognised by a PDA that uses its stack as a
+counter (add 1 per \(a\), subtract 2 per \(b\); accept if the counter is positive), and CFLs are closed under union. So \(L\) is
+context-free, and no correct proof of the opposite exists. A grammar for it (checked on every string up to length 12):</p>
+<p>\(S\to A\mid B,\ A\to EaE\mid EaA,\ B\to FbF\mid FbB,\) \(E\to aEaEbE\mid aEbEaE\mid bEaEaE\mid\lambda,\) \(F\to bFbFaF\mid bFaFbF\mid aFbFbF\mid\lambda\)</p>
+<p><b>If this happens on your exam:</b> don’t freeze. Write briefly why the attempt fails, give the PDA/union argument, and say
+you believe the question contains a mistake — then move on. If a similar question appears with three letters, e.g.
+\(\{w\in\{a,b,c\}^*\mid |w|_a=|w|_b=|w|_c\}\), it <i>is</i> non-CF: intersect with the regular \(a^*b^*c^*\) to get
+\(a^nb^nc^n\) (CFL ∩ regular is CF, so if \(L\) were CF, \(a^nb^nc^n\) would be too).</p>
+</div>
+<pre class="run" data-cmd="python3 verify/fcs_q4.py" data-show="python3 verify/fcs_q4.py"></pre>
+
+<h2>11.1 Closure properties of CFLs</h2>
+<table class="wide">
+<tr><th>Operation</th><th>CFL</th><th>DCFL</th><th>Why</th></tr>
+<tr><td>Union</td><td>yes</td><td>no</td><td>\(S\to S_1\mid S_2\)</td></tr>
+<tr><td>Concatenation</td><td>yes</td><td>no</td><td>\(S\to S_1S_2\)</td></tr>
+<tr><td>Star</td><td>yes</td><td>no</td><td>\(S\to S_1S\mid\lambda\)</td></tr>
+<tr><td>Intersection</td><td><b>no</b></td><td>no</td><td>\(\{a^nb^nc^m\}\cap\{a^mb^nc^n\}=\{a^nb^nc^n\}\)</td></tr>
+<tr><td>Complement</td><td><b>no</b></td><td><b>yes</b></td><td>if CFL were closed under complement, then ∩ via De Morgan</td></tr>
+<tr><td>∩ with a regular language</td><td>yes</td><td>yes</td><td>product of PDA and DFA (one stack is enough)</td></tr>
+</table>
+<p>Decidable for CFLs: membership (CYK), emptiness, finiteness. <b>Undecidable</b>: whether two CFGs are equivalent, whether a
+CFG is ambiguous, whether \(L(G)=\Sigma^*\).</p>

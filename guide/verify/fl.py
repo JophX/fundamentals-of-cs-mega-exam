@@ -227,6 +227,8 @@ def minimize_table_filling(dfa, show=True):
         for q in Q[i + 1:]:
             if (p in dfa.finals) != (q in dfa.finals):
                 marked[frozenset((p, q))] = 0
+    if show:
+        print("round 0: mark every (final, non-final) pair:", ", ".join("(" + ",".join(sorted(k)) + ")" for k in marked))
     changed = True
     while changed:
         changed = False
@@ -257,6 +259,5 @@ def minimize_table_filling(dfa, show=True):
         else:
             classes.append([q])
     if show:
-        print("round 0 marked every (final, non-final) pair.")
         print("Unmarked pairs are indistinguishable → classes:", ", ".join("{" + ",".join(c) + "}" for c in classes))
     return classes

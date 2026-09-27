@@ -1,0 +1,55 @@
+<h1>8. Precedence and associativity <span class="tag pl">PL</span></h1>
+
+<div class="box intuition"><span class="t">Intuition</span>
+<p>Without parentheses, <code>2 + 3 * 4</code> could mean 20 or 14. The language must decide. <b>Precedence</b>: which operator
+wins between <i>different</i> operators (<code>*</code> beats <code>+</code>). <b>Associativity</b>: which side wins between
+<i>equal</i> operators (<code>10 - 4 - 3</code> is <code>(10 - 4) - 3</code>).</p>
+</div>
+
+<h2>8.1 Common rules</h2>
+<table class="wide">
+<tr><th>Level (high → low)</th><th>Operators</th><th>Associativity</th></tr>
+<tr><td>1</td><td><code>^</code> / <code>**</code> (power)</td><td>right: <code>2^3^2 = 2^(3^2) = 512</code></td></tr>
+<tr><td>2</td><td>unary <code>-</code>, <code>!</code></td><td>right</td></tr>
+<tr><td>3</td><td><code>*</code> <code>/</code> <code>%</code></td><td>left</td></tr>
+<tr><td>4</td><td><code>+</code> <code>-</code></td><td>left: <code>10-4-3 = 3</code></td></tr>
+<tr><td>5</td><td><code>&lt;</code> <code>==</code> …</td><td>often non-associative</td></tr>
+<tr><td>6</td><td><code>&amp;&amp;</code>, then <code>||</code></td><td>left</td></tr>
+<tr><td>7</td><td><code>=</code> (assignment)</td><td>right: <code>a = b = 0</code></td></tr>
+</table>
+<p>In Haskell you can even declare them: <code>infixl 6 +</code>, <code>infixl 7 *</code>, <code>infixr 8 ^</code>,
+<code>infixr 5 :</code>, <code>infixr 5 ++</code>. Function application binds tighter than any operator:
+<code>f x + 1</code> = <code>(f x) + 1</code>.</p>
+
+<h2>8.2 How a grammar encodes them</h2>
+<div class="box recipe"><span class="t">Recipe: one variable per precedence level</span>
+<pre class="code text">expr   → expr + term   | expr - term   | term       (lowest precedence, left-assoc)
+term   → term * factor | term / factor | factor
+factor → base ^ factor | base                         (right-assoc: RIGHT recursion)
+base   → number | ( expr )                            (highest: parentheses)</pre>
+<ul>
+  <li><b>Lower in the grammar = binds tighter</b>: a <code>term</code> is built before it can be added.</li>
+  <li><b>Left recursion</b> (<code>expr → expr + term</code>) grows the tree to the left ⇒ <b>left associative</b>.</li>
+  <li><b>Right recursion</b> (<code>factor → base ^ factor</code>) ⇒ <b>right associative</b>.</li>
+</ul>
+</div>
+<p>This grammar is unambiguous: <code>2 + 3 * 4</code> has exactly one tree, with <code>*</code> below <code>+</code>:</p>
+<div class="dot">digraph{node[shape=plaintext fontname="Helvetica"]; edge[arrowhead=none];
+e[label="expr"]; e2[label="expr"]; p[label="+"]; t[label="term"]; t2[label="term"]; f2[label="factor"]; n2[label="2"];
+t3[label="term"]; m[label="*"]; f4[label="factor"]; f3[label="factor"]; n3[label="3"]; n4[label="4"];
+e->e2; e->p; e->t; e2->t2; t2->f2; f2->n2; t->t3; t->m; t->f4; t3->f3; f3->n3; f4->n4;}</div>
+<p>A working parser built exactly this way (in Haskell) is in Chapter 22; it really turns <code>10 - 4 - 3</code> into
+<code>(10 - 4) - 3</code>.</p>
+
+<div class="box model"><span class="t">Model answer (6 p): “Briefly describe precedence and associativity. How are they related?”</span>
+<p><b>Precedence</b> decides which of two <b>different</b> operators binds tighter when there are no parentheses:
+<code>*</code> has higher precedence than <code>+</code>, so <code>2 + 3 * 4 = 2 + (3 * 4) = 14</code>.
+<b>Associativity</b> decides how operators of the <b>same</b> precedence level are grouped: <code>-</code> is left-associative,
+so <code>10 - 4 - 3 = (10 - 4) - 3 = 3</code>; exponentiation and assignment are usually right-associative
+(<code>2^3^2 = 2^(3^2)</code>, <code>a = b = 0</code>).</p>
+<p><b>Relation:</b> both are rules that remove the <b>ambiguity</b> of expressions without parentheses and thereby fix the shape of
+the syntax tree (and so the result). Precedence is used between different levels; associativity only matters when operators have
+the <b>same</b> precedence. In a grammar they are encoded by one non-terminal per precedence level (lower levels deeper in the tree
+bind tighter) and by the direction of recursion (left recursion ⇒ left associative, right recursion ⇒ right associative).
+Parentheses override both.</p>
+</div>

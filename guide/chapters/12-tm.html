@@ -1,0 +1,90 @@
+<h1 class="part">Part II<small>Computability and complexity <br><span class="tag fcs">FCS</span> only</small></h1>
+
+<h1>12. Turing machines and the language hierarchy <span class="tag fcs">FCS</span></h1>
+
+<div class="box intuition"><span class="t">Intuition: the simplest possible computer</span>
+<p>A Turing machine is a finite automaton that can <b>read and write</b> on an infinite tape and <b>move both ways</b>. That is
+enough to compute anything any computer can compute (Church–Turing thesis). Unlike a DFA it may <b>never stop</b>.</p>
+</div>
+
+<div class="box def"><span class="t">Definition (exam appendix)</span>
+<p>\(M=(Q,\Sigma,\Gamma,\delta,q_0,\square,F)\): states, input alphabet, tape alphabet \(\Gamma\supseteq\Sigma\cup\{\square\}\),
+transition function \(\delta:Q\times\Gamma\to Q\times\Gamma\times\{L,R\}\) (partial), start state, blank \(\square\notin\Sigma\),
+final states.</p>
+<p>\(\delta(q,a)=(p,b,R)\): in state \(q\) reading \(a\): write \(b\), move right, go to \(p\). The machine <b>halts</b> when
+\(\delta\) is undefined. (Linz) it <b>accepts</b> \(w\) if it halts in a final state. An <b>instantaneous description</b>
+\(x\,q\,y\) means: tape contents \(xy\), state \(q\), head on the first symbol of \(y\).</p>
+</div>
+
+<h3>Example: accept \(\{a^nb^n\mid n\ge1\}\)</h3>
+<p>Idea: repeatedly cross off the leftmost \(a\) (write \(x\)) and the leftmost \(b\) (write \(y\)).</p>
+<table class="wide">
+<tr><th>State</th><th>Does</th></tr>
+<tr><td>\(q_0\)</td><td>on \(a\): write \(x\), R, go \(q_1\). On \(y\): all a’s done — go \(q_3\) to check only y’s remain.</td></tr>
+<tr><td>\(q_1\)</td><td>move R over \(a\)’s and \(y\)’s; on \(b\): write \(y\), L, go \(q_2\)</td></tr>
+<tr><td>\(q_2\)</td><td>move L over \(y\)’s and \(a\)’s; on \(x\): R, go \(q_0\)</td></tr>
+<tr><td>\(q_3\)</td><td>move R over \(y\)’s; on \(\square\): go final \(q_4\). (Anything else: no move ⇒ halt, reject.)</td></tr>
+</table>
+<p>Trace on <i>aabb</i> (instantaneous descriptions, produced by simulating the machine; it was also checked to accept exactly \(a^nb^n\) on every string up to length 10):</p>
+<pre class="run" data-cmd="python3 verify/ch12_tm.py | tail -1" data-hidecmd="1"></pre>
+
+<h2>12.1 Turing machines computing functions — composition (FCS Q6, 6 p)</h2>
+<p>A TM computes \(f\) if started on \(v\) it halts in a final state with \(f(v)\) on the tape (head at its start).</p>
+<div class="box model"><span class="t">Model answer: build \(M_{gf}\) computing \(g(f(v))\) from \(M_f\) and \(M_g\)</span>
+<p>Idea: run \(M_f\); when it finishes, the tape holds \(f(v)\) — exactly the input \(M_g\) needs — so continue with \(M_g\).
+Rename states so the two machines don’t clash (assume \(Q_f\cap Q_g=\emptyset\)).</p>
+<p>\(M_{gf}=(Q_f\cup Q_g,\ \Sigma,\ \Gamma,\ \delta,\ q_{0,f},\ \square,\ F_g)\) with</p>
+<ul>
+  <li>\(\delta(q,a)=\delta_f(q,a)\) for \(q\in Q_f\) where \(\delta_f\) is defined (run \(M_f\));</li>
+  <li>\(\delta(q,a)=\delta_g(q,a)\) for \(q\in Q_g\) (run \(M_g\));</li>
+  <li>for every final state \(q\in F_f\) and every \(a\in\Gamma\) where \(\delta_f(q,a)\) is undefined (i.e. where \(M_f\) would
+    halt): hand over to \(M_g\). Since \(M_f\) halts with the head at the start of \(f(v)\), we need a move into
+    \(q_{0,g}\) without changing the tape. With only \(\{L,R\}\) moves: \(\delta(q,a)=(q',a,R)\) and
+    \(\delta(q',b)=(q_{0,g},b,L)\) for all \(b\), with a fresh state \(q'\) (step right and back).</li>
+  <li>Final states: \(F_g\) only (states of \(F_f\) are no longer final).</li>
+</ul>
+<p>Assumptions to state: both machines use the same tape alphabet (take the union), halt with the head on the first symbol of
+the output and leave nothing else on the tape.</p>
+</div>
+
+<h2>12.2 Variants — all equally powerful</h2>
+<table class="wide">
+<tr><th>Variant</th><th>Why no more powerful</th></tr>
+<tr><td>Stay option (S move)</td><td>replace each S by R then L</td></tr>
+<tr><td>Semi-infinite tape</td><td>fold the two-way tape: two tracks, one for each half</td></tr>
+<tr><td>Off-line (read-only input)</td><td>copy the input to the work tape</td></tr>
+<tr><td>Multitape (k tapes)</td><td>one tape with 2k tracks: contents + head markers; each step sweeps the tape (quadratic slowdown)</td></tr>
+<tr><td>Multidimensional</td><td>encode coordinates on a 1-D tape</td></tr>
+<tr><td>Nondeterministic</td><td>see below (exponential slowdown)</td></tr>
+</table>
+
+<div class="box model"><span class="t">Model answer — FCS Q7 (6 p): “Why NTMs are not more powerful than DTMs”</span>
+<p>Every DTM is an NTM with one choice, so NTMs are at least as powerful. Conversely, let \(N\) be an NTM. The computations of
+\(N\) on input \(w\) form a tree: each node is a configuration (ID), its children are the configurations reachable in one move;
+since \(\delta\) gives finitely many choices, each node has at most \(k\) children. \(N\) accepts \(w\) iff some node of the tree
+is an accepting configuration. A deterministic machine \(D\) (conveniently with 3 tapes: input, simulation, choice-sequence) explores
+this tree <b>breadth-first</b>: for \(\ell=1,2,3,\dots\) it tries every sequence of choices of length \(\ell\), simulating \(N\)
+on \(w\) following those choices. If \(N\) has an accepting computation of length \(\ell\), \(D\) finds it at stage \(\ell\) and
+accepts; otherwise \(D\) never accepts. (Breadth-first, not depth-first, since one branch can be infinite.) Multitape DTMs are
+equivalent to single-tape DTMs, so \(L(N)\) is accepted by a DTM. The price is time: up to \(k^{\ell}\) branches, an exponential
+slowdown — but the <b>set of languages</b> is the same.</p>
+</div>
+
+<h2>12.3 The universal Turing machine</h2>
+<p>Encode any TM \(M\) as a binary string \(\langle M\rangle\) (list its transitions). A <b>universal TM</b> \(U\) takes
+\(\langle M\rangle w\) and simulates \(M\) on \(w\). Like an interpreter running a program — it is why one computer can run any
+program. It also shows the set of TMs is <b>countable</b> (they are strings).</p>
+
+<h2>12.4 The hierarchy (FCS Q3, 8 p)</h2>
+<div class="box model"><span class="t">Model answer — fill in 5 classes, each with a machine and a language that is <i>not</i> in the smaller class</span>
+<table class="wide">
+<tr><th>Class</th><th>Represented by</th><th>Example language (in this class, not in the smaller)</th></tr>
+<tr><td>1. Regular</td><td>DFA / NFA / regular expression</td><td>\(\{a^n\mid n \text{ even}\}\), \(a^*b^*\)</td></tr>
+<tr><td>2. Deterministic CF</td><td>DPDA</td><td>\(\{a^nb^n\mid n\ge0\}\)</td></tr>
+<tr><td>3. Context-free</td><td>NPDA / CFG</td><td>\(\{ww^R\mid w\in\{a,b\}^*\}\)</td></tr>
+<tr><td>4. Recursive (decidable)</td><td>TM that always halts (decider)</td><td>\(\{a^nb^nc^n\mid n\ge0\}\)</td></tr>
+<tr><td>5. Recursively enumerable</td><td>TM (may loop on non-members)</td><td>the halting problem \(H=\{\langle M\rangle w\mid M \text{ halts on } w\}\)</td></tr>
+</table>
+<p>Also valid: <b>context-sensitive</b> (linear bounded automaton / context-sensitive grammar, e.g. \(a^nb^nc^n\)), placed between
+CF and recursive. The grading is on <b>consistency</b>: class, machine and language must agree.</p>
+</div>

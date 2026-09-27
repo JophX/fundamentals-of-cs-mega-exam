@@ -1,0 +1,45 @@
+<h1>4. Minimizing a DFA <span class="tag fcs">FCS</span></h1>
+
+<div class="box intuition"><span class="t">Intuition</span>
+<p>Two states are <b>the same in practice</b> if, from either of them, exactly the same future strings lead to
+acceptance. Then you can merge them. The minimal DFA is the one where every state “means” something different.</p>
+</div>
+<div class="box def"><span class="t">Definition</span>
+<p>States \(p\) and \(q\) are <b>indistinguishable</b> if for every string \(w\):
+\(\delta^*(p,w)\in F \iff \delta^*(q,w)\in F\). Otherwise they are <b>distinguishable</b> — some string \(w\) takes one
+to a final state and the other to a non-final state.</p>
+</div>
+
+<div class="box recipe"><span class="t">Recipe: the marking (table-filling) algorithm</span>
+<ol>
+  <li>Remove states that can’t be reached from the start state.</li>
+  <li>Draw a table with one cell for every pair of states.</li>
+  <li><b>Round 0:</b> mark every pair where one state is final and the other is not (the empty string distinguishes them).</li>
+  <li><b>Repeat:</b> for every unmarked pair \((p,q)\) and every letter \(a\): if \((\delta(p,a),\delta(q,a))\) is already
+    marked, mark \((p,q)\). Stop when a whole round marks nothing new.</li>
+  <li>Unmarked pairs are indistinguishable: merge them. Each group becomes one state of the minimal DFA.</li>
+</ol>
+</div>
+
+<h3>Worked example</h3>
+<p>This DFA accepts “ends with <i>ab</i>” but has one state too many (\(q_3\) behaves exactly like \(q_0\)):</p>
+<div class="dot">digraph{rankdir=LR; node[shape=circle fontname="Helvetica"]; edge[fontname="Helvetica"];
+s[shape=point]; q2[shape=doublecircle]; s->q0; q0->q1[label="a"]; q0->q3[label="b"]; q1->q1[label="a"]; q1->q2[label="b"];
+q2->q1[label="a"]; q2->q0[label="b"]; q3->q1[label="a"]; q3->q0[label="b"];}</div>
+<pre class="run" data-cmd="python3 verify/ch04_min.py" data-show="marking algorithm"></pre>
+<p>Round 0 marks every pair with \(q_2\) (the only final state). Round 1: \((q_0,q_1)\) on <i>b</i> goes to \((q_3,q_2)\),
+which is marked, so mark it. Same for \((q_1,q_3)\). The pair \((q_0,q_3)\): on <i>a</i> both go to \(q_1\); on <i>b</i> both go
+to \(q_0\) — never reaches a marked pair. So \(q_0\) and \(q_3\) merge, giving the 3-state DFA of Chapter 2.</p>
+
+<div class="box thm"><span class="t">Facts to know</span>
+<ul>
+  <li>The minimal DFA of a regular language is <b>unique</b> (up to renaming states).</li>
+  <li>Two DFAs accept the same language ⇔ their minimal DFAs are the same. So equivalence of regular languages is
+    <b>decidable</b>.</li>
+</ul>
+</div>
+<div class="box trap"><span class="t">Traps</span>
+<ul><li>Forgetting to delete unreachable states first.</li>
+<li>Stopping after one round — keep going until a full round marks nothing.</li>
+<li>Forgetting the trap state when the DFA is drawn with missing arrows.</li></ul>
+</div>

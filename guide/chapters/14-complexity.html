@@ -1,0 +1,73 @@
+<h1>14. Complexity: P, NP and NP-completeness <span class="tag fcs">FCS</span></h1>
+
+<div class="box intuition"><span class="t">Intuition</span>
+<p>Decidability asks “can it be solved at all?”. Complexity asks “can it be solved <b>fast</b>?”. <b>P</b> = problems we can
+<i>solve</i> quickly. <b>NP</b> = problems where a proposed solution can be <i>checked</i> quickly (sudoku: hard to solve, easy
+to check). Whether P = NP is the famous open problem.</p>
+</div>
+
+<h2>14.1 Definitions</h2>
+<div class="box def"><span class="t">Definitions</span>
+<ul>
+  <li>\(f(n)=O(g(n))\) if there are \(c, n_0\) with \(f(n)\le c\,g(n)\) for all \(n\ge n_0\).</li>
+  <li>A TM runs in time \(T(n)\) if it halts within \(T(n)\) steps on every input of length \(n\).</li>
+  <li>\(\mathbf{P}\) = languages decided by a <b>deterministic</b> TM in polynomial time \(O(n^k)\).</li>
+  <li>\(\mathbf{NP}\) = languages decided by a <b>nondeterministic</b> TM in polynomial time (every branch halts in
+    \(O(n^k)\), accept if some branch accepts). Equivalently: languages with a polynomial-time <b>verifier</b>: \(w\in L\) iff
+    there is a <b>certificate</b> \(c\) with \(|c|\) polynomial in \(|w|\) such that a deterministic poly-time machine accepts
+    \((w,c)\).</li>
+  <li>\(\mathbf P\subseteq\mathbf{NP}\) (a deterministic machine is a special NTM). Simulating an NTM deterministically takes
+    exponential time (Ch. 12), which is why we don’t know whether they are equal.</li>
+  <li>Poly-time reduction \(A\le_p B\): a poly-time computable \(f\) with \(w\in A\iff f(w)\in B\).</li>
+  <li>\(B\) is <b>NP-hard</b> if \(A\le_p B\) for every \(A\in\) NP; <b>NP-complete</b> if also \(B\in\) NP.</li>
+</ul>
+</div>
+<div class="box thm"><span class="t">Cook–Levin</span>
+<p>SAT (is a propositional formula satisfiable?) is NP-complete. Then 3SAT, CLIQUE, VERTEX COVER, HAMILTONIAN PATH, SUBSET-SUM…
+are NP-complete by chains of reductions (SAT \(\le_p\) 3SAT \(\le_p\) CLIQUE).</p>
+<p>Consequence: if any NP-complete problem is in P, then P = NP. So “If P=NP then there is a polynomial algorithm for SAT” is
+<b>True</b> (FCS Q1).</p>
+</div>
+
+<div class="box recipe"><span class="t">Recipe: proving problem B is NP-complete</span>
+<ol>
+  <li><b>B ∈ NP</b>: say what the certificate is and why checking it takes polynomial time.</li>
+  <li><b>B is NP-hard</b>: pick a known NP-complete A (SAT, 3SAT, CLIQUE…) and give a reduction \(f\) from <b>A to B</b>.</li>
+  <li>Show \(f\) runs in polynomial time (output size polynomial).</li>
+  <li>Show \(w\in A\Rightarrow f(w)\in B\) <b>and</b> \(f(w)\in B\Rightarrow w\in A\).</li>
+</ol>
+</div>
+
+<h2>14.2 SAT → 3SAT → CLIQUE, briefly</h2>
+<p><b>SAT → 3SAT:</b> convert to CNF with new variables (to avoid blow-up), then split long clauses:
+\((l_1\lor l_2\lor l_3\lor l_4)\) → \((l_1\lor l_2\lor y)\land(\lnot y\lor l_3\lor l_4)\).</p>
+<p><b>3SAT → CLIQUE:</b> for a formula with \(k\) clauses, make a vertex per literal occurrence; connect two vertices if they are
+in different clauses and are not contradictory (\(x\) vs \(\lnot x\)). The formula is satisfiable iff the graph has a clique of
+size \(k\) (pick one true literal per clause).</p>
+
+<h2>14.3 FCS ☆ Q8: ◇-EQUATION is NP-complete</h2>
+<p>\(\diamond\) is NAND: \(0\diamond0=0\diamond1=1\diamond0=1\), \(1\diamond1=0\).</p>
+<div class="box model"><span class="t">Model answer</span>
+<p><b>In NP.</b> Certificate: an assignment of 0/1 to the variables (size ≤ input). Check: evaluate both sides bottom-up, one
+operation per \(\diamond\) — linear time — and compare.</p>
+<p><b>NP-hard: reduce SAT.</b> Given a formula \(\varphi\) over \(\lnot,\land,\lor\), translate it recursively:
+\(T(x)=x\), \(T(\lnot\alpha)=T(\alpha)\diamond1\), \(T(\alpha\land\beta)=(T(\alpha)\diamond T(\beta))\diamond1\),
+\(T(\alpha\lor\beta)=(T(\alpha)\diamond1)\diamond(T(\beta)\diamond1)\). These are correct since \(x\diamond1=\lnot x\),
+\(\lnot(a\diamond b)=a\land b\), and \((\lnot a)\diamond(\lnot b)=a\lor b\). Each subformula is used <b>once</b>, so
+\(|T(\varphi)|\le 5|\varphi|\): polynomial time. Output the equation \(T(\varphi)=1\).</p>
+<p>For every assignment, \(T(\varphi)\) has the same value as \(\varphi\). So \(\varphi\) is satisfiable ⇔ some assignment makes
+\(T(\varphi)=1\) ⇔ the equation has a solution. Hence SAT \(\le_p\) ◇-EQUATION, which is therefore NP-complete.</p>
+</div>
+<pre class="run" data-cmd="python3 verify/fcs_diamond.py" data-show="checked on the exam example and 3000 random formulas"></pre>
+
+<h2>14.4 FCS ☆ Q10: NP is closed under ∪ and ∩</h2>
+<div class="box model"><span class="t">Model answer</span>
+<p><b>Definition:</b> NP is the class of languages \(L\) decided by a nondeterministic TM in polynomial time (as above).</p>
+<p>Let \(L_1,L_2\in\) NP, decided by NTMs \(N_1,N_2\) in times \(p_1(n), p_2(n)\).</p>
+<p><b>Union:</b> NTM \(N\) on \(w\): nondeterministically choose \(i\in\{1,2\}\), run \(N_i\) on \(w\). Some branch accepts ⇔
+\(N_1\) or \(N_2\) has an accepting branch ⇔ \(w\in L_1\cup L_2\). Time \(O(p_1(n)+p_2(n))\), polynomial.</p>
+<p><b>Intersection:</b> NTM \(N\) on \(w\): run \(N_1\) on \(w\) (nondeterministically); if that branch accepts, run \(N_2\) on
+\(w\) (on a fresh copy of \(w\)); accept if it accepts. A branch accepts ⇔ it contains an accepting run of \(N_1\) followed by one
+of \(N_2\) ⇔ \(w\in L_1\cap L_2\). Every branch takes at most \(p_1(n)+p_2(n)+O(n)\) steps (copying \(w\)), polynomial.
+(Verifier version: the certificate for ∩ is the pair \((c_1,c_2)\); for ∪ it is \((i, c_i)\).)</p>
+</div>

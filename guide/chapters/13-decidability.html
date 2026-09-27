@@ -1,0 +1,70 @@
+<h1>13. Decidability, countability, the halting problem <span class="tag fcs">FCS</span></h1>
+
+<h2>13.1 Recursive vs recursively enumerable</h2>
+<div class="box def"><span class="t">Definitions</span>
+<ul>
+  <li>\(L\) is <b>recursively enumerable (RE)</b> if some TM accepts exactly \(L\): on \(w\in L\) it halts and accepts; on
+    \(w\notin L\) it rejects <b>or runs forever</b>. (A <b>recognizer</b>.)</li>
+  <li>\(L\) is <b>recursive (decidable)</b> if some TM accepts \(L\) and <b>halts on every input</b>. (A <b>decider</b>.)</li>
+  <li>A <b>problem</b> is decidable if the language of its yes-instances is recursive.</li>
+</ul>
+</div>
+<div class="box thm"><span class="t">Key facts</span>
+<ul>
+  <li>Recursive ⊂ RE (strict). Recursive languages are closed under complement (swap accept/reject of the decider).</li>
+  <li><b>If \(L\) and \(\overline L\) are both RE, then \(L\) is recursive</b>: run both recognizers in parallel (one step each);
+    one of them must accept.</li>
+  <li>So \(\overline H\) (the complement of the halting problem) is <b>not</b> RE.</li>
+</ul>
+</div>
+<div class="box trap"><span class="t">FCS Q1 true/false traps</span>
+<ul>
+  <li>“It can be correct to say that a Turing machine M is decidable.” — <b>False</b>. Languages/problems are decidable; a
+    <i>machine</i> is a decider (halts always) or not. (Expected answer: false.)</li>
+  <li>“The set of suitably encoded Turing machines is RE.” — <b>True</b> (even recursive: a TM can check whether a string is a
+    valid encoding).</li>
+</ul>
+</div>
+
+<h2>13.2 Countability and diagonalization</h2>
+<div class="box intuition"><span class="t">Intuition</span>
+<p>There are only <b>countably many</b> TMs (each is a finite string, and strings can be listed by length). But there are
+<b>uncountably many</b> languages (all subsets of \(\Sigma^*\)). So most languages have no TM at all.</p>
+</div>
+<div class="box thm"><span class="t">Cantor: \(2^{\Sigma^*}\) is uncountable</span>
+<p>Suppose the languages could be listed \(L_1,L_2,L_3,\dots\) and list the strings \(w_1,w_2,w_3,\dots\). Define
+\(D=\{w_i\mid w_i\notin L_i\}\). For each \(i\), \(D\) differs from \(L_i\) on the string \(w_i\) (flip the diagonal). So \(D\)
+is not in the list — contradiction. Hence there are languages that are <b>not RE</b>.</p>
+</div>
+
+<h2>13.3 The halting problem</h2>
+<div class="box thm"><span class="t">Theorem</span>
+<p>\(H=\{\langle M\rangle w \mid M \text{ halts on } w\}\) is RE but <b>not recursive</b>.</p>
+<p><b>RE:</b> the universal TM simulates \(M\) on \(w\) and accepts if it halts.</p>
+<p><b>Not recursive (proof by contradiction):</b> suppose a TM \(H_D\) decides it. Build \(D\): on input \(\langle M\rangle\), run
+\(H_D\) on \(\langle M\rangle\langle M\rangle\); if it says “halts”, loop forever; if it says “doesn’t halt”, halt. Now run \(D\)
+on \(\langle D\rangle\): \(D\) halts ⇔ \(H_D\) says \(D\) doesn’t halt on \(\langle D\rangle\) ⇔ \(D\) doesn’t halt.
+Contradiction. So no such \(H_D\).</p>
+</div>
+
+<h2>13.4 Reductions</h2>
+<div class="box recipe"><span class="t">Recipe: proving problem B is undecidable</span>
+<ol>
+  <li>Pick a known undecidable problem A (usually halting).</li>
+  <li>Assume B is decidable by a decider \(M_B\).</li>
+  <li>Show how to use \(M_B\) to decide A: given an instance of A, <b>construct</b> (by an algorithm that always halts) an
+    instance of B whose answer is the same.</li>
+  <li>Then A would be decidable — contradiction.</li>
+</ol>
+<p>Direction matters: reduce the <b>known hard</b> problem <b>to</b> the new one.</p>
+</div>
+<h3>Example: the state-entry problem</h3>
+<p>“Given \(M\), \(w\), and a state \(q\): does \(M\) ever enter \(q\) on \(w\)?” Reduce halting: given \(\langle M\rangle, w\),
+build \(M'\): add a new state \(q_{new}\); wherever \(M\) would halt (\(\delta(p,a)\) undefined), make \(M'\) go to \(q_{new}\).
+Then \(M'\) enters \(q_{new}\) on \(w\) ⇔ \(M\) halts on \(w\). A decider for state-entry would decide halting. So state-entry
+is undecidable.</p>
+<h3>Example: blank-tape halting</h3>
+<p>Given \(M, w\), build \(M_w\): starting on a blank tape, it first writes \(w\), then runs \(M\). \(M_w\) halts on blank ⇔
+\(M\) halts on \(w\). So blank-tape halting is undecidable.</p>
+<p><b>Rice’s theorem</b> (general version): every non-trivial property of the <i>language</i> of a TM (“is \(L(M)\) empty?”,
+“finite?”, “regular?”) is undecidable.</p>
