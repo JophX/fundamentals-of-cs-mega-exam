@@ -1,0 +1,80 @@
+=== PAGE 1 ===
+
+Tentamen 2023-03-16
+Programspr ˚ak (5DV086)
+– H. Bj ¨orklund –
+Totalt antal uppgifter 7
+Maximalt antal po ¨ang 60
+Krav f ¨or betyg 3 36
+F¨or godk ¨ant p ˚a tentamen kr ¨avs 60%, dvs 36 po ¨ang. De resterande 24 po ¨angen kommer att viktas
+och sl ˚as ihop med po ¨angen fr ˚an inl ¨amningsuppgifterna f ¨or att avg ¨ora om betyget kan bli 4 eller 5.
+Kom ih ˚ag att vi bara kan r ¨atta och ge po ¨ang till svar vi kan l ¨asa.Skriv tydligt!
+Problem 1 10 po ¨ang
+L˚atG=(N,Σ,R,S )vara en kontextfri grammatik d ¨ar
+•N={S,A,B,C }¨ar icketerminalerna,
+•Σ={a,b,c }¨ar terminalerna,
+•S¨ar startsymbolen och
+•Rinneh ˚aller f ¨oljande regler:
+S→SB
+S→aA
+A→aAb
+A→ε
+B→BB
+B→C
+S→cCb
+C→ε
+(εst˚ar h¨ar f¨or den tomma str ¨angen).
+Vilka av f ¨oljande str ¨angar kan Ggenerera?
+A.ε
+B.abcb
+C.aabcb
+D.cbab
+E.abc
+F.acb
+G.aaabbbbcccbb
+H.aaabbbbccbbcc
+I.ccbbbaab
+
+=== PAGE 2 ===
+
+Problem 2 10 po ¨ang
+L˚atL1vara det o ¨andliga str ¨angspr ˚aket ¨over alfabetet {a,b}som har f ¨oljande egenskaper:
+Oms¨ar en str ¨ang iL1s˚a
+I. inneh ˚allersexakt lika m ˚angaasomb
+II. inneh ˚aller varje preﬁx av sminst lika m ˚angaasomb
+L1best˚ar allts ˚a av alla str ¨angar som uppfyller I. och II., men inga andra str ¨angar.
+Exempel p ˚a str¨angar i L1:
+•ε
+•ab
+•aabb
+•aababbab
+Konstruera en kontextfri grammatik som genererar spr ˚aketL1.
+Problem 3 6 po ¨ang
+Beskriv kortfattat begreppen precedens och associavitet. Hur ¨ar de relaterade i kontexten program-
+spr˚ak?
+Problem 4 8 po ¨ang
+Beskriv kortfattat de olika delarna av en interpretator. Vilka ¨ar deras uppgifter och vilka typer av
+datastrukturer anv ¨ander sig de typiskt av?
+Problem 5 6 po ¨ang
+F¨orklara skillnaderna mellan pass-by-reference och pass-by-value. Vilka f ¨or- och nackdelar har de
+olika metoderna?
+Problem 6 10 po ¨ang
+Skriv en funktion compress i Haskell som “komprimerar” en str ¨ang. Den ska ta en str ¨ang som
+argument och returnera en lista som beskriver str ¨angen genom att ange hur m ˚anga upprepningar av
+ett visst tecken som ﬁnns p ˚a en viss plats. Till exempel ska anropet
+compress ’’aaaabbcccb’’
+ge returv ¨ardet
+[(’a’, 4), (’b’, 2), (’c’, 3), (’b’, 1)]
+eftersom str ¨angen b ¨orjar med 4 instanser av a, f¨oljt av 2 instanser av b, f¨oljt av 3 instanser av c, f¨oljt
+av 1 instans av b.
+Funktionen f ˚ar anv ¨anda sig av hj ¨alpfunktioner. Anv ¨and till exempel g ¨arna biblioteksfunktioner d ¨ar
+det¨ar l¨ampligt.
+Problem 7 10 po ¨ang
+Skriv en funktion myRev i Haskell som v ¨ander p ˚a listor:
+myRev ’’Hello’’
+’’olleH’’
+myRev [1, 2, 3]
+[3, 2, 1]
+Din funktion f˚ar inte anv¨anda sig av inbyggda funktioner som “rev”, “map”, “foldl”, “ﬁlter” etc.
+Din funktion ska ha en tidskomplexitet som ¨ar linj ¨ar i listans l ¨angd , det vill s ¨agaO(n), d¨arn
+¨ar listans l ¨angd.

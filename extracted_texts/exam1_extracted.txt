@@ -1,0 +1,65 @@
+=== PAGE 1 ===
+
+Tentamen 2023-05-05
+Programspr ˚ak (5DV086)
+– H. Bj ¨orklund –
+Totalt antal uppgifter 7
+Maximalt antal po ¨ang 60
+Krav f ¨or betyg 3 36
+F¨or godk ¨ant p ˚a tentamen kr ¨avs 60%, dvs 36 po ¨ang. De resterande 24 po ¨angen kommer att viktas
+och sl ˚as ihop med po ¨angen fr ˚an inl ¨amningsuppgifterna f ¨or att avg ¨ora om betyget kan bli 4 eller 5.
+Kom ih ˚ag att vi bara kan r ¨atta och ge po ¨ang till svar vi kan l ¨asa.Skriv tydligt!
+Problem 1 10 po ¨ang
+L˚atLvara spr ˚aket ¨over alfabetet {a,b}deﬁnerat av
+L={anbm/divides.alt0n≠2m}.
+Lbest˚ar med andra ord av alla str ¨angar som best ˚ar f¨orst av en sekvens av instanser av aoch sedan
+en sekvens av instanser av bs˚adana att antalet ainte¨ar exakt h ¨alften av antalet b.
+Konstruera en kontextfri grammatik som genererar L.
+Problem 2 10 po ¨ang
+L˚atL1vara det o ¨andliga str ¨angspr ˚aket ¨over alfabetet {a,b}som har f ¨oljande egenskaper:
+Oms¨ar en str ¨ang iL1s˚a
+I. inneh ˚allersexakt lika m ˚angaasomb
+II. inneh ˚aller varje preﬁx1avsminst lika m ˚angaasomb
+L1best˚ar allts ˚a av alla str ¨angar som uppfyller I. och II., men inga andra str ¨angar.
+Exempel p ˚a str¨angar i L1:
+•ε
+•ab
+•aabb
+•aababbab
+Konstruera en kontextfri grammatik som genererar spr ˚aketL1.
+Problem 3 6 po ¨ang
+Beskriv kortfattat begreppen precedens och associavitet. Hur ¨ar de relaterade i kontexten program-
+spr˚ak?
+Problem 4 8 po ¨ang
+En interpretator best ˚ar normalt sett av en Scanner/Lexer, en Parser, och en del som exekverar koden.
+Vilka ¨ar deras uppgifter och vilka typer av datastrukturer anv ¨ander sig de typiskt av?
+1Ettpreﬁx av en str ¨angs¨ar en str ¨angtsom man f ˚ar fr˚ansgenom att b ¨orja l ¨asa fr ˚an b¨orjan av soch sedan
+sluta n ˚agonstans, inte n ¨odv¨andigtvis f ¨orst d ¨arstar slut. Str ¨angen abca har allts ˚a preﬁxen ε,a,ab,abc, och
+abca .
+
+=== PAGE 2 ===
+
+Problem 5 6 po ¨ang
+I rent funktionella spr ˚ak s¨ager vi att det inte ﬁnns n ˚agra variabler. ¨And˚a kan vi i b ˚ade funktionella
+och imperativa spr ˚ak se uttryck som
+a = b + 4
+(med viss variation i den exakta syntaxen). I imperativa spr ˚ak kallar vi det f ¨or en variabeltilldelning
+medan vi i funktionella spr ˚ak kallar det f ¨or att namnge ett v ¨arde (eller binda ett v ¨arde till ett namn).
+Vad beror det p ˚a? Vad ¨ar skillnaden?
+Problem 6 10 po ¨ang
+Betrakta f ¨oljande tv ˚a Haskell-funktioner:
+foo x y = filter ( \w -> x == w) y
+bar x y = foldl ( \w -> \q -> (if q /= x then w+1 else w)) 0 y
+Beskriv kortfattat vad respektive funktion g ¨or.
+Vad blir resultatet av f ¨oljande anrop?
+foo ’c’ ”aabcccaacbba”
+bar ’c’ ”aabcccaacbba”
+Problem 7 10 po ¨ang
+Skriv en funktion myRev i Haskell som v ¨ander p ˚a listor:
+myRev ’’Hello’’
+’’olleH’’
+myRev [1, 2, 3]
+[3, 2, 1]
+Din funktion f˚ar inte anv¨anda sig av inbyggda funktioner som “rev”, “map”, “foldl”, “ﬁlter” etc.
+Din funktion ska ha en tidskomplexitet som ¨ar linj ¨ar i listans l ¨angd , det vill s ¨agaO(n), d¨arn
+¨ar listans l ¨angd.

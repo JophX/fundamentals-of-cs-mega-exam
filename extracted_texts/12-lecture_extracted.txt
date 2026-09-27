@@ -1,0 +1,244 @@
+=== PAGE 1 ===
+
+Programspråk
+Kapitel 12: Concurrency mm.
+Henrik Björklund
+
+=== PAGE 2 ===
+
+Kodbibliotek vs. språkkonstruktioner
+•Semaforer
+•Monitorer
+•Meddleanden
+•Transactional memory
+•Indikera vad som kan göras samtidigtConcurrency i programspråk
+2/20 Henrik Björklund Programspråk
+
+=== PAGE 3 ===
+
+En datastruktur med två atomära operationer.
+•wait: om räknaren är större än noll, räkna ner och
+fortsätt. Om räknaren är noll, blockera
+•signal: Om ingen väntar, räkna upp med 1. Om någon
+väntar, starta någon av de blockerade processerna.
+Enkelt: Kan implementeras med ett minimum av kod
+Nackdel: programmeraren ansvarar för alltSemaforer
+3/20 Henrik Björklund Programspråk
+
+=== PAGE 4 ===
+
+Oftast en språkkonstruktion
+Bara en process/tråd kan exekvera åt gången
+Kommandon för att signalera till andra och blockera sig själv
+Finns olika varianter, men fungerar som “synchronized” i
+JavaHur bra fungerar det egentligen? Låser man för mycket?
+Monitorer
+4/20 Henrik Björklund Programspråk
+
+=== PAGE 5 ===
+
+Oftast en språkkonstruktion
+Bara en process/tråd kan exekvera åt gången
+Kommandon för att signalera till andra och blockera sig själv
+Finns olika varianter, men fungerar som “synchronized” i
+Java
+Hur bra fungerar det egentligen? Låser man för mycket?Monitorer
+4/20 Henrik Björklund Programspråk
+
+=== PAGE 6 ===
+
+Enkelt att förstå: Processer skickar brev till vaandra via
+postlåda, brevbärare och brevlåda
+Synkront eller asynkront – eller båda
+Till exempel Ada har stöd för detta. Kan också
+implementeras via bibliotek.
+Problem: hastighet och resurser.Meddelanden
+5/20 Henrik Björklund Programspråk
+
+=== PAGE 7 ===
+
+Ungefär som transaktioner i databaser: En sekvens
+instruktioner betraktas som ett atomärt block. Om inte alla
+instruktioner blir körda rullas de föregående tillbaka.
+Finns i vissa implementationer av existerande språk.
+Kan implementeras i mjuk- eller hårdvara.Transactional memory
+6/20 Henrik Björklund Programspråk
+
+=== PAGE 8 ===
+
+•Riktigt ovändtade: Minnesfel, diskfel, datorn brinner, etc.
+•Oväntat, men kan hända: Numeriskt overflow,
+nolldivision, etc.
+•Förväntat: filslut, etc.
+Dessa kan alla resultera i att datorn genererar ett avbrott:
+den uppäcker att något är fel och signalerar detta.
+Vad göra?
+•Försöka återhämta sig
+•Avsluta programmetAvbrott - vad är det?
+7/20 Henrik Björklund Programspråk
+
+=== PAGE 9 ===
+
+Egentligen skulle det räcka med kod som kollar flaggor,
+returvärden, etc.
+I praktiken blir det rörig kod som är svår att förstå.
+De flesta moderna språk använder ungefär samma modell
+(de reserverade orden kan skilja sig åt): try–catch
+•Tydligare och enklare kod
+•Lättare att tänka på vilka typer av fel som kan uppstå
+•Kan välja att hantera felen på olika nivåerAvbrottshantering
+8/20 Henrik Björklund Programspråk
+
+=== PAGE 10 ===
+
+•Hur aktiveras ett undantag när det genereras i
+programmet?
+•Finns det parametrar? Vad ska de innehålla
+•Finns det möjlighet att hantera avbrottet på olika nivåer?
+•Hur fungerar i så fall denna mekanism?
+•Var ska felen hanteras?
+•Kan det finnas flera felhanterare? Hur väljs den rätta ut?Att tänka på
+9/20 Henrik Björklund Programspråk
+
+=== PAGE 11 ===
+
+Events skiljer sig från avbrott i att de inte indikerar att något
+gått fel, utan är ett sätt att programmera.
+De liknar avbrott, men har också stora likheter med
+meddelanden som de används mellan trådar.
+Undantag och events har samma ursprung:
+Hårdvarusignaler och avbrottsvektorer.
+Javas event-hantering är ganska typisk, även om skillnader
+mellan språk förstås förekommer.Händelser (Events)
+10/20 Henrik Björklund Programspråk
+
+=== PAGE 12 ===
+
+LISP - Scheme, ML, Haskell, Erlang
+Utmärkande: Inga sidoeffekterFunktionella språk
+11/20 Henrik Björklund Programspråk
+
+=== PAGE 13 ===
+
+(DEFINE (member a lst)
+(COND ((NULL? lst) /quotesingle.ts1())
+((EQ a (CAR lst) #T)
+(ELSE (member a (CDR lst)))))funmember a [] = false
+| membera(b::l)=a=b orelse member a l
+LISP och ML
+12/20 Henrik Björklund Programspråk
+
+=== PAGE 14 ===
+
+(DEFINE (member a lst)
+(COND ((NULL? lst) /quotesingle.ts1())
+((EQ a (CAR lst) #T)
+(ELSE (member a (CDR lst)))))
+funmember a [] = false
+| membera(b::l)=a=b orelse member a lLISP och ML
+12/20 Henrik Björklund Programspråk
+
+=== PAGE 15 ===
+
+•I princip samma sak
+•Helt funktionellt (inga sidoeffekter)
+•Bättre hantering av I/O
+•Icke-strikt semantik -> Lazy evaluationints=[0..]
+squares =[n*n | n <-ints]
+member 16 squares
+Haskell
+13/20 Henrik Björklund Programspråk
+
+=== PAGE 16 ===
+
+•I princip samma sak
+•Helt funktionellt (inga sidoeffekter)
+•Bättre hantering av I/O
+•Icke-strikt semantik -> Lazy evaluation
+ints=[0..]
+squares =[n*n | n <-ints]
+member 16 squaresHaskell
+13/20 Henrik Björklund Programspråk
+
+=== PAGE 17 ===
+
+•Bevisförning
+•Programtransformationer
+•Funktioner är första klassens medborgare
+•Enklare syntax och semantik
+•NaturlighetFördelar funktionella språk
+14/20 Henrik Björklund Programspråk
+
+=== PAGE 18 ===
+
+En del imperativa språk har stöd för en del funktionell
+programmering (tex funktioner som parametrar, anonyma
+funktioner).
+•Java
+•Javascript
+•Python
+•Ruby
+•C#Stöd i “icke-funktionella” språk
+15/20 Henrik Björklund Programspråk
+
+=== PAGE 19 ===
+
+Grundidé: Modellera en problemdomän logiskt
+•Ställ upp regler
+•Ange fakta
+•Fråga om ett visst mål följer av reglerna och fakta
+•Tala inte om för datorn hur den ska göra
+•Detta sköts av en bevismotorLogikspråk
+16/20 Henrik Björklund Programspråk
+
+=== PAGE 20 ===
+
+Exempel: Sortera en lista
+•C, Java, ML, etc
+•Steg-för-steg-beskrivning av hur man sorterar
+•Logikspråk
+•Beskriv egenskaperna hos en sorterad listasort(oldList,nL) ⊂permute(oldList,nL) ∩sorted(nL)
+sorted(list)⊂ ∀ j: 1≤j<n,list(j)≤list(j+1)
+Logikprogrammering
+17/20 Henrik Björklund Programspråk
+
+=== PAGE 21 ===
+
+Exempel: Sortera en lista
+•C, Java, ML, etc
+•Steg-för-steg-beskrivning av hur man sorterar
+•Logikspråk
+•Beskriv egenskaperna hos en sorterad lista
+sort(oldList,nL) ⊂permute(oldList,nL) ∩sorted(nL)
+sorted(list)⊂ ∀ j: 1≤j<n,list(j)≤list(j+1)Logikprogrammering
+17/20 Henrik Björklund Programspråk
+
+=== PAGE 22 ===
+
+// FACTS
+studies(charlie, csc135).
+studies(olivia, csc135).
+teaches(kirke, csc135).
+teaches(collins, csc131).
+// RULES
+professor(X, Y) :- teaches(X, C), studies(Y, C).
+// QUERIES / GOALS
+?- studies(charlie,What)
+?- professor(kirke,Students)Prolog
+18/20 Henrik Björklund Programspråk
+
+=== PAGE 23 ===
+
+•Effektivitet
+•Hur ska man söka?
+•True/fail
+•Negationer
+För att i viss mån avhjälpa dessa problem använder vissa
+språk cut (!) för att delvis styra sökningen.Begränsningar
+19/20 Henrik Björklund Programspråk
+
+=== PAGE 24 ===
+
+•Database management
+•Expert systemsApplications
+20/20 Henrik Björklund Programspråk

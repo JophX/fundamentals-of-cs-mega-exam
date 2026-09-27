@@ -1,0 +1,412 @@
+=== PAGE 1 ===
+
+Programspråk
+Kapitel 11: ADT och OOP
+Henrik Björklund
+
+=== PAGE 2 ===
+
+Grundläggande insikt: abstraktion är bra (eller till och med
+nödvändig)
+•När vi manipulerar data är det dess egenskaper vi är
+intresserade av, inte specifika detaljer.
+•Lättare att hantera kod
+•Vi människor fungerar så - vi behöver abstraktion
+•Abstraktion låter oss diskutera saker på olika nivåer
+•Detaljer är ibland ointressanta
+•Förmåga att se ett system på olika nivåerAbstrakta datatyper
+2/33 Henrik Björklund Programspråk
+
+=== PAGE 3 ===
+
+ADT stack i s elem + boolean + operations :
+empty: −> stack
+push : stack *elem −> stack
+pop : stack −> stack
+top : stack −> elem
+isEmpty : stack −> booleanEquations :
+isEmpty (empty) = true
+isEmpty (push( s , e ) ) = false
+pop(push( s , e ) ) = s
+pop(empty) = error
+top (push( s , e ) ) = e
+top (empty) = error
+Formell definition
+3/33 Henrik Björklund Programspråk
+
+=== PAGE 4 ===
+
+ADT stack i s elem + boolean + operations :
+empty: −> stack
+push : stack *elem −> stack
+pop : stack −> stack
+top : stack −> elem
+isEmpty : stack −> boolean
+Equations :
+isEmpty (empty) = true
+isEmpty (push( s , e ) ) = false
+pop(push( s , e ) ) = s
+pop(empty) = error
+top (push( s , e ) ) = e
+top (empty) = errorFormell definition
+3/33 Henrik Björklund Programspråk
+
+=== PAGE 5 ===
+
+Program innehåller detaljer om implementationen, inte bara
+abstrakt funktionalitet.ADT är ett försök att smälta ihop högnivåbeskrivningar från
+till exempel algebra med implementationsdetaljer.
+•Beskriv data och operationer på en högre
+abstraktionsnivå
+•Isolera olika delar så att de inte kan användas av andra
+delar av programmet.
+•Bara den utåt beskrivna funktionaliteten kan användas.
+Program̸=Algebra
+4/33 Henrik Björklund Programspråk
+
+=== PAGE 6 ===
+
+Program innehåller detaljer om implementationen, inte bara
+abstrakt funktionalitet.
+ADT är ett försök att smälta ihop högnivåbeskrivningar från
+till exempel algebra med implementationsdetaljer.•Beskriv data och operationer på en högre
+abstraktionsnivå
+•Isolera olika delar så att de inte kan användas av andra
+delar av programmet.
+•Bara den utåt beskrivna funktionaliteten kan användas.
+Program̸=Algebra
+4/33 Henrik Björklund Programspråk
+
+=== PAGE 7 ===
+
+Program innehåller detaljer om implementationen, inte bara
+abstrakt funktionalitet.
+ADT är ett försök att smälta ihop högnivåbeskrivningar från
+till exempel algebra med implementationsdetaljer.
+•Beskriv data och operationer på en högre
+abstraktionsnivå
+•Isolera olika delar så att de inte kan användas av andra
+delar av programmet.
+•Bara den utåt beskrivna funktionaliteten kan användas.Program̸=Algebra
+4/33 Henrik Björklund Programspråk
+
+=== PAGE 8 ===
+
+Encapsulation: En ADT specificeras som en syntaktisk enhet.
+Andra delar av programmet kan bara använda sig av
+definitionen.Information hiding: Den interna representationen är inte
+tillgänglig utanför enheten.
+Encapsulation and Information Hiding
+5/33 Henrik Björklund Programspråk
+
+=== PAGE 9 ===
+
+Encapsulation: En ADT specificeras som en syntaktisk enhet.
+Andra delar av programmet kan bara använda sig av
+definitionen.
+Information hiding: Den interna representationen är inte
+tillgänglig utanför enheten.Encapsulation and Information Hiding
+5/33 Henrik Björklund Programspråk
+
+=== PAGE 10 ===
+
+Encapsulation: Bättre organisation, lättare att läsa, lättare
+att modifiera, separatkompilering.Information hiding: Pålitlighet – ingen som inte har
+“behörighet” kan ändra på informationen.
+Fördelar
+6/33 Henrik Björklund Programspråk
+
+=== PAGE 11 ===
+
+Encapsulation: Bättre organisation, lättare att läsa, lättare
+att modifiera, separatkompilering.
+Information hiding: Pålitlighet – ingen som inte har
+“behörighet” kan ändra på informationen.Fördelar
+6/33 Henrik Björklund Programspråk
+
+=== PAGE 12 ===
+
+Abstraktion på olika nivåer
+•Primitiva datatyper
+•Procedurer/funktioner
+•Moduler
+•Records
+•ADT
+•Hierarkiska moduler/paket
+•Objektorienterad programmeringAbstraktion igen
+7/33 Henrik Björklund Programspråk
+
+=== PAGE 13 ===
+
+•Data i centrum, inte kod
+•Inkapsling
+•Arv
+•Dynamisk bindning
+•ModelleringObjektorienterad programmering
+8/33 Henrik Björklund Programspråk
+
+=== PAGE 14 ===
+
+•1963 definition av objekt/instanser
+•1967 Simula
+•1972 Smalltalk
+•80-talet: Java, C++Historia
+9/33 Henrik Björklund Programspråk
+
+=== PAGE 15 ===
+
+•Objekt som skickar och svarar på meddelanden
+•Klasser, instanser och “medlemmar”
+•Klass-metoder och instans-metoder
+•Går att jämföra med trådarSätt att tänka
+10/33 Henrik Björklund Programspråk
+
+=== PAGE 16 ===
+
+•C++, Objective-C (nya namn och annorlunda syntax, men
+i grunden utbyggnader av C)
+•Ada 95
+•CLOS
+•SchemeSupport som byggts in i existerande
+språk
+11/33 Henrik Björklund Programspråk
+
+=== PAGE 17 ===
+
+•Eiffel
+•Java
+•C#Stora delar OO
+12/33 Henrik Björklund Programspråk
+
+=== PAGE 18 ===
+
+•Smalltalk
+•Ruby
+•Squeak (smalltalk)Helt OO
+13/33 Henrik Björklund Programspråk
+
+=== PAGE 19 ===
+
+•Fält kan vara öppna eller stängda
+•Äteranvändning - kan vara besvärligt med ADT
+•Ibland vill man låta viss kod se implementationsdetaljerOO vs. ADT
+14/33 Henrik Björklund Programspråk
+
+=== PAGE 20 ===
+
+•private, protected, public
+•Flexiblare
+•Bryter mot definitionen av ADT
+•Omdefinition av metoder (kan ge upphov till
+“shadowing”)
+•En variabel kan ta olika typer
+•Dynamisk bindning – en variant av polymorfismArv
+15/33 Henrik Björklund Programspråk
+
+=== PAGE 21 ===
+
+•Bara objekt: Enkelt, elegant, långsamt
+•En blandning: Snabbare, specialfallAtt tänka på
+16/33 Henrik Björklund Programspråk
+
+=== PAGE 22 ===
+
+•Flexibilitet
+•Hastighet
+•Tillåt båda?Dynamisk bindning vs statisk
+17/33 Henrik Björklund Programspråk
+
+=== PAGE 23 ===
+
+•Dynamisk kontroll
+•Kostar tid och resurser
+•Krav på samma parametrar/returvärde
+•Statisk kontroll
+•Mindre kostsamtTypkontroll
+18/33 Henrik Björklund Programspråk
+
+=== PAGE 24 ===
+
+•Fördelar?
+•Nackdelar?
+•Enkelt eller multipelt?Hur ser ni på arv?
+19/33 Henrik Björklund Programspråk
+
+=== PAGE 25 ===
+
+•Stack
+•Heap
+•Fördelar/nackdelarVar skapas objekten?
+20/33 Henrik Björklund Programspråk
+
+=== PAGE 26 ===
+
+•Har setts på AP-javan
+•Fördelar?
+•Nackdelar?
+•Användningsområden?Nästlade klasser
+21/33 Henrik Björklund Programspråk
+
+=== PAGE 27 ===
+
+class Demo :
+def__init__(self,value):
+self.myValue = value
+defvalue(self):
+return self.myValue
+defsetValue(self,newValue):
+self.myValue = newValue
+d = Demo(12)
+print(d.value())
+d.setValue(17)
+print(d.value())Setters och getters
+22/33 Henrik Björklund Programspråk
+
+=== PAGE 28 ===
+
+class Demo :
+def__init__(self,value):
+self.myValue = value
+@property
+defvalue(self):
+return self.myValue
+@value.setter
+defsetValue(self,newValue):
+self.myValue = newValue
+d = Demo(12)
+print(d.value())
+d.setValue(17)
+print(d.value())Setters och getters
+23/33 Henrik Björklund Programspråk
+
+=== PAGE 29 ===
+
+•Ren OOP
+•Allt är objekt
+•Full programmeringsomgivning med GUI
+•Allt är dynamiskt
+•Enkelt arv
+•Vill du testa? Ladda ner squeakSmalltalk
+24/33 Henrik Björklund Programspråk
+
+=== PAGE 30 ===
+
+fac | result |
+result <- i <- 1.
+[i < self]
+whileTrue: [i <- i+1.
+result <- result * i].
+^result.Smalltalk
+25/33 Henrik Björklund Programspråk
+
+=== PAGE 31 ===
+
+•Mycket vanligt
+•Blandat typsystem
+•Stort och (i vissas tycke onödigt) komplext
+•Accesskontroll
+•Multipelt arv•Läs intervjuerna med Bjarne Stroustrup!
+C++
+26/33 Henrik Björklund Programspråk
+
+=== PAGE 32 ===
+
+•Mycket vanligt
+•Blandat typsystem
+•Stort och (i vissas tycke onödigt) komplext
+•Accesskontroll
+•Multipelt arv
+•Läs intervjuerna med Bjarne Stroustrup!C++
+26/33 Henrik Björklund Programspråk
+
+=== PAGE 33 ===
+
+•Allt utom primitiva typer är objekt
+•Wrapper classes
+•Heap-dynamic
+•Enkelt arv, men har interfacesJava
+27/33 Henrik Björklund Programspråk
+
+=== PAGE 34 ===
+
+•Enkelt uttryckt: flera saker händer samtidigt
+•Olika typer:
+•Samma sak på många dataobjekt
+•Olika saker på olika dataobjekt
+•Olika varianter
+•“Sant jämnlöpande” – flera fysiska beräkningsenheter
+•“Logiskt jämnlöpande” – simulering av flera fysiska
+beräkningsenheterVad är “concurrency”?
+28/33 Henrik Björklund Programspråk
+
+=== PAGE 35 ===
+
+•Maskininstruktioner
+•Uttryck
+•Funktioner/procedurer/metoder
+•ProgramNivåer
+29/33 Henrik Björklund Programspråk
+
+=== PAGE 36 ===
+
+•HPC – High Performance Computing: Pressa varje
+droppe prestanda ur systemet. Vetenskapliga
+beräkningar. Varje klockcykel är av intresse.
+Inte vårt fokus här
+•Många olika saker ska göras samtidigt på olika ställen.
+Mer intressant för oss.Vad vi intresserar oss för här
+30/33 Henrik Björklund Programspråk
+
+=== PAGE 37 ===
+
+•Verkligheten är parallell (kognition, organisation,
+abstraktion)
+•Bättre respons från systemet
+•Exempel: Ett användargränssnitt använder trådar för att få
+bättre responstid från systemet (inte hastighet i
+exekvering utan i reaktionstid).
+•Distribution av program över flera
+kärnor/processorer/maskinerVarför concurrency?
+31/33 Henrik Björklund Programspråk
+
+=== PAGE 38 ===
+
+Princip: Vi vill att systemet ska kunna utföra flera olika saker
+samtidigt.För att det ska vara någon skillnad mot att köra flera
+program separat från varandra måste de kunna
+kommunicera med varandra.
+Målet är att utbyta information och samordna användandet
+av resurser.
+Vad är problemet?
+32/33 Henrik Björklund Programspråk
+
+=== PAGE 39 ===
+
+Princip: Vi vill att systemet ska kunna utföra flera olika saker
+samtidigt.
+För att det ska vara någon skillnad mot att köra flera
+program separat från varandra måste de kunna
+kommunicera med varandra.Målet är att utbyta information och samordna användandet
+av resurser.
+Vad är problemet?
+32/33 Henrik Björklund Programspråk
+
+=== PAGE 40 ===
+
+Princip: Vi vill att systemet ska kunna utföra flera olika saker
+samtidigt.
+För att det ska vara någon skillnad mot att köra flera
+program separat från varandra måste de kunna
+kommunicera med varandra.
+Målet är att utbyta information och samordna användandet
+av resurser.Vad är problemet?
+32/33 Henrik Björklund Programspråk
+
+=== PAGE 41 ===
+
+•För att kunna kommunicera är det nödvändigt att se till
+att en eller flera trådar/processer inte ändra data som
+andra trådar/processer just använder.
+•Trådar/processer måste kunna synkronisera
+användandet av resurser.Problemet forts.
+33/33 Henrik Björklund Programspråk

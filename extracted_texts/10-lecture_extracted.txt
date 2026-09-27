@@ -1,0 +1,344 @@
+=== PAGE 1 ===
+
+Programspråk
+Kapitel 10: Kontrollstrukturer och subprogram
+Henrik Björklund
+
+=== PAGE 2 ===
+
+Imprerativa språk består huvudsakligen av instruktioner av
+typen:
+var = expr;För att få ett Turing-fullständigt språk behöver vi två saker
+till:
+•Villkor (enklaste varianten: if)
+•Hopp (enklaste - och kraftfullaste - varianten: goto)
+Kontrollstrukturer
+2/28 Henrik Björklund Programspråk
+
+=== PAGE 3 ===
+
+Imprerativa språk består huvudsakligen av instruktioner av
+typen:
+var = expr;
+För att få ett Turing-fullständigt språk behöver vi två saker
+till:
+•Villkor (enklaste varianten: if)
+•Hopp (enklaste - och kraftfullaste - varianten: goto)Kontrollstrukturer
+2/28 Henrik Björklund Programspråk
+
+=== PAGE 4 ===
+
+•Nästlade if-then-else
+•Läsbarhet! Använd alltid block
+•Vissa språk har någon form av “elif”
+•Flera val
+•switch-case
+•Finns i många språk men inte alla (t.ex. Python)
+•Med/utan “break” ... ger olika programmeringsstil
+•Default?
+•Pattern matchingKontrollstrukturer
+3/28 Henrik Björklund Programspråk
+
+=== PAGE 5 ===
+
+•Logiska loopar
+•while (expr) do ... end
+•do ... while (expr)
+•Kontrollera loopar
+•break
+•continueIteration
+4/28 Henrik Björklund Programspråk
+
+=== PAGE 6 ===
+
+while(uttryck){ ...
+if(uttryck){
+break;
+}
+...
+}
+while(uttryck){
+...
+if(uttryck){
+continue;
+}
+...
+}Iteration
+5/28 Henrik Björklund Programspråk
+
+=== PAGE 7 ===
+
+•Iteratorer i stället för räknare
+•Smidigt och flexibelt
+•Kan vara listor, träd, etc.
+forxinrange(4):
+print x
+fruit = [ /quotesingle.ts1apelsin /quotesingle.ts1,/quotesingle.ts1banan /quotesingle.ts1,/quotesingle.ts1citron /quotesingle.ts1]
+forxinrange(len(fruit)):
+print fruit[x]
+forxinfruit:
+print xIteration
+6/28 Henrik Björklund Programspråk
+
+=== PAGE 8 ===
+
+if<boolexp> -> <statements>
+[] <boolexp> -> <statements>
+...
+[] <boolexp> -> <statements>
+ﬁ
+do<boolexp> -> <statements>
+[] <boolexp> -> <statements>
+...
+[] <boolexp> -> <statements>
+od
+doq1>q2 -> tmp=q1; q1=q2; q2=tmp;
+[] q2>q3 -> tmp=q2; q2=q3; q2=tmp;
+[] q3>q4 -> tmp=q3; q3=q4; q4=tmp;
+odGuarded commands
+7/28 Henrik Björklund Programspråk
+
+=== PAGE 9 ===
+
+Abstraktion behövs för att det är så vi människor fungerar.•Inkapsling (encapsulation)
+•Organiserar koden (lättare att förstå)
+•Lättare att ändra och underhålla
+•Separatkompilering
+•Information hiding
+•Pålitlighet - Kod som inte är “betrodd” kan inte komma åt
+eller ändra “intern” information
+Abstraktion
+8/28 Henrik Björklund Programspråk
+
+=== PAGE 10 ===
+
+Abstraktion behövs för att det är så vi människor fungerar.
+•Inkapsling (encapsulation)
+•Organiserar koden (lättare att förstå)
+•Lättare att ändra och underhålla
+•Separatkompilering
+•Information hiding
+•Pålitlighet - Kod som inte är “betrodd” kan inte komma åt
+eller ändra “intern” informationAbstraktion
+8/28 Henrik Björklund Programspråk
+
+=== PAGE 11 ===
+
+MODULE PrintHelloWorld;
+(*This program prints "Hello world!" on the standard output device*)
+FROM InOut IMPORT WriteString, WriteLn;
+BEGIN
+WriteString( /quotesingle.ts1Hello world! /quotesingle.ts1);
+WriteLn;
+END PrintHelloWorld.Modula-2
+9/28 Henrik Björklund Programspråk
+
+=== PAGE 12 ===
+
+DEFINITION MODULE Circles;
+PROCEDURE AreaOfCircle(Radius : REAL; VAR Area : REAL);
+PROCEDURE PerimeterOfCircle(Radius : REAL; VAR Perim : REAL);
+END Circles.Modula-2
+10/28 Henrik Björklund Programspråk
+
+=== PAGE 13 ===
+
+IMPLEMENTATION MODULE Circles;
+PROCEDURE GetPi(VAR Pi : REAL);
+BEGIN
+Pi := 3.14159;
+END GetPi;
+PROCEDURE AreaOfCircle(Radius : REAL; VAR Area : REAL);
+VAR Pie : REAL;
+BEGIN
+GetPi(Pie);
+Area := Pie * Radius * Radius;
+END AreaOfCircle;
+...Modula-2
+11/28 Henrik Björklund Programspråk
+
+=== PAGE 14 ===
+
+class StackClass {
+private int [] stackRef;
+private int maxLen, topIndex;
+publicStackClass(){
+stackRef = new int[100]; maxIndex = 99;
+topIndex = -1;
+}
+public void push( intnumber){
+if(topIndex == maxIndex){
+// Error
+}else{
+stackRef[++topIndex] = number;
+}
+}
+public void pop(){
+...Exempel
+12/28 Henrik Björklund Programspråk
+
+=== PAGE 15 ===
+
+exception EmptyStack ;
+abstype /quotesingle.ts1astack=Stack of /quotesingle.ts1a list
+with
+valempty = Stack []
+funpush(Stack s, e) = Stack(e::s)
+funpop(Stack []) = raiseEmptyStack
+| pop(Stack (_::l) ) = Stack l
+funtop(Stack [] ) = raiseEmptyStack
+| top(Stack (a::_) ) = a
+funisEmpty( Stack s ) = s = []
+end;Exempel
+13/28 Henrik Björklund Programspråk
+
+=== PAGE 16 ===
+
+class Stack :
+def__init__(self):
+self.data = []
+defpush(self,value):
+self.data.append(value)
+defpop(self):
+ifself.data == []:
+raise"Empty Stack"
+self.data = self.data[:-1]
+deftop(self):
+ifself.data == []:
+raise"Empty Stack"
+returnself.data[-1]
+defisEmpty(self): returnself.data == []Exempel
+14/28 Henrik Björklund Programspråk
+
+=== PAGE 17 ===
+
+•Återigen en abstraktion, men av kod i stället för data
+•Procedurer, funktioner och metoder
+•Procedurer gör något (ändrar till exempel värden på
+variabler)
+•Funktioner returnerar ett värde
+•Metoder är “funktioner och procedurer för objekt”
+•Vanligtvis definieras namn, parametrar och resultatSubprogram
+15/28 Henrik Björklund Programspråk
+
+=== PAGE 18 ===
+
+•Formella parametrar (formal parameters): Parametrarna
+i funktionens definition
+•Faktiska parametrer (actual parameters): Parametrarna i
+funktionsanropet
+•Bindningen av namn och värde kan gå till på olika sätt
+•Godtyckligt antal
+•Default-värdenParametrar
+16/28 Henrik Björklund Programspråk
+
+=== PAGE 19 ===
+
+“Normalt” beteende
+17/28 Henrik Björklund Programspråk
+
+=== PAGE 20 ===
+
+defexample1(p1, p2):
+print p1, p2
+example1(4,5) # 4 5
+defexample2(weight=20, length=57):
+print weight, length
+example2(length=12) # 20 12
+defexample3(p1, weight=20):
+print p1, weight
+example3(1) # 1 20
+defexample4(p1, *p2):
+print p1
+print p2
+example4(1) # 1 ()
+example4(1,2,3,4,5) # 1 (2,3,4,5)Exempel
+18/28 Henrik Björklund Programspråk
+
+=== PAGE 21 ===
+
+defexample5(weight=20, length=57, **parameters):
+print weight
+print length
+print parameters
+example5(length=12,myname="Halvard Nattluva")
+# 20, 12, { /quotesingle.ts1myname /quotesingle.ts1:/quotesingle.ts1Halvard Nattluva /quotesingle.ts1}
+defexample6(para, *manypara, **kwpara):
+print para
+print manypara
+print kwpara
+example6("Kalle","Anka","kalle@disney.com",engﬁrst="Donald",englast="Duck")
+# Kalle ( /quotesingle.ts1Anka /quotesingle.ts1,/quotesingle.ts1kalle@disney.com /quotesingle.ts1), { /quotesingle.ts1englast /quotesingle.ts1:/quotesingle.ts1Duck /quotesingle.ts1,/quotesingle.ts1engﬁrst /quotesingle.ts1:/quotesingle.ts1Donald /quotesingle.ts1}Exempel
+19/28 Henrik Björklund Programspråk
+
+=== PAGE 22 ===
+
+•Riktning
+•in-mode
+•out-mode
+•in-out-mode
+•Huvudsakligen
+•värde
+•referensRiktning
+20/28 Henrik Björklund Programspråk
+
+=== PAGE 23 ===
+
+•Pass-by-value
+•Pass-by-result
+•Möjligt problem: procA(a, a)
+•Möjligt problem: procA(a[i], i)
+•Pass-by-value-result
+•Möjligt problem: procA(4+4)
+•Pass-by-reference
+•Vanligt
+•“Öppnar upp” informationMetoder för parameteröverföring
+21/28 Henrik Björklund Programspråk
+
+=== PAGE 24 ===
+
+•Typkontroll: när och hur?
+•Nästlade funktioner/procedurere
+•Ska funktioner/procedurer kunna vara parametrar
+•Överladdade funktioner/procedurer
+•Generiska funktioner/procedurer
+•Sidoeffekter
+•Returvärden: vad kan returneras? hur många värden?Viktiga designval
+22/28 Henrik Björklund Programspråk
+
+=== PAGE 25 ===
+
+defexample(a,b):
+returna + b
+example(1,2)
+example("Hello", "World")
+example([1,2,3],[4,5,6])Exempel
+23/28 Henrik Björklund Programspråk
+
+=== PAGE 26 ===
+
+•Ser inte på samma sätt anropande och anropad funktion
+som “master” och “slave”.
+•En procedur/funktion kan ha flera ingångsställen
+•Kan användas för att få jämnlöpande programCo-routines
+24/28 Henrik Björklund Programspråk
+
+=== PAGE 27 ===
+
+Co-routines
+25/28 Henrik Björklund Programspråk
+
+=== PAGE 28 ===
+
+Subprogram i minnet
+26/28 Henrik Björklund Programspråk
+
+=== PAGE 29 ===
+
+Subprogram i minnet
+27/28 Henrik Björklund Programspråk
+
+=== PAGE 30 ===
+
+Subprogram i minnet
+28/28 Henrik Björklund Programspråk

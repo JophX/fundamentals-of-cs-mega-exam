@@ -1,0 +1,206 @@
+=== PAGE 1 ===
+
+Code number:
+ 
+Ume˚ a University
+Department of Computing Science
+Examination set by Martin Berglund
+Examination for Fundamentals of Computer Science (5DV037)
+2025-03-17, 08:00-12:00
+To be filled out by the student
+Please print carefully and readably. Ensure that all submitted pages carry the code number X92 (as
+shown on the top right of this page). Submit all 9 numbered pages of the exam. Further instructions on
+the next page.
+Name:
+UmU-id:
+Personnummer:
+Todays date:
+Submission time:
+Prefilled information from the department
+Program: Examination in computing science, contact person Ellinor Hansson.
+Course title/module: 5DV037 Fundamentals of Computer Science (Datavetenskapens Grunder).
+To be filled out by the exam invigilator
+◻The student has submitted a blank exam Signature: Time:
+
+=== PAGE 2 ===
+
+Code number:
+ 
+Ume˚ a University
+Department of Computing Science
+Examination set by Martin Berglund
+Examination for Fundamentals of Computer Science (5DV037)
+2022-03-17, 13:00-17:00
+Material permitted: Pens and an English dictionary.
+Number of problems and grades: This exam has a total of 10 questions, the requirement for grades are
+as follows.
+• For a grade of 3 you need: At least 50% of the 50 total possible points.
+• For a grade of 4 you need: At least 67% of the 50 total points, andat least 1 of the 3 possible points
+on the final three questions which are marked with a ☆.
+• For a grade of 5 you need: At least 83% of the 50 total points, andat least 2 of the 3 possible points
+on the final three questions which are marked with a ☆.
+Notice that the ☆-marked problems are a bit harder, but do not give very many points. Thus you may
+want to make them low priority unless shooting for a higher grade.
+Instructions: read carefully before you begin writing your exam!
+• Begin by writing your name, UmU-id, and ‘personnummer’ on the cover sheet. Double-check that
+the code number is correctly entered on every sheet.
+• The space provided on the exam itself is designed to be sufficient to answer the questions, exces-
+sively long answers may have points deducted.
+• If needed you may give answers on additional sheets (e.g. if you can come up with no shorter
+answer, or if you accidentally ruin a sheet), but make sure to write your code number and the number
+of the question on that sheet. Answer at most one question on each additional sheet.
+• Make sure to answer questions in full whenever possible, notably where motivation is requested
+make sure you provide it.
+• Find attached (on the last page) some helpful definitions from the course.
+Question Answered Score
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+Total score:
+Grade:
+Page 1 of 9
+
+=== PAGE 3 ===
+
+Code number:
+Question 1 (6 points): For each statement below indicate whether it is true or false. Note on scoring:
+Incorrect answers give -0.5 points, but the total for this question is never less than zero.
+Statement True False
+The language over {a,b,c}which contains a string wif and only if it either starts
+with an a, ends with a c, or contains an odd number of bs is a regular language.◻ ◻
+IfLis a (non-regular) context-free language and L′is a regular language then it
+is necessarily the case that L∪L′isnotregular.◻ ◻
+IfLis a (non-regular) context-free language and L′is a regular language then it
+is necessarily the case that L∩L′isnotregular.◻ ◻
+If P=NP then it follows that there exists a polynomial time algorithm which
+decides whether propositional logic formulas are satisfiable.◻ ◻
+It can be correct to say that a Turing machine Misdecidable. ◻ ◻
+The set of suitably encoded Turing machines is recursively enumerable. ◻ ◻
+Question 2 (5 points): Argue, with as much detail as space permits, that the set of regular languages is
+closed under complement, intersection, concatenation and union.
+Page 2 of 9
+
+=== PAGE 4 ===
+
+Code number:
+Question 3 (8 points): Below is outlined a hierarchy of five language classes. Select five of the classes
+we have learned about during this course and for each fill in: (a) the name of the language class; (b)
+one example of a type of device/automata/grammars that can represent all the languages in that class;
+and; (c) one example of a language which is in that class but not in any of the subclasses you have
+included. The language does not have to be given as a grammar or automaton, it can be carefully
+described informally or using “setbuilder” notation (e.g. {anb∣n∈N}).
+(a). Name of class(b). Representable by
+(c). A language from that class1.1.1.
+1.2.2.2.
+2.3.3.3.
+3.4.4.4.
+4.5.5.
+5.
+5.
+A note on grading: points are given primarily for how your answers agree. That is, even if a correct lan-
+guage class is given in (a) it will not be given points if the answer doesn’t agree with the corresponding
+answer in (b) and/or (c).
+Page 3 of 9
+
+=== PAGE 5 ===
+
+Code number:
+Question 4 (8 points): Prove that L={w∈{a,b}∗∣ ∣w∣a>2∣w∣b}∪{w∈{a,b}∗∣2∣w∣a<∣w∣b}isnot
+context-free. That is, Lis the language of all strings which either contain more than twice the number of
+as then bs,ormore than twice the number of bs than as.
+Page 4 of 9
+
+=== PAGE 6 ===
+
+Code number:
+Question 5 (8 points): Consider the context-free grammar ({S,S′,X,Y,B,C},{a,b,c},P,S)with the
+productions in Pas below.
+S→SS∣XY∣XS′
+S′→SY
+X→a
+Y→BC∣BB∣b
+B→b
+C→CC∣c
+Is this grammar on Chomsky normal form?
+◻ Yes
+◻ No, one production breaks the normal form
+◻ No, several productions break the normal form
+Demonstrate how the string abcab is parsed in this grammar using Cocke-Younger-Kasami. Show the
+resulting table and very briefly explain what the result means.
+Page 5 of 9
+
+=== PAGE 7 ===
+
+Code number:
+Question 6 (6 points): Describe how to construct a Turing machine Mg fwhich computes a function
+g(f(v))(i.e. started on v∈Σ∗the machine should halt with the output g(f(v))on its tape) given a
+Turing machine Mf=(Qf,Σ,Γ,δf,q0,f,◻,Ff)which computes the function f, and a Turing machine
+Mg=(Qg,Σ,Γ,δg,q0,g,◻,Fg)which computes the function g. Describe the elements of the tuple defining
+Mg fis as much detail as space permits.
+Question 7 (6 points): Very briefly sketch why the class of nondeterministic Turing machines is no
+more computationally powerful than the class of deterministic Turing machines.
+Page 6 of 9
+
+=== PAGE 8 ===
+
+Code number:
+Question 8 (1 points, ☆):Define the binary operator ◇so that (0◇0)=(0◇1)=(1◇0)=1, and
+(1◇1)=0. Then the ◇-EQUATION problem is formally defined as follows.
+Input: An equation e1=e2where e1and e2are both expressions which combine
+variables, the constants 0 and 1, using the operator ◇.
+Question: Is there an assignment of values from {0, 1}to the variables which makes
+the equation true?
+Prove that the ◇-EQUATION problem is NP-complete with as much detail as the space provided permits.
+Example of problem: Input ((x◇1)◇y)◇(x◇z)=(z◇1)has the answer “yes”, since taking x=0,y=1,
+z=0 we get ((0◇1)◇1)◇(0◇0)=(0◇1), and evaluating both sides we get 1 =1, the equation holds.
+The assignment x=0,y=0 and z=1 also works, but no others.
+Page 7 of 9
+
+=== PAGE 9 ===
+
+Code number:
+Question 9 (1 points, ☆):LetNbe a countably infinite set. Associate with each n∈Na regular language
+Ln. Prove or disprove the following statement: The infinite union LN=⋃n∈NLnis necessarily regular.
+Page 8 of 9
+
+=== PAGE 10 ===
+
+Code number:
+Question 10 (1 points, ☆):Define the complexity class NP and demonstrate that it is closed under
+union and intersection. Include as much detail as possible in the proof. That NP is closed under union
+and intersection means that if the languages L1and L2both belong to NP, then so does L1⋃L2and
+L1⋂L2.
+Page 9 of 9
+
+=== PAGE 11 ===
+
+Collection of definitions
+Theorem 1 (The regular pumping lemma) .Let L be a (usually infinite) regular language. Then there exists
+some positive integer n such that any w ∈L with ∣w∣≥n can be decomposed as w =xyz, with ∣xy∣≤n and ∣y∣≥1,
+such that w i=xyiz, is also in L for all i ≥0.
+Theorem 2 (The context-free pumping lemma) .Let L be an (infinite) context-free language. Then there exists
+some positive integer n such that any w ∈L with ∣w∣≥n can be decomposed as w =xuyvz with ∣uyv∣≤n and
+∣uv∣≥1such that xuiyviz∈L for all i∈N(including 0).
+Definition 1. Anondeterministic pushdown automaton (NPDA) is a septuple M=(Q,Σ,Γ,δ,q0,z,F)where:
+•Qis a finite set of states,
+•Σis the input alphabet,
+•Γis a finite set of symbols called the stack alphabet ,
+•δ∶Q×(Σ∪{λ})×Γ→2Q×Γ∗, where each set in the range is finite, is the transition function,
+•q0∈Qis the initial state,
+•z∈Γis the stack start symbol ,
+•F⊆Qis the set of final states.
+Definition 2. A deterministic single-tape Turing machine Mis defined by M=(Q,Σ,Γ,δ,q0,◻,F), where
+•Qis the set of states,
+•Σis the input alphabet,
+•Γis a finite set of symbols called the tape alphabet ,
+•δis the transition function defined as δ∶Q×Γ→Q×Γ×{L,R}.
+•◻∈Γis a special symbol called the (tape) blank , we assume that ◻∉Σ,
+•q0∈Qis the initial state, and
+•F⊆Qis the set of final states.

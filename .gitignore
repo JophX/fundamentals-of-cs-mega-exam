@@ -1,0 +1,4 @@
+# Git ignore
+*.tmp
+.DS_Store
+Thumbs.db
