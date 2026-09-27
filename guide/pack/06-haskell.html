@@ -1,0 +1,180 @@
+<h1>6. Haskell: fold, list → int, compress / decompress, reverse</h1>
+
+<div class="box intuition"><span class="t">The idea in plain words</span>
+<p>Haskell has no loops and no variables that change. Instead of “repeat this for each element”, you say:
+<b>“what is the answer for the empty list?”</b> and <b>“if I already had the answer for the rest of the list, how do I
+get the answer for the whole list?”</b>. That’s it. Every exam function is one of <b>two patterns</b>: plain
+recursion, or recursion with an <b>accumulator</b>. Learn both patterns and you can write all of them.</p>
+</div>
+
+<h2>6.1 The five pieces of syntax you need</h2>
+<pre class="hs" data-title="1. type signature (write it FIRST — it tells you what the function takes and returns)">
+countA :: String -> Int
+countA [] = 0
+countA (c:cs) = if c == 'a' then 1 + countA cs else countA cs
+</pre>
+<ul>
+  <li><code>[]</code> is the empty list; <code>(x:xs)</code> matches a non-empty list: <code>x</code> = first element
+    (head), <code>xs</code> = the rest (tail). A <code>String</code> is a list of <code>Char</code>, so
+    <code>"abc"</code> = <code>'a' : 'b' : 'c' : []</code>.</li>
+  <li><code>x : xs</code> <b>puts</b> an element in front (O(1)). <code>xs ++ ys</code> <b>glues</b> two lists (costs
+    O(length xs)).</li>
+  <li><b>Guards</b> — a cleaner if/else:</li>
+</ul>
+<pre class="hs">
+countA :: String -> Int
+countA [] = 0
+countA (c:cs)
+  | c == 'a'  = 1 + countA cs
+  | otherwise = countA cs
+</pre>
+<ul>
+  <li><b>where</b> — local helper definitions, written after the function body (indented).</li>
+  <li><b>Lambda</b> — an unnamed function: <code>\x -&gt; x * 2</code> is “the function that takes x and returns x*2”.
+    <code>\acc x -&gt; acc + x</code> takes two arguments.</li>
+</ul>
+
+<h2>6.2 Pattern 1 — plain recursion</h2>
+<div class="box recipe"><span class="t">Recipe</span>
+<ol>
+  <li>Write the type signature.</li>
+  <li>Base case: <code>f [] = ...</code> — the answer for the empty list.</li>
+  <li>Recursive case: <code>f (x:xs) = ...  x  ...  f xs ...</code> — <b>assume <code>f xs</code> already works</b>
+    (“trust the recursion”) and combine it with <code>x</code>.</li>
+  <li>Test by hand on a 2–3 element list.</li>
+</ol>
+</div>
+<pre class="hs" data-file="Pack.hs" data-block="map" data-title="map: apply f to every element"></pre>
+<pre class="hs" data-file="Pack.hs" data-block="filter" data-title="filter: keep the elements where p is True"></pre>
+<pre class="ghci" data-file="Pack.hs">map (*2) [1,2,3]
+filter even [1..10]</pre>
+
+<h2>6.3 Pattern 2 — the accumulator (“carry the answer so far”)</h2>
+<div class="box intuition"><span class="t">Intuition</span>
+<p>Like a loop with a running total: <code>acc = start; for x in list: acc = update(acc, x); return acc</code>. In
+Haskell the “loop” is a helper function <code>go</code> that takes the rest of the list and the accumulator. When the
+list is empty, the accumulator <i>is</i> the answer.</p>
+</div>
+<pre class="hs" data-title="The accumulator template">
+template :: [Int] -> Int
+template xs = go xs 0            -- 0 = the starting value of the accumulator
+  where
+    go []     acc = acc          -- list finished: the accumulator is the answer
+    go (y:ys) acc = go ys (acc + y)   -- update the accumulator, continue with the rest
+</pre>
+<p>This is also <b>tail recursion</b>: the recursive call is the very last thing done, so nothing has to be remembered
+on the stack (it runs like a loop). That is what “write a tail-recursive function” (2017 exam) asks for.</p>
+
+<h3>myRev — the exact exam question (10 p, asked twice)</h3>
+<p>“Write <code>myRev</code> that reverses a list, without built-in functions, in O(n).”</p>
+<pre class="hs" data-file="Pack.hs" data-block="myRev"></pre>
+<pre class="ghci" data-file="Pack.hs">myRev "Hello"
+myRev [1,2,3]</pre>
+<p><b>Trace</b> (do this on the exam!): <code>go [1,2,3] []</code> → <code>go [2,3] [1]</code> →
+<code>go [3] [2,1]</code> → <code>go [] [3,2,1]</code> → <code>[3,2,1]</code>. Each step does one <code>:</code>
+(constant time), there are n steps ⇒ <b>O(n)</b>. Say that sentence on the exam.</p>
+<div class="box trap"><span class="t">The O(n²) trap</span>
+<pre class="hs" data-file="Pack.hs" data-block="slowRev"></pre>
+<p>This is correct but <code>xs ++ [x]</code> walks through all of <code>xs</code> every time: \(n + (n-1) + \dots + 1
+= O(n^2)\). The exam says “linear”, so this loses points. (It also uses <code>++</code>, a library function.)</p>
+</div>
+
+<h3>listToInt — a list of digits to a number</h3>
+<p><code>[1,2,3]</code> → <code>123</code>. Think like reading digits left to right on a calculator: every new digit
+<b>shifts the number so far one place left</b> (×10) and adds the digit.</p>
+<pre class="hs" data-file="Pack.hs" data-block="listToInt"></pre>
+<pre class="ghci" data-file="Pack.hs">listToInt [1,2,3]</pre>
+<p><b>Trace:</b> <code>go [1,2,3] 0</code> → <code>go [2,3] 1</code> (0·10+1) → <code>go [3] 12</code> (1·10+2) →
+<code>go [] 123</code> (12·10+3) → <code>123</code>.</p>
+<pre class="hs" data-file="Pack.hs" data-block="strToInt" data-title="Variant: from a String of digits (digitToInt comes from Data.Char)"></pre>
+<pre class="ghci" data-file="Pack.hs">strToInt "2025"</pre>
+<pre class="hs" data-file="Pack.hs" data-block="intToList" data-title="The other direction: Int -> [Int]"></pre>
+<pre class="ghci" data-file="Pack.hs">intToList 4071</pre>
+
+<h2>6.4 Writing foldr and foldl yourself</h2>
+<div class="box intuition"><span class="t">Intuition</span>
+<p>A <b>fold</b> is just “the accumulator pattern, packaged as a library function”. You give it three things: a
+<b>combining function</b>, a <b>starting value</b>, and the <b>list</b>. It combines everything into one value.</p>
+<ul>
+  <li><b>foldl</b> (left): starts from the <b>left</b>, carrying the accumulator:
+    <code>foldl f z [1,2,3] = f (f (f z 1) 2) 3</code>. The accumulator is the <b>first</b> argument of f.</li>
+  <li><b>foldr</b> (right): builds from the <b>right</b>:
+    <code>foldr f z [1,2,3] = f 1 (f 2 (f 3 z))</code>. The element is the <b>first</b> argument of f.</li>
+</ul>
+</div>
+<pre class="hs" data-file="Pack.hs" data-block="foldl" data-title="foldl — it IS the accumulator pattern"></pre>
+<pre class="hs" data-file="Pack.hs" data-block="foldr" data-title="foldr — it IS plain recursion"></pre>
+<div class="box recipe"><span class="t">How to remember the definitions (rewrite them from this)</span>
+<ul>
+  <li><b>Both</b>: on the empty list, return the starting value <code>acc</code>.</li>
+  <li><b>foldl</b>: “update the accumulator with x, then continue with the rest”:
+    <code>foldl f (f acc x) xs</code>. The type: <code>(b -&gt; a -&gt; b) -&gt; b -&gt; [a] -&gt; b</code>
+    — f takes <b>acc first, element second</b>.</li>
+  <li><b>foldr</b>: “combine x with the result for the rest”: <code>f x (foldr f acc xs)</code>. The type:
+    <code>(a -&gt; b -&gt; b) -&gt; b -&gt; [a] -&gt; b</code> — f takes <b>element first, acc second</b>.</li>
+</ul>
+</div>
+<p><b>Where they differ — subtraction (not commutative):</b></p>
+<pre class="ghci" data-file="Pack.hs">foldl (-) 0 [1,2,3]
+foldr (-) 0 [1,2,3]</pre>
+<table class="wide">
+<tr><th>foldl (-) 0 [1,2,3]</th><th>foldr (-) 0 [1,2,3]</th></tr>
+<tr><td class="mono small">= foldl (-) (0-1) [2,3]<br>= foldl (-) ((0-1)-2) [3]<br>= foldl (-) (((0-1)-2)-3) []<br>= ((0-1)-2)-3 = <b>-6</b></td>
+<td class="mono small">= 1 - foldr (-) 0 [2,3]<br>= 1 - (2 - foldr (-) 0 [3])<br>= 1 - (2 - (3 - foldr (-) 0 []))<br>= 1 - (2 - (3 - 0)) = <b>2</b></td></tr>
+</table>
+<pre class="hs" data-file="Pack.hs" data-block="sumlen" data-title="Using folds (both are one-liners)"></pre>
+<pre class="hs" data-file="Pack.hs" data-block="myRevFold" data-title="myRev with foldl (only if library functions are allowed)"></pre>
+<pre class="hs" data-file="Pack.hs" data-block="listToIntFold"></pre>
+<pre class="ghci" data-file="Pack.hs">sum [1..10]
+length "hello"
+myRevFold [1,2,3]
+listToIntFold [4,0,7]</pre>
+
+<h3>The old exam question with filter and foldl (2023-05-05, 10 p)</h3>
+<pre class="hs" data-file="Pack.hs" data-block="foobar"></pre>
+<p><b>foo x y</b> keeps the elements of list <code>y</code> that are equal to <code>x</code> (so it returns all
+occurrences of <code>x</code>). <b>bar x y</b> folds from the left with accumulator <code>w</code> starting at 0, and for each
+element <code>q</code> adds 1 if <code>q /= x</code>: it <b>counts the elements that are not equal to x</b>.</p>
+<pre class="ghci" data-file="Pack.hs">foo 'c' "aabcccaacbba"
+bar 'c' "aabcccaacbba"</pre>
+<p>Check: the string has 12 characters, 4 of them are <code>'c'</code> → foo gives <code>"cccc"</code>, bar gives
+12 − 4 = 8.</p>
+
+<h2>6.5 compress (2023-03-16) and decompress (your last exam)</h2>
+<p><code>compress "aaaabbcccb"</code> should give <code>[('a',4),('b',2),('c',3),('b',1)]</code> (run-length
+encoding). <code>decompress</code> goes back.</p>
+<pre class="hs" data-file="Pack.hs" data-block="compress" data-title="compress with takeWhile / dropWhile (library functions allowed)"></pre>
+<p>Read it as: take the first char <code>c</code>; <code>same</code> = the run of equal characters right after it;
+<code>rest</code> = everything after the run. Output the pair, then compress the rest.</p>
+<pre class="hs" data-file="Pack.hs" data-block="compressAcc" data-title="compress with only recursion (no library functions): accumulator = current char and its count"></pre>
+<pre class="ghci" data-file="Pack.hs">compress "aaaabbcccb"
+compress2 "aaaabbcccb"</pre>
+
+<pre class="hs" data-file="Pack.hs" data-block="decompress" data-title="decompress — each pair (c, n) becomes n copies of c"></pre>
+<pre class="hs" data-file="Pack.hs" data-block="decompressNoLib" data-title="decompress without replicate/++ (count down)"></pre>
+<pre class="ghci" data-file="Pack.hs">decompress [('a',4),('b',2),('c',3),('b',1)]
+decompress2 (compress "aaaabbcccb")</pre>
+<p>If the compressed form is a <b>string</b> like <code>"a4b2c3"</code> instead (read the question!):</p>
+<pre class="hs" data-file="Pack.hs" data-block="decompressStr"></pre>
+<pre class="ghci" data-file="Pack.hs">decompressStr "a4b2c3x12"</pre>
+
+<h2>6.6 Tail-recursive Fibonacci (2017 exam)</h2>
+<p>“Write a tail-recursive function that returns the first X Fibonacci numbers: <code>fibonacci 10</code> →
+<code>[0,1,1,2,3,5,8,13,21,34]</code>.” The accumulators are the <b>two latest numbers</b> <code>a</code> and
+<code>b</code>; each step shifts them: <code>(a, b) → (b, a+b)</code>.</p>
+<pre class="hs" data-file="Pack.hs" data-block="fib"></pre>
+<pre class="ghci" data-file="Pack.hs">fibs 10
+fibTail 10</pre>
+
+<div class="box trap"><span class="t">The Haskell mistakes that cost points</span>
+<ul>
+  <li>No type signature — write it first; it forces you to know what goes in and out.</li>
+  <li>Forgetting the base case <code>f [] = ...</code> (the function crashes on the empty list).</li>
+  <li>Writing <code>x ++ xs</code> when <code>x</code> is an element — use <code>x : xs</code>; <code>++</code> needs two
+    <b>lists</b> (<code>[x] ++ xs</code>).</li>
+  <li><code>f x:xs</code> means <code>(f x) : xs</code>. In patterns always write parentheses: <code>f (x:xs)</code>.</li>
+  <li>foldl’s function takes <code>acc</code> first; foldr’s takes the element first. Getting it backwards is a type
+    error (or a wrong answer).</li>
+  <li>Indentation: the lines under <code>where</code> must line up.</li>
+</ul>
+</div>

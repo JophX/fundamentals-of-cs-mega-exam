@@ -1,0 +1,113 @@
+<h1>8. Grill — answers</h1>
+
+<h2>A. Chomsky normal form</h2>
+<p><b>1.</b> \(S\to AB\) ✔, \(S\to a\) ✔, \(A\to b\) ✔. Broken: \(S\to aB\) (terminal together with a variable),
+\(A\to ABA\) (three variables), \(B\to B\) (unit production — and pointless), \(B\to\lambda\) (λ-production),
+\(B\to bb\) (two terminals).</p>
+
+<p><b>2.</b> Nullable: \(\{S\}\). Remove λ: \(S\to aSa\mid aa\mid bSb\mid bb\). No units, nothing useless. Terminals
+\(A\to a\), \(B\to b\): \(S\to ASA\mid AA\mid BSB\mid BB\). Break the long ones:</p>
+<div class="box model"><span class="t">Answer 2</span>
+<p>\(S\to AX\mid BY\mid AA\mid BB\qquad X\to SA\qquad Y\to SB\qquad A\to a\qquad B\to b\) &nbsp; (generates the language minus λ)</p></div>
+
+<p><b>3.</b> Nullable: \(\{A\}\) (not \(S\), not \(B\): both rules of each contain something non-nullable).
+Remove λ: \(S\to AB\mid B\mid aB\), \(A\to aab\), \(B\to bbA\mid bb\).
+Units: \(S\to B\) → \(S\) gets \(bbA, bb\); delete it: \(S\to AB\mid aB\mid bbA\mid bb\).
+Useless: none. Shapes with \(U\to a\), \(T\to b\): \(S\to AB\mid UB\mid TTA\mid TT\), \(A\to UUT\), \(B\to TTA\mid TT\);
+break \(TTA\) with \(W\to TA\) and \(UUT\) with \(V\to UT\):</p>
+<div class="box model"><span class="t">Answer 3</span>
+<p>\(S\to AB\mid UB\mid TW\mid TT\quad A\to UV\quad V\to UT\quad B\to TW\mid TT\quad W\to TA\quad U\to a\quad T\to b\)</p>
+<p><i>The classic slip:</i> forgetting to copy \(bbA\) into \(S\) when removing \(S\to B\) (the checker caught exactly this
+mistake in the first draft of this answer).</p></div>
+
+<p><b>4.</b> No λ. Unit \(S\to A\): copy \(bA\), \(b\) into \(S\): \(S\to aSb\mid bA\mid b\), \(A\to bA\mid b\).
+Shapes with \(U\to a\), \(T\to b\), \(X\to ST\):</p>
+<div class="box model"><span class="t">Answer 4</span><p>\(S\to UX\mid TA\mid b\qquad X\to ST\qquad A\to TA\mid b\qquad U\to a\qquad T\to b\)</p></div>
+
+<p><b>5.</b> \(S\to ASA\) could only vanish if \(S\) itself were already nullable (circular — never established), and
+\(S\to aB\) contains the terminal \(a\), which can never vanish.</p>
+
+<p>All CNF answers are machine-checked against the original grammars:</p>
+<pre class="run" data-cmd="python3 verify/pack_drill.py --check" data-show="python3 verify/pack_drill.py --check"></pre>
+
+<h2>B. CYK</h2>
+<p><b>6.</b></p>
+<pre class="run" data-cmd="python3 verify/cyk_explain.py &quot;S -> AX | BY | AA | BB ; X -> SA ; Y -> SB ; A -> a ; B -> b&quot; abba" data-show="CYK, abba"></pre>
+<pre class="run" data-cmd="python3 verify/cyk_explain.py &quot;S -> AX | BY | AA | BB ; X -> SA ; Y -> SB ; A -> a ; B -> b&quot; abab" data-show="CYK, abab"></pre>
+<p><code>abba</code> is an even palindrome and is accepted; <code>abab</code> is not a palindrome and is rejected — the sanity
+check agrees.</p>
+<p><b>7.</b></p>
+<pre class="run" data-cmd="python3 verify/cyk_explain.py &quot;S -> SS | XY | XS' ; S' -> SY ; X -> a ; Y -> BC | BB | b ; B -> b ; C -> CC | c&quot; aabbb" data-show="CYK, aabbb"></pre>
+<pre class="run" data-cmd="python3 verify/cyk_explain.py &quot;S -> SS | XY | XS' ; S' -> SY ; X -> a ; Y -> BC | BB | b ; B -> b ; C -> CC | c&quot; abcca" data-show="CYK, abcca"></pre>
+<p><b>8.</b> A cell of length \(\ell\) has \(\ell-1\) cuts: 3 for length 4, and 5 for the top cell of a length-6 string.</p>
+
+<h2>C. Theory</h2>
+<p>Compare your answers with the model answers — check that you have <b>every part</b>:</p>
+<table class="wide">
+<tr><th>Q</th><th>Must contain</th><th>Model answer in</th></tr>
+<tr><td>9</td><td>one syntactic unit with data + operations; used only through its definition; organisation, readability,
+modifiability, separate compilation; example</td><td>§4.2</td></tr>
+<tr><td>10</td><td>internal representation not accessible outside; mechanism (private / export list / definition vs implementation
+module); reliability, invariants, change implementation without affecting clients; example <code>s.top = 50</code> is an error;
+difference: grouping vs restricting access</td><td>§4.2</td></tr>
+<tr><td>11</td><td>keep essential properties, ignore irrelevant details; process abstraction (subprograms) and data abstraction
+(ADTs)</td><td>§4.3</td></tr>
+<tr><td>12</td><td>one interface, many types; subtype (inheritance + dynamic binding: <code>animal.speak()</code>), parametric
+(generics, <code>length :: [a] -&gt; Int</code>), ad hoc (overloading, <code>+</code> on Int and Double)</td><td>§4.3</td></tr>
+<tr><td>13</td><td>characters → lexemes → tokens (type, lexeme, value, line); skip whitespace/comments; keywords vs identifiers;
+lexical errors; regular expressions / finite automaton; buffer + positions, keyword hash table, token list</td><td>§3.1</td></tr>
+<tr><td>14</td><td>tokens in; checks against the CFG; builds AST; precedence/associativity; syntax errors + recovery; recursive
+descent / LL / LR; stack (PDA); output feeds semantic analysis and execution</td><td>§3.2, §3.6</td></tr>
+<tr><td>15</td><td>walks the AST, evaluates recursively, control flow, calls, runtime errors; environments (chained hash
+tables), call stack of activation records, heap</td><td>§3.4</td></tr>
+<tr><td>16</td><td>precedence = different operators; associativity = same level; both resolve ambiguity / tree shape;
+grammar levels; left recursion ⇒ left assoc; examples <code>2+3*4</code>, <code>10-4-3</code>, <code>2^3^2</code></td><td>§3.6</td></tr>
+<tr><td>17</td><td>copy vs address/alias; in vs in-out; pros and cons of each; <code>swap</code>; <code>f(a,a)</code> = aliasing
+(by reference 12 vs value-result 10 in the example)</td><td>§5.3</td></tr>
+</table>
+
+<h2>D. Haskell</h2>
+<p><b>18–21</b>: see section 6 (<code>foldl</code>, <code>foldr</code>, <code>myRev</code>, <code>listToInt</code>,
+<code>compress</code>, <code>decompress</code>). Compare line by line.</p>
+<pre class="hs" data-file="Drill.hs" data-block="d1" data-title="22"></pre>
+<pre class="hs" data-file="Drill.hs" data-block="d2" data-title="23"></pre>
+<pre class="hs" data-file="Drill.hs" data-block="d3" data-title="24"></pre>
+<pre class="hs" data-file="Drill.hs" data-block="d4" data-title="25"></pre>
+<pre class="hs" data-file="Drill.hs" data-block="d5" data-title="26"></pre>
+<pre class="hs" data-file="Drill.hs" data-block="d6" data-title="27 (isPal)"></pre>
+<pre class="hs" data-file="Drill.hs" data-block="d7" data-title="27 (dedup)"></pre>
+<pre class="hs" data-file="Drill.hs" data-block="d8" data-title="28"></pre>
+<pre class="hs" data-file="Drill.hs" data-block="d9"></pre>
+<pre class="ghci" data-file="Drill.hs">countOcc 'a' "banana"
+myLength [5,6,7,8]
+mapF (+1) [1,2,3]
+filterF (>2) [1,5,2,7]
+sumSqOdd [1,2,3,4,5]
+myLast [1,2,3]
+myMaximum [3,9,2]
+elemAt "hello" 1
+isPal "racecar"
+dedup [1,1,2,3,3,3,1]
+myZip [1,2,3] "ab"
+myAppend [1,2] [3,4]
+myReplicate 3 'x'</pre>
+<p><b>29.</b></p>
+<pre class="ghci">foldr (\x acc -> x : x : acc) [] [1,2,3]
+foldl (\acc x -> x : acc) [] "abc"
+foldr (\x acc -> acc + 1) 0 "hello"
+foldl (\acc x -> acc * 2 + x) 0 [1,0,1,1]
+foldl (-) 10 [1,2,3]
+foldr (-) 10 [1,2,3]</pre>
+<p>(d) is binary → decimal: 1011₂ = 11. (e) foldl: ((10−1)−2)−3 = 4; foldr: 1−(2−(3−10)) = 1−9 = −8.</p>
+
+<h2>E. Grammars</h2>
+<div class="box model"><span class="t">30</span>
+<p>\(S\to aSbS\mid\lambda\). Why: a non-empty string of this language starts with an \(a\); match it with the \(b\) that
+first brings the count back to zero. Between them is a balanced string (\(S\)), after the \(b\) is another balanced string
+(\(S\)). Test: \(ab\): \(S\Rightarrow aSbS\Rightarrow abS\Rightarrow ab\) ✔; \(aababbab\) ✔; \(ba\) cannot start ✔.
+(Also correct: \(S\to SS\mid aSb\mid\lambda\).)</p></div>
+<div class="box model"><span class="t">31</span>
+<p>\(S\to aSb\mid A\mid B\qquad A\to aA\mid a\qquad B\to bB\mid b\). Why: \(aSb\) builds the equal part from the outside
+in; in the middle we must put <b>at least one</b> extra \(a\) (\(A\)) or at least one extra \(b\) (\(B\)). λ is correctly
+excluded since \(A\), \(B\) never give λ.</p></div>
+<pre class="run" data-cmd="python3 verify/pack_drill.py --check | tail -2" data-show="grammar check, every string up to length 14"></pre>

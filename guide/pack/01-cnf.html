@@ -1,0 +1,167 @@
+<h1>1. Chomsky normal form (CNF), step by step</h1>
+
+<div class="box intuition"><span class="t">The idea in plain words</span>
+<p>A grammar in CNF is a grammar where <b>every rule is one of only two boring shapes</b>:</p>
+<p style="text-align:center">\(A \to BC\) &nbsp;(exactly two variables) &nbsp;&nbsp;or&nbsp;&nbsp; \(A\to a\) &nbsp;(exactly one terminal).</p>
+<p>Why would anyone want that? Because then every derivation tree is a <b>binary tree</b>, and a string of length
+\(n\) is always derived in exactly \(2n-1\) steps. That makes algorithms like CYK (section 2) possible. Converting to
+CNF does <b>not change the language</b> (except that λ disappears) — it only rewrites the rules into boring shapes.</p>
+</div>
+
+<div class="box def"><span class="t">Definition (write this on the exam)</span>
+<p>A context-free grammar is in <b>Chomsky normal form</b> if every production has the form
+\[A \to BC \qquad\text{or}\qquad A \to a\]
+where \(A, B, C\) are variables and \(a\) is a terminal. Every CFG \(G\) with \(\lambda\notin L(G)\) has an equivalent
+grammar in CNF. (If \(\lambda\in L(G)\), the CNF grammar generates \(L(G)\setminus\{\lambda\}\).)</p>
+</div>
+
+<h3>Checking whether a grammar is in CNF</h3>
+<p>Go through the rules one by one and mark anything that is not of those two shapes:</p>
+<table class="wide">
+<tr><th>Rule</th><th>CNF?</th><th>Why</th></tr>
+<tr><td>\(S\to AB\)</td><td>✔</td><td>two variables</td></tr>
+<tr><td>\(A\to a\)</td><td>✔</td><td>one terminal</td></tr>
+<tr><td>\(S\to aB\)</td><td>✘</td><td>terminal mixed with a variable</td></tr>
+<tr><td>\(S\to ABC\)</td><td>✘</td><td>three variables (too long)</td></tr>
+<tr><td>\(A\to B\)</td><td>✘</td><td>a <i>unit</i> production (single variable)</td></tr>
+<tr><td>\(A\to\lambda\)</td><td>✘</td><td>a λ-production</td></tr>
+<tr><td>\(A\to ab\)</td><td>✘</td><td>two terminals</td></tr>
+</table>
+
+<h2>1.1 The recipe (Linz order: λ → units → useless → shape)</h2>
+<div class="box recipe"><span class="t">Recipe: converting to CNF — always in this order</span>
+<ol>
+  <li><b>Remove λ-productions.</b>
+    <ul>
+      <li>Find the <b>nullable</b> variables: \(A\) is nullable if \(A\to\lambda\), or \(A\to B_1\dots B_k\) where
+        all \(B_i\) are nullable. Repeat until nothing new.</li>
+      <li>For every rule, add <b>all versions where you leave out any combination of nullable variables</b>
+        (but never add \(A\to\lambda\)).</li>
+      <li>Delete all \(A\to\lambda\).</li>
+    </ul></li>
+  <li><b>Remove unit productions</b> (\(A\to B\)).
+    <ul>
+      <li>For every \(A\), find all \(B\) with \(A\Rightarrow^* B\) using <i>only</i> unit rules.</li>
+      <li>Give \(A\) a copy of every <b>non-unit</b> rule of each such \(B\).</li>
+      <li>Delete all unit rules (including \(A\to A\)).</li>
+    </ul></li>
+  <li><b>Remove useless variables</b>, in this order:
+    <ol type="a">
+      <li>non-<b>generating</b>: variables that can never finish into a terminal string (e.g. \(C\to cC\) only);</li>
+      <li>non-<b>reachable</b>: variables that can’t be reached from \(S\).</li>
+    </ol>
+    Delete every rule that mentions them.</li>
+  <li><b>Fix the shapes.</b>
+    <ol type="a">
+      <li>In every rule whose right side has length ≥ 2, replace each terminal \(a\) by a new variable
+        \(T_a\) and add \(T_a\to a\).</li>
+      <li>Break every right side with 3 or more variables into a chain:
+        \(A\to C_1C_2C_3\cdots C_n\) becomes \(A\to C_1D_1,\ D_1\to C_2D_2,\ \dots,\ D_{n-2}\to C_{n-1}C_n\).</li>
+    </ol></li>
+</ol>
+</div>
+
+<div class="box trap"><span class="t">Why the order matters</span>
+<p>Removing λ can <b>create</b> unit rules (e.g. \(S\to aSb\mid SS\) with nullable \(S\) gives \(S\to S\)).
+Removing units can <b>create</b> useless variables (a variable nobody uses any more). So: λ first, units second,
+useless third, shapes last. If you do it in another order you will have to repeat steps.</p>
+</div>
+
+<h2>1.2 Worked example A — the exam’s own grammar \(S\to aSbS\mid\lambda\)</h2>
+<p>This is the grammar for the PL-exam language “equally many \(a\) and \(b\), every prefix has at least as many
+\(a\) as \(b\)”. Convert it to CNF.</p>
+
+<p><b>Step 1 — λ-productions.</b> Nullable: \(S\) (because \(S\to\lambda\)). The rule \(S\to aSbS\) contains two
+occurrences of \(S\), so we write all four combinations of keeping/dropping them:</p>
+<table class="center">
+<tr><th>keep 1st S?</th><th>keep 2nd S?</th><th>new rule</th></tr>
+<tr><td>yes</td><td>yes</td><td>\(S\to aSbS\)</td></tr>
+<tr><td>no</td><td>yes</td><td>\(S\to abS\)</td></tr>
+<tr><td>yes</td><td>no</td><td>\(S\to aSb\)</td></tr>
+<tr><td>no</td><td>no</td><td>\(S\to ab\)</td></tr>
+</table>
+<p>Delete \(S\to\lambda\). Result: \(S\to aSbS\mid abS\mid aSb\mid ab\).</p>
+
+<p><b>Step 2 — unit productions.</b> None (no rule of the form \(S\to X\)). <b>Step 3 — useless.</b> None.</p>
+
+<p><b>Step 4a — terminals.</b> Introduce \(A\to a\) and \(B\to b\):
+\(S\to ASBS\mid ABS\mid ASB\mid AB\).</p>
+<p><b>Step 4b — long right sides.</b></p>
+<ul>
+  <li>\(S\to ASBS\) (4 symbols) → \(S\to AX,\ X\to SW,\ W\to BS\).</li>
+  <li>\(S\to ABS\) (3 symbols) → \(S\to AY,\ Y\to BS\).</li>
+  <li>\(S\to ASB\) (3 symbols) → \(S\to AZ,\ Z\to SB\).</li>
+  <li>\(S\to AB\) is already fine.</li>
+</ul>
+<div class="box model"><span class="t">Final answer</span>
+<p>\(S\to AX\mid AY\mid AZ\mid AB\qquad X\to SW\qquad W\to BS\qquad Y\to BS\qquad Z\to SB\qquad A\to a\qquad B\to b\)</p>
+<p>Since \(\lambda\) was in the original language, the CNF grammar generates the same language minus \(\lambda\).
+(You may reuse \(W\) instead of introducing \(Y\) — both are correct.)</p>
+</div>
+
+<h2>1.3 Worked example B — every step is needed</h2>
+<p>\(G:\quad S\to ASA\mid aB \qquad A\to B\mid S\qquad B\to b\mid\lambda\)</p>
+
+<p><b>Step 1 — λ-productions.</b></p>
+<ul>
+  <li>Nullable: \(B\) (since \(B\to\lambda\)); then \(A\) (since \(A\to B\) and \(B\) is nullable). Is \(S\)?
+    \(S\to ASA\) needs \(S\) itself nullable, \(S\to aB\) has a terminal. So <b>no</b>. Nullable \(=\{A,B\}\).</li>
+  <li>\(S\to ASA\): the two \(A\)’s may each be dropped: \(ASA,\ SA,\ AS,\ S\).</li>
+  <li>\(S\to aB\): drop \(B\): \(aB,\ a\).</li>
+  <li>\(A\to B\): dropping \(B\) would give \(A\to\lambda\) — never add that. \(A\to S\) unchanged.</li>
+  <li>Delete \(B\to\lambda\).</li>
+</ul>
+<p>Result: \(S\to ASA\mid SA\mid AS\mid S\mid aB\mid a\qquad A\to B\mid S\qquad B\to b\)</p>
+
+<p><b>Step 2 — unit productions.</b> The unit rules are \(S\to S\), \(A\to B\), \(A\to S\).</p>
+<ul>
+  <li>\(S\to S\): just delete it.</li>
+  <li>\(A\Rightarrow^* B\) and \(A\Rightarrow^* S\). So \(A\) gets all non-unit rules of \(B\) (\(b\)) and of \(S\)
+    (\(ASA, SA, AS, aB, a\)).</li>
+</ul>
+<p>Result: \(S\to ASA\mid SA\mid AS\mid aB\mid a\qquad A\to b\mid ASA\mid SA\mid AS\mid aB\mid a\qquad B\to b\)</p>
+
+<p><b>Step 3 — useless.</b> Everything generates a terminal string and is reachable. Nothing to remove.</p>
+
+<p><b>Step 4.</b> \(aB\) → \(UB\) with \(U\to a\). \(ASA\) → \(AX\) with \(X\to SA\).</p>
+<div class="box model"><span class="t">Final answer</span>
+<p>\(S\to AX\mid SA\mid AS\mid UB\mid a\)<br>
+\(A\to b\mid AX\mid SA\mid AS\mid UB\mid a\)<br>
+\(B\to b\qquad U\to a\qquad X\to SA\)</p>
+</div>
+
+<h2>1.4 Worked example C — unit chains and useless variables</h2>
+<p>\(G:\quad S\to Aa\mid B\mid C\qquad A\to a\mid bA\qquad B\to A\mid bb\qquad C\to cC\)</p>
+<ol>
+  <li><b>λ:</b> no λ-rules. Skip.</li>
+  <li><b>Units:</b> \(S\to B\), \(S\to C\), \(B\to A\). Unit reachability: \(S\Rightarrow^* B, A, C\);
+    \(B\Rightarrow^* A\). So \(S\) gets \(bb\) (from \(B\)), \(a, bA\) (from \(A\)), \(cC\) (from \(C\));
+    \(B\) gets \(a, bA\). Now: \(S\to Aa\mid bb\mid a\mid bA\mid cC\), \(A\to a\mid bA\), \(B\to bb\mid a\mid bA\),
+    \(C\to cC\).</li>
+  <li><b>Useless:</b> (a) \(C\) is <b>not generating</b> — \(C\to cC\) never ends. Delete \(C\) and \(S\to cC\).
+    (b) \(B\) is now <b>unreachable</b> — nobody mentions \(B\). Delete it.
+    Now: \(S\to Aa\mid bb\mid a\mid bA\), \(A\to a\mid bA\).</li>
+  <li><b>Shapes:</b> \(V\to a\) and \(T\to b\): \(S\to AV\mid TT\mid a\mid TA\), \(A\to a\mid TA\).</li>
+</ol>
+<div class="box model"><span class="t">Final answer</span>
+<p>\(S\to AV\mid TT\mid a\mid TA\qquad A\to a\mid TA\qquad V\to a\qquad T\to b\)</p>
+<p>Note: you cannot reuse \(A\) for “\(\to a\)” here, because \(A\) also has the rule \(A\to TA\); a new
+variable that <i>only</i> produces \(a\) is required.</p>
+</div>
+
+<div class="box trap"><span class="t">The mistakes that cost points</span>
+<ul>
+  <li>Dropping <b>only one</b> combination of nullable symbols. With two nullable symbols in a rule there are up to
+    4 versions (with three, up to 8). Make the little table.</li>
+  <li>Adding \(A\to\lambda\) back by dropping everything.</li>
+  <li>Forgetting that a variable is nullable <i>indirectly</i> (\(A\to B\), \(B\to\lambda\)).</li>
+  <li>Removing a unit rule without copying the rules over (then the language shrinks).</li>
+  <li>Replacing a terminal by a variable that has other rules too (see example C).</li>
+  <li>Not saying anything about λ. One sentence: “λ ∈ L(G), so the CNF grammar generates L(G) − {λ}.”</li>
+</ul>
+</div>
+
+<h3>Proof that these answers are right</h3>
+<p>Each grammar below was compared with the original on every non-empty string (up to the length shown) using a
+general parser, and checked to be in CNF:</p>
+<pre class="run" data-cmd="python3 verify/pack_cnf.py --check" data-show="python3 verify/pack_cnf.py --check"></pre>

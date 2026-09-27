@@ -1,0 +1,94 @@
+<h1>4. Encapsulation and information hiding — not vague this time</h1>
+
+<div class="box intuition"><span class="t">The idea in plain words</span>
+<p>Think of a <b>medicine capsule</b>. <b>Encapsulation</b> is putting the ingredients <i>together in one
+capsule</i>: the data and the operations that work on it are packed into one unit (a class, a module, an ADT).
+<b>Information hiding</b> is making the capsule <i>opaque</i>: from outside you can’t see or touch what is inside;
+you can only use it the intended way (swallow it = call its public operations).</p>
+<p>They are two different things. You can have a capsule you can see through: a Python class groups data and methods
+(encapsulation) but anyone can still write <code>s.data = []</code> (no real hiding).</p>
+</div>
+
+<h2>4.1 Definitions (these are the lecture’s own words, expanded)</h2>
+<div class="box def"><span class="t">Encapsulation</span>
+<p>An abstract data type is specified as <b>one syntactic unit</b> (class, module, package) that contains the
+<b>representation</b> of the data <i>together with</i> the <b>operations</b> on it. Other parts of the program can use the
+type <b>only through that definition</b>.</p>
+<p><b>Advantages:</b> better <b>organisation</b> (everything about stacks is in one place), code is <b>easier to read and
+understand</b>, <b>easier to modify and maintain</b>, and units can be <b>compiled separately</b>.</p>
+</div>
+<div class="box def"><span class="t">Information hiding</span>
+<p>The <b>internal representation</b> of the unit (its data fields, helper functions, implementation details) is
+<b>not accessible from outside</b> the unit. Clients see only the <b>interface</b> (the public operations and their
+types).</p>
+<p><b>Advantages:</b> <b>reliability</b> — code that is not “authorised” cannot read or change the internal data, so the
+unit can guarantee its own <b>invariants</b> (e.g. <code>top</code> always points at the top element). And
+<b>changeability</b> — the representation can be replaced (array → linked list) without changing any client code, because
+no client could depend on it. It also lowers what a programmer must know to use the unit.</p>
+<p><b>How languages provide it:</b> access modifiers <code>private</code>/<code>protected</code>/<code>public</code>
+(Java, C++, C#); separate definition and implementation modules (Modula-2: the definition module is public, the implementation
+module is hidden); export lists (Haskell modules exporting a type but not its constructor; ML <code>abstype</code>).</p>
+</div>
+
+<h2>4.2 The same stack, showing both ideas (compiles and runs)</h2>
+<pre class="code" data-lang="cpp" data-src="verify/Stack.cpp"></pre>
+<pre class="run" data-cmd="g++ -o /tmp/stack_demo verify/Stack.cpp &amp;&amp; /tmp/stack_demo" data-show="g++ Stack.cpp &amp;&amp; ./a.out"></pre>
+<p>Now “cheat” by compiling with the line <code>s.top = 50;</code> switched on — the compiler refuses. <i>That</i> is
+information hiding: the language enforces it.</p>
+<pre class="run" data-cmd="g++ -DCHEAT verify/Stack.cpp -o /tmp/stack_demo2 2&gt;&amp;1 | grep -o &quot;error: .*&quot; | head -1" data-show="g++ -DCHEAT Stack.cpp"></pre>
+
+<div class="box model"><span class="t">Model answer: “Explain encapsulation” (write all four parts)</span>
+<p><b>(1) Definition.</b> Encapsulation means that a data type’s representation and the operations on it are defined
+together as one syntactic unit (a class, module or package), so the rest of the program uses the type only through that
+unit’s definition. <b>(2) Purpose.</b> It is a way of achieving data abstraction: the user thinks in terms of “a stack
+with push/pop”, not in terms of arrays and indices. <b>(3) Example.</b> A class <code>Stack</code> containing the array
+and the <code>top</code> index together with <code>push</code>, <code>pop</code>, <code>isEmpty</code>.
+<b>(4) Advantages.</b> Better organisation of the code, easier to read, understand and modify, and supports separate
+compilation of the unit. It is often combined with, but is not the same as, information hiding.</p>
+</div>
+
+<div class="box model"><span class="t">Model answer: “Explain information hiding” (write all five parts)</span>
+<p><b>(1) Definition.</b> Information hiding means that the internal representation and implementation details of a unit
+are not visible or accessible outside it; clients can only use the public interface. <b>(2) Mechanism.</b> E.g.
+<code>private</code> fields with <code>public</code> methods in Java/C++, an export list in a Haskell module that exports the
+type but not its constructors, or Modula-2’s separate definition and implementation modules. <b>(3) Example.</b> In the
+stack class, <code>data</code> and <code>top</code> are private; <code>s.top = 50</code> from outside is a compile error,
+so nobody can put the stack into an inconsistent state. <b>(4) Advantages.</b> Reliability/integrity (invariants cannot be
+broken by outside code), the implementation can be changed without affecting clients (low coupling), and users need to know
+less. <b>(5) Relation to encapsulation.</b> Encapsulation <i>groups</i> data and operations; information hiding
+<i>restricts access</i> to the grouped internals. Together they give an abstract data type.
+<i>(Possible disadvantage to mention: some overhead — calls to getters/setters — and sometimes less flexibility, e.g. a
+subclass or a trusted piece of code may legitimately need internal access; that is why languages add <code>protected</code>
+or “friend”.)</i></p>
+</div>
+
+<h2>4.3 The neighbours — define these precisely too</h2>
+<table class="wide">
+<tr><th style="width:18%">Term</th><th>Precise definition</th><th style="width:28%">Tiny example</th></tr>
+<tr><td><b>Abstraction</b></td><td>Representing something by its <b>essential properties</b> and ignoring details that are
+irrelevant at the current level. Two kinds: <b>process abstraction</b> (subprograms: you call <code>sort(list)</code> without
+knowing the algorithm) and <b>data abstraction</b> (abstract data types: you use a stack through push/pop without knowing its
+representation). Humans need it to manage complexity.</td><td><code>sort(xs)</code>; a <code>Stack</code> ADT</td></tr>
+<tr><td><b>Abstract data type (ADT)</b></td><td>A data type whose values can only be created and used through a set of
+operations, defined by <b>what</b> the operations do (e.g. equations <code>pop(push(s,e)) = s</code>,
+<code>top(push(s,e)) = e</code>), not how. Implemented with encapsulation + information hiding.</td><td>stack: empty, push, pop,
+top, isEmpty</td></tr>
+<tr><td><b>Inheritance</b></td><td>A class (subclass) is defined as an extension of an existing class (superclass): it
+<b>inherits</b> its fields and methods and can add new ones or <b>override</b> existing ones. Gives code reuse and an
+“is-a” hierarchy. Single (Java) or multiple (C++).</td><td><code>class Dog extends Animal</code></td></tr>
+<tr><td><b>Polymorphism</b></td><td>“Many forms”: one name/interface can be used with values of <b>different types</b>.
+<b>Subtype</b> polymorphism: a variable of type <code>Animal</code> can hold a <code>Dog</code>, and
+<code>a.speak()</code> runs the Dog version (via dynamic binding). <b>Parametric</b>: one definition works for all types
+(generics; Haskell <code>length :: [a] -&gt; Int</code>). <b>Ad hoc</b>: overloading — the same name has different
+implementations for different types (<code>+</code> on ints and floats; Haskell type classes).</td><td><code>animal.speak()</code>;
+<code>length</code> on any list</td></tr>
+<tr><td><b>Dynamic binding</b></td><td>Which method implementation a call runs is decided <b>at run time</b> from the
+object’s actual class (not from the variable’s declared type). Flexible but costs a little speed; static binding decides at
+compile time (faster).</td><td>virtual methods in C++, all methods in Java</td></tr>
+</table>
+
+<div class="box trap"><span class="t">Why your answer was “too vague”</span>
+<p>“Encapsulation is hiding the data” is (a) vague and (b) mixes up the two concepts. Examiners want: a precise
+definition, the mechanism, an example, the advantages, and the difference from the related concept. The model answers above
+have exactly that structure — use it for <i>every</i> “explain the concept X” question.</p>
+</div>

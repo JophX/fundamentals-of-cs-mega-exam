@@ -1,0 +1,42 @@
+<div class="cover" style="padding-top:12%">
+  <h1 class="notoc" style="break-before:auto">Priority Pack</h1>
+  <div class="sub">Everything you lost points on in your last exam (27 / 36 needed), fixed</div>
+  <div class="note" style="max-width:36em">
+    Every Haskell function here was compiled and run with GHC while this PDF was built; the output shown under
+    each <code>ghci&gt;</code> line is the real output. Every grammar conversion and CYK table was checked by a
+    program on every string up to length 9–12. You can trust every answer in here.
+  </div>
+</div>
+
+<h2 class="notoc">What you lost points on, and where it is fixed</h2>
+<table class="wide">
+<tr><th>On the exam</th><th>What went wrong</th><th>Section</th></tr>
+<tr><td>Convert a grammar to Chomsky normal form</td><td>botched the steps</td><td>1</td></tr>
+<tr><td>CYK: demonstrate how a string is parsed, show the table, explain</td><td>failed</td><td>2</td></tr>
+<tr><td>Describe the role of a parser (lexer, parser, interpreter)</td><td>incomplete</td><td>3</td></tr>
+<tr><td>Encapsulation / information hiding</td><td>too vague / incomplete</td><td>4</td></tr>
+<tr><td>Call-by-value vs call-by-reference</td><td>(you got points — keep it)</td><td>5</td></tr>
+<tr><td>Haskell: write <code>foldl</code>; list → integer</td><td>could not write it</td><td>6</td></tr>
+<tr><td>Haskell: write <code>decompress</code></td><td>not answered</td><td>6</td></tr>
+</table>
+
+<div class="box exam"><span class="t">How to use this pack (about 4–5 hours of work)</span>
+<ol>
+  <li>Read a section once, slowly. Every section follows the same order: the idea in plain words, the recipe,
+    a fully worked example, then the traps.</li>
+  <li><b>Close the PDF and write the model answer or the function from memory on paper.</b> Then compare.
+    This is the step that matters. Reading alone is how you ended up with 27.</li>
+  <li>Do the <b>Grill</b> section (section 7) without looking. The answers are on separate pages after it.</li>
+  <li>Anything you got wrong: redo it tomorrow morning before the exam.</li>
+</ol>
+</div>
+
+<div class="box trap"><span class="t">Where the points were: 9 more would have been a pass</span>
+<p>CNF and CYK are pure <b>procedures</b>. There is nothing to be creative about, so a person who follows the
+recipe step by step gets full points every time. The same goes for the theory questions: they have a fixed
+“complete answer” (definition + how + example + advantages), and incomplete answers lose half the points.
+Section 3 and section 4 give you those complete answers.</p>
+</div>
+
+<h2 class="notoc">Contents</h2>
+<!--TOC-->

@@ -1,0 +1,130 @@
+<div class="cover">
+  <h1 class="notoc" style="break-before:auto">The Mega Study Guide</h1>
+  <div class="sub">Everything for both exams — taught from zero, step by step</div>
+  <div class="codes">
+    <div><span class="tag fcs">FCS</span>&nbsp; 5DV037 Fundamentals of Computer Science (Datavetenskapens grunder)</div>
+    <div><span class="tag pl">PL</span>&nbsp; 5DV086 Programming Languages (Programspråk)</div>
+    <div><span class="tag both">BOTH</span>&nbsp; = material that is examined in both courses</div>
+  </div>
+  <div class="note">
+    Every Haskell example in this guide was compiled and run with GHC 9.4 while the PDF was built, and the output
+    you see printed under it is the real output. Every grammar, automaton, CYK table and reduction was checked by
+    a program (see <code>guide/verify/</code>) — grammars against every string up to length 14.
+    Nothing here is “from memory only”.
+  </div>
+</div>
+
+<h1 class="notoc">Contents</h1>
+<!--TOC-->
+
+<h1 id="how-to-use">How to use this guide (read this first)</h1>
+
+<p>You have two exams with one day in between. They overlap a lot: grammars, regular expressions and the idea of
+“a language as a set of strings” show up in both. So this guide is built as <b>one</b> course, not two:</p>
+
+<ol>
+  <li><b>Part I — The shared foundation</b> <span class="tag both">BOTH</span>. Strings and languages, automata,
+    regular expressions, context-free grammars, precedence &amp; associativity, parsing. You need this for both
+    exams, so it comes first.</li>
+  <li><b>Part II — Computability &amp; complexity</b> <span class="tag fcs">FCS</span>. Turing machines,
+    decidability, the halting problem, P and NP.</li>
+  <li><b>Part III — Haskell from zero</b> <span class="tag pl">PL</span>. Written as if you have never seen
+    it. Ends with every kind of function the exam has asked you to write.</li>
+  <li><b>Part IV — Programming-language concepts</b> <span class="tag pl">PL</span>. Abstraction,
+    encapsulation, polymorphism, scope, binding, parameter passing, interpreters, concurrency, exceptions, logic
+    programming — with <i>model answers</i> written the way an examiner wants to read them.</li>
+  <li><b>Part V — Real exams, solved</b>, and new practice exams with solutions.</li>
+  <li><b>Appendix</b> — one-page cheat sheets and a Swedish–English glossary (the PL exam is in Swedish).</li>
+</ol>
+
+<div class="box intuition"><span class="t">How each chapter works</span>
+<p>Every chapter goes: <b>intuition first</b> (what is this, in plain words) → <b>the formal definition</b> (what
+you write on the exam) → <b>worked examples</b> (slowly, every step shown) → <b>recipes</b> (a checklist you can
+follow under stress) → <b>traps</b> (where students lose points) → <b>practice</b> with solutions.</p>
+<p>The coloured boxes mean: <span style="color:#1f5fa8"><b>Intuition</b></span>,
+<span style="color:#8a6a00"><b>Definition</b></span>, <span style="color:#6a3aa0"><b>Theorem</b></span>,
+<span style="color:#a15c00"><b>Recipe</b></span>, <span style="color:#13784a"><b>Exam tip / Model answer</b></span>,
+<span style="color:#b3321f"><b>Trap</b></span>.</p>
+</div>
+
+<h2>What the two exams actually look like</h2>
+
+<h3><span class="tag pl">PL</span> Programspråk 5DV086 (H. Björklund)</h3>
+<p>Both past exams you have (2023-03-16 and 2023-05-05) have <b>7 problems, 60 points, 36 needed to pass</b>
+(60%). They are almost the same exam twice:</p>
+<table class="wide">
+<tr><th>#</th><th>2023-03-16</th><th>2023-05-05</th><th>Pts</th><th>Where in this guide</th></tr>
+<tr><td>1</td><td>Which strings does grammar G generate?</td><td>Build a CFG for \(\{a^nb^m \mid n\neq 2m\}\)</td><td>10</td><td>Ch. 7 (CFGs)</td></tr>
+<tr><td>2</td><td colspan="2">Build a CFG for “equally many a and b, every prefix has at least as many a as b” — <b>identical both times</b></td><td>10</td><td>Ch. 7</td></tr>
+<tr><td>3</td><td colspan="2">Explain <i>precedence</i> and <i>associativity</i> — <b>identical</b></td><td>6</td><td>Ch. 8</td></tr>
+<tr><td>4</td><td colspan="2">Parts of an interpreter (scanner, parser, executor) and their data structures — <b>identical</b></td><td>8</td><td>Ch. 22</td></tr>
+<tr><td>5</td><td>Pass-by-value vs pass-by-reference</td><td>“Variables” in functional vs imperative languages</td><td>6</td><td>Ch. 19, 20</td></tr>
+<tr><td>6</td><td>Write <code>compress</code> in Haskell</td><td>Explain/evaluate code with <code>filter</code>, <code>foldl</code></td><td>10</td><td>Ch. 15–17</td></tr>
+<tr><td>7</td><td colspan="2">Write <code>myRev</code> (reverse a list) in O(n), no library functions — <b>identical</b></td><td>10</td><td>Ch. 16</td></tr>
+</table>
+<p>So the exam is roughly <b>20 points grammars + 20 points Haskell + 20 points concepts</b>. If you can do
+Problem 2, Problem 3, Problem 4 and Problem 7 perfectly you already have 34 points — almost a pass — and those
+four were <i>word-for-word the same</i> on both exams. An older exam (2017) also asked for a
+<b>tail-recursive Fibonacci</b> function (Ch. 16).</p>
+
+<div class="box trap"><span class="t">The course changed in 2024</span>
+<p>The official syllabus for 5DV086 was revised from 2024-01-01. The listed literature is now
+<i>Crafting Interpreters</i> (Robert Nystrom) and <i>Learn You a Haskell for Great Good!</i> (Lipovača). The
+content description is unchanged: variables, binding, scope, types, type checking, control abstraction,
+subprograms, parameter passing, abstract data types, the paradigms (imperative, OO, functional, logic),
+concurrency and exceptions, with special emphasis on functional programming (recursive functions, recursive data
+types, type constructors). Because of the new book, expect more weight on <b>how interpreters work</b> (scanning,
+parsing, trees, environments) — Chapter 22 covers it and includes a small working interpreter in Haskell. When you
+find your own recent exams, compare them against the table above.</p>
+</div>
+
+<h3><span class="tag fcs">FCS</span> Datavetenskapens grunder 5DV037 (M. Berglund)</h3>
+<p>The past exam (2022 content, 2025 cover sheet) has <b>10 questions, 50 points, 4 hours</b>, and you may bring
+only pens and an English dictionary. <b>A page of definitions is attached</b>: the two pumping lemmas, the NPDA
+definition and the Turing-machine definition. You do not need to memorise those statements — you need to know how
+to <i>use</i> them.</p>
+<ul>
+  <li>Grade 3: 50% (25/50). Grade 4: 67% <i>and</i> ≥1 of the 3 ☆-points. Grade 5: 83% <i>and</i> ≥2 ☆-points.</li>
+  <li>The three ☆-questions are worth only 1 point each. <b>Do them last.</b></li>
+</ul>
+<table class="wide">
+<tr><th>#</th><th>Topic</th><th>Pts</th><th>Chapter</th></tr>
+<tr><td>1</td><td>True/false (−0.5 per wrong answer!) on closure, P/NP, decidability</td><td>6</td><td>5, 11, 13, 14</td></tr>
+<tr><td>2</td><td>Argue regular languages are closed under complement, ∩, concatenation, ∪</td><td>5</td><td>5</td></tr>
+<tr><td>3</td><td>Hierarchy of 5 language classes: name, machine, example language</td><td>8</td><td>12</td></tr>
+<tr><td>4</td><td>Prove a language is not context-free (pumping lemma)</td><td>8</td><td>11</td></tr>
+<tr><td>5</td><td>Is the grammar in CNF? Run CYK on <code>abcab</code></td><td>8</td><td>10</td></tr>
+<tr><td>6</td><td>Build a TM that computes \(g(f(v))\) from TMs for \(f\) and \(g\)</td><td>6</td><td>12</td></tr>
+<tr><td>7</td><td>Why nondeterministic TMs are no more powerful than deterministic ones</td><td>6</td><td>12</td></tr>
+<tr><td>8☆</td><td>Prove a ◇-EQUATION problem is NP-complete</td><td>1</td><td>14</td></tr>
+<tr><td>9☆</td><td>Is an infinite union of regular languages regular?</td><td>1</td><td>5</td></tr>
+<tr><td>10☆</td><td>Define NP; prove NP is closed under ∪ and ∩</td><td>1</td><td>14</td></tr>
+</table>
+<p>Questions 1–7 (47 points) are all “standard technique” questions. Every one of them has a recipe in this guide.</p>
+
+<h2>The plan for the next days</h2>
+<p>Because the PL exam relies heavily on grammars, and the FCS exam relies on grammars and automata, do Part I
+first no matter which exam comes first.</p>
+<table class="wide">
+<tr><th>Block</th><th>Do this</th><th>Why</th></tr>
+<tr><td>1</td><td>Ch. 1 (notation) → Ch. 7 (CFGs) → Ch. 8 (precedence/associativity)</td><td>30 PL points and ~16 FCS points depend on grammars</td></tr>
+<tr><td>2</td><td>Ch. 15–17 (Haskell) — type every example into GHCi if you can</td><td>20 PL points; needs practice, not reading</td></tr>
+<tr><td>3</td><td>Ch. 2–6 (automata, regex, closure, pumping lemma)</td><td>FCS Q1, Q2, Q3, Q9</td></tr>
+<tr><td>4</td><td>Ch. 9–11 (PDA, CNF, CYK, CF pumping)</td><td>FCS Q4, Q5 = 16 points</td></tr>
+<tr><td>5</td><td>Part IV (PL concepts) — learn the model answers</td><td>20 PL points, pure memorisation of understanding</td></tr>
+<tr><td>6</td><td>Ch. 12–14 (TM, decidability, NP)</td><td>FCS Q3, Q6, Q7 and ☆</td></tr>
+<tr><td>7</td><td>Part V: do the real exams under time pressure, then the practice exams</td><td>Exam technique</td></tr>
+</table>
+
+<div class="box exam"><span class="t">Why you lost points before — and how to stop</span>
+<ul>
+  <li><b>Blank answers get zero.</b> Every question in both exams gives partial credit. Write the definition, the
+    recipe, the first steps. “Motivate” means: say <i>why</i>, in one sentence per step.</li>
+  <li><b>Grammar questions:</b> test your grammar on 3–4 short strings (including the empty string!) before
+    moving on. Chapter 7 shows exactly how.</li>
+  <li><b>Haskell questions:</b> always write the type signature first; always write the base case first. Then
+    trace your function on a tiny input on paper.</li>
+  <li><b>Theory questions:</b> define the term, give a tiny example, give one advantage and one disadvantage.
+    That structure alone earns most of the points.</li>
+</ul>
+</div>

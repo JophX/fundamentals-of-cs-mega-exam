@@ -1,0 +1,156 @@
+<h1>3. Regular expressions <span class="tag both">BOTH</span></h1>
+
+<div class="box intuition"><span class="t">Intuition</span>
+<p>A regular expression is a <b>formula that describes a language</b>, built from single letters using three
+operations: <b>or</b> (union), <b>then</b> (concatenation) and <b>repeat</b> (star). A DFA is a machine that
+<i>checks</i> strings; a regular expression is a pattern that <i>describes</i> them. They have exactly the same
+power (Kleene’s theorem).</p>
+</div>
+
+<h2>3.1 Definition (course syntax)</h2>
+<div class="box def"><span class="t">Definition (Linz)</span>
+<ol>
+  <li>\(\emptyset\), \(\lambda\) and every \(a\in\Sigma\) are regular expressions (primitive).
+    They denote \(\emptyset\), \(\{\lambda\}\) and \(\{a\}\).</li>
+  <li>If \(r_1, r_2\) are regular expressions, so are \(r_1 + r_2\) (union), \(r_1 \cdot r_2\) or just
+    \(r_1r_2\) (concatenation), \(r_1^*\) (star) and \((r_1)\).</li>
+  <li>Nothing else is a regular expression.</li>
+</ol>
+<p>\(L(r_1+r_2) = L(r_1)\cup L(r_2)\), \(L(r_1r_2) = L(r_1)L(r_2)\), \(L(r^*) = (L(r))^*\).</p>
+</div>
+
+<div class="box trap"><span class="t">+ means different things in different places</span>
+<p>In the course (Linz), \(a+b\) means “\(a\) <b>or</b> \(b\)”. In programming regexes (Python, Java, grep)
+the “or” is written <code>a|b</code> and <code>a+</code> means “one or more a’s” (\(aa^*\)). Sipser writes
+\(\cup\) for union. On the FCS exam use the course notation; on the PL exam either is fine if you say which.</p>
+</div>
+
+<h3>Precedence: star, then concatenation, then union</h3>
+<p>Exactly like arithmetic where \(^\wedge\) binds tighter than \(\times\), which binds tighter than \(+\):</p>
+<table class="center">
+<tr><th>Regex</th><th>means</th><th>not</th></tr>
+<tr><td>\(ab^*\)</td><td>\(a(b^*)\): \(a, ab, abb,\dots\)</td><td>\((ab)^*\)</td></tr>
+<tr><td>\(a+bc\)</td><td>\(a+(bc)\): \(\{a, bc\}\)</td><td>\((a+b)c\)</td></tr>
+<tr><td>\(a+b^*\)</td><td>\(a+(b^*)\)</td><td>\((a+b)^*\)</td></tr>
+</table>
+<p>This is a first taste of <i>precedence</i>, the topic of PL exam Problem 3 (Chapter 8).</p>
+
+<h2>3.2 Reading regular expressions</h2>
+<p>Read from the outside in, and list the shortest members first.</p>
+<table class="wide">
+<tr><th>Regex</th><th>Language in words</th></tr>
+<tr><td>\((a+b)^*\)</td><td>all strings over \(\{a,b\}\) (“anything”)</td></tr>
+<tr><td>\((a+b)^*ab\)</td><td>ends with \(ab\)</td></tr>
+<tr><td>\((a+b)^*aba(a+b)^*\)</td><td>contains \(aba\) somewhere (“anything, aba, anything”)</td></tr>
+<tr><td>\(a^*ba^*\)</td><td>exactly one \(b\)</td></tr>
+<tr><td>\(a^*(\lambda+b)a^*\)</td><td>at most one \(b\)</td></tr>
+<tr><td>\(((a+b)(a+b))^*\)</td><td>even length (blocks of two letters)</td></tr>
+<tr><td>\((ab+ba)^*\)</td><td>cut into blocks of two, each block is \(ab\) or \(ba\)</td></tr>
+<tr><td>\(a^*(ba^*ba^*)^*\)</td><td>an even number of \(b\)’s (b’s come in pairs, a’s anywhere)</td></tr>
+<tr><td>\((b+ab)^*(\lambda+a)\)</td><td>no two consecutive \(a\)’s (every \(a\) except maybe the last is followed by \(b\))</td></tr>
+</table>
+
+<h2>3.3 Writing regular expressions — recipes</h2>
+<div class="box recipe"><span class="t">Recipe: building a regex</span>
+<ul>
+  <li><b>“contains X”</b> → \((a+b)^*\,X\,(a+b)^*\).</li>
+  <li><b>“starts with X” / “ends with X”</b> → \(X(a+b)^*\) / \((a+b)^*X\).</li>
+  <li><b>“exactly / at most k of letter b”</b> → put the b’s explicitly with \(a^*\) (all the other letters,
+    starred) between them: exactly two b’s = \(a^*ba^*ba^*\).</li>
+  <li><b>Counting modulo k</b> (“even number of b’s”, “#a divisible by 3”) → a block that contains exactly k of
+    the counted letter, starred, with the other letters starred in between: \(b^*(ab^*ab^*ab^*)^*\).</li>
+  <li><b>“A or B or C”</b> → build each separately, join with \(+\).</li>
+  <li><b>Forbidden pattern</b> (“no aa”) → describe what every letter must be followed by, and fix the end.</li>
+</ul>
+</div>
+
+<p><b>The FCS 2022 exam, Q1 statement 1:</b> “strings over \(\{a,b,c\}\) that start with \(a\), or end with
+\(c\), or contain an odd number of \(b\)’s — is this regular?” <b>True.</b> Each part is regular and regular
+languages are closed under union. You can even write the regex:
+\[a(a+b+c)^* \;+\; (a+b+c)^*c \;+\; (a+c)^*b(a+c)^*\big(b(a+c)^*b(a+c)^*\big)^*\]</p>
+
+<h2>3.4 Useful identities</h2>
+<table class="center">
+<tr><th>Identity</th><th>Why</th></tr>
+<tr><td>\(r+r = r\)</td><td>union with itself</td></tr>
+<tr><td>\(\lambda r = r\lambda = r\)</td><td>λ is the unit of concatenation</td></tr>
+<tr><td>\(\emptyset r = r\emptyset = \emptyset\)</td><td>nothing to glue with → nothing (a classic trap!)</td></tr>
+<tr><td>\(\emptyset^* = \lambda\), \(\lambda^* = \lambda\)</td><td>zero pieces = the empty string</td></tr>
+<tr><td>\((r^*)^* = r^*\), \(r^*r^* = r^*\)</td><td>repeating a repeat adds nothing</td></tr>
+<tr><td>\(\lambda + rr^* = r^*\)</td><td>“zero times, or at least once”</td></tr>
+<tr><td>\((a+b)^* = (a^*b^*)^*\)</td><td>both are “everything”</td></tr>
+<tr><td>\((ab)^*a = a(ba)^*\)</td><td>both are \(a, aba, ababa,\dots\)</td></tr>
+<tr><td>\((a+b)^* \ne a^*+b^*\) !</td><td>\(ab\) is in the left one only</td></tr>
+</table>
+
+<h2>3.5 Regular expression → NFA (Thompson’s construction)</h2>
+<div class="box intuition"><span class="t">Intuition</span>
+<p>Build a small NFA for each piece, then glue with λ-arrows, following the structure of the expression — exactly
+like evaluating an arithmetic expression bottom-up. Each little NFA has one start and one final state.</p>
+</div>
+<div class="dot" data-caption="Building blocks: letter a, union r1+r2, concatenation r1r2, star r*">digraph{rankdir=LR; node[shape=circle fontname="Helvetica" width=0.35 label=""]; edge[fontname="Helvetica"]; compound=true;
+subgraph cluster_a{label="a" fontname="Helvetica"; a1->a2[label="a"]; a2[shape=doublecircle];}
+subgraph cluster_u{label="r1 + r2" fontname="Helvetica"; u0; u1[shape=box label="r1"]; u2[shape=box label="r2"]; uf[shape=doublecircle]; u0->u1[label="λ"]; u0->u2[label="λ"]; u1->uf[label="λ"]; u2->uf[label="λ"];}
+subgraph cluster_c{label="r1 r2" fontname="Helvetica"; c1[shape=box label="r1"]; c2[shape=box label="r2"]; c1->c2[label="λ"];}
+subgraph cluster_s{label="r*" fontname="Helvetica"; s0; s1[shape=box label="r"]; sf[shape=doublecircle]; s0->s1[label="λ"]; s1->sf[label="λ"]; s0->sf[label="λ"]; sf->s0[label="λ"];}
+}</div>
+<p>In words: <b>union</b> — new start with λ-arrows into both machines, both finals λ-arrow to a new final.
+<b>Concatenation</b> — λ-arrow from the final of \(r_1\) to the start of \(r_2\). <b>Star</b> — new start that
+can skip straight to the end (zero repetitions) and a λ-arrow back to repeat.</p>
+<p><b>Example:</b> \((a+b)^*ab\). Build \(a+b\) (union of two letter-machines), star it, then concatenate
+with \(a\) and then \(b\). If you then remove the unnecessary λ’s you get exactly the 3-state NFA of Chapter 2
+(\(p_0\) loops on \(a,b\), then \(a\), then \(b\)).</p>
+
+<h2>3.6 Automaton → regular expression (state elimination)</h2>
+<div class="box recipe"><span class="t">Recipe: state elimination (the idea)</span>
+<ol>
+  <li>Add a new start state with a λ-arrow to the old start, and a new single final state with λ-arrows from all old
+    finals.</li>
+  <li>Remove the other states one at a time. When you remove state \(q\) that has a self-loop \(s\), an incoming
+    arrow \(p \xrightarrow{r_1} q\) and an outgoing arrow \(q\xrightarrow{r_2} t\), add the arrow
+    \(p \xrightarrow{r_1 s^* r_2} t\) (union it with an existing \(p\to t\) arrow using \(+\)).</li>
+  <li>When only start and final remain, the label on the arrow is the regex.</li>
+</ol>
+</div>
+<p>You do not need to be fast at this for the exam; you need to know <b>that</b> it works, because it proves:</p>
+<div class="box thm"><span class="t">Theorem (Kleene)</span>
+<p>A language is <b>regular</b> ⇔ it is accepted by some DFA ⇔ by some NFA ⇔ it is described by some regular
+expression ⇔ it is generated by a <b>right-linear (regular) grammar</b> (rules of the form \(A\to aB\) or
+\(A\to a\) or \(A\to\lambda\)).</p>
+</div>
+
+<h2>3.7 Regular expressions in real programming languages <span class="tag pl">PL</span></h2>
+<p>Practical regex libraries add shorthand, but most of it is just abbreviation of the three basic operations:</p>
+<table class="wide">
+<tr><th>Practical syntax</th><th>Meaning</th><th>Course notation</th></tr>
+<tr><td><code>a|b</code></td><td>a or b</td><td>\(a+b\)</td></tr>
+<tr><td><code>a*</code></td><td>zero or more</td><td>\(a^*\)</td></tr>
+<tr><td><code>a+</code></td><td>one or more</td><td>\(aa^*\)</td></tr>
+<tr><td><code>a?</code></td><td>optional</td><td>\(\lambda + a\)</td></tr>
+<tr><td><code>[a-z]</code></td><td>one character in the range</td><td>\(a+b+\dots+z\)</td></tr>
+<tr><td><code>.</code></td><td>any single character</td><td>union of the whole alphabet</td></tr>
+<tr><td><code>a{2,3}</code></td><td>2 or 3 a’s</td><td>\(aa(\lambda+a)\)</td></tr>
+</table>
+<p>A <b>scanner/lexer</b> describes each kind of token by a regex, e.g. identifier
+<code>[a-zA-Z_][a-zA-Z_0-9]*</code>, integer <code>[0-9]+</code>, and runs the corresponding finite automaton
+(Chapter 22). <b>Caution:</b> some library features, notably <i>back-references</i> like <code>(a*)b\1</code>
+(“the same group again”), go beyond regular languages — \(\{a^nba^n\}\) is not regular, yet
+<code>(a*)b\1</code> matches exactly it. So “regex” in a library is not always “regular” in theory.</p>
+
+<h2>3.8 Verification of this chapter</h2>
+<pre class="run" data-cmd="python3 verify/ch03_regex.py" data-show="python3 verify/ch03_regex.py"></pre>
+
+<div class="box try"><span class="t">Practice</span>
+<ol>
+  <li>Regex for strings over \(\{a,b\}\) with exactly two \(a\)’s.</li>
+  <li>Regex for strings that do not end in \(b\).</li>
+  <li>Describe \(L((a+\lambda)(b+ab)^*)\) — hint: compare with “no aa”.</li>
+  <li>Is \((a+b)^*a(a+b)^*\) the same as \((a+b)^*\)?</li>
+</ol>
+</div>
+<div class="box sol"><span class="t">Solutions</span>
+<p>1. \(b^*ab^*ab^*\). &nbsp; 2. \(\lambda + (a+b)^*a\) (don’t forget λ!). &nbsp;
+3. strings with no \(aa\) that do <i>not</i> end in a lone \(a\) unless the whole string is \(a\)… concretely: optional
+leading \(a\), then blocks \(b\) or \(ab\) — every \(a\) after the first position is preceded by \(b\) and followed by
+\(b\). &nbsp; 4. No: the first requires at least one \(a\), so \(\lambda\) and \(bbb\) are not in it.</p>
+</div>

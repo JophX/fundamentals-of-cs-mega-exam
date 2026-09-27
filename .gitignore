@@ -2,3 +2,8 @@
 *.tmp
 .DS_Store
 Thumbs.db
+guide/tools/node_modules/
+guide/build/
+__pycache__/
+*.hi
+*.o

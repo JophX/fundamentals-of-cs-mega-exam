@@ -1,0 +1,68 @@
+<h1>7. The Grill — do these on paper, without looking</h1>
+<p>Set a timer. Write full answers as if on the exam. Answers start on the next page, so don’t turn it until you are done.
+Mark each question ✔ or ✘ and redo every ✘ tomorrow morning.</p>
+
+<h2>A. Chomsky normal form</h2>
+<ol>
+  <li>Which rules break CNF, and why?
+    \(S\to AB\mid aB\mid a \quad A\to ABA\mid b \quad B\to B \mid \lambda \mid bb\)</li>
+  <li>Convert to CNF: \(S\to aSa\mid bSb\mid\lambda\) (even-length palindromes).</li>
+  <li>Convert to CNF: \(S\to AB\mid aB\qquad A\to aab\mid\lambda\qquad B\to bbA\)</li>
+  <li>Convert to CNF: \(S\to A\mid aSb\qquad A\to bA\mid b\)</li>
+  <li>In example B of section 1.3, why is \(S\) <i>not</i> nullable even though \(A\) is?</li>
+</ol>
+
+<h2>B. CYK</h2>
+<ol start="6">
+  <li>Using your CNF grammar from question 2, run CYK on <code>abba</code> and on <code>abab</code>. Show the tables and
+    explain the results.</li>
+  <li>Using the exam grammar \(S\to SS\mid XY\mid XS'\), \(S'\to SY\), \(X\to a\), \(Y\to BC\mid BB\mid b\), \(B\to b\),
+    \(C\to CC\mid c\): run CYK on <code>aabbb</code> and on <code>abcca</code>.</li>
+  <li>How many cuts do you try for a cell of length 4? For the top cell of a string of length 6?</li>
+</ol>
+
+<h2>C. Theory — write complete answers (definition, mechanism, example, advantages)</h2>
+<ol start="9">
+  <li>Explain <b>encapsulation</b>.</li>
+  <li>Explain <b>information hiding</b>, and how it differs from encapsulation.</li>
+  <li>What is <b>abstraction</b>? Name its two kinds.</li>
+  <li>What is <b>polymorphism</b>? Name the three kinds with an example each.</li>
+  <li>What does the <b>lexer</b> do, what is its output, and what data structures does it use?</li>
+  <li>Describe the role of the <b>parser</b> in as much detail as you can.</li>
+  <li>What does the <b>executing part</b> of an interpreter do and what data structures does it use?</li>
+  <li>Explain <b>precedence</b> and <b>associativity</b> and how they are related. How does a grammar encode them?</li>
+  <li>Pass-by-value vs pass-by-reference: differences, advantages, disadvantages. What does <code>f(a, a)</code> have to do
+    with it?</li>
+</ol>
+
+<h2>D. Haskell — write these (type signature first!)</h2>
+<ol start="18">
+  <li><code>foldl</code> and <code>foldr</code>, from scratch.</li>
+  <li><code>myRev</code> in O(n), without library functions. Explain why it is O(n).</li>
+  <li><code>listToInt :: [Int] -&gt; Int</code> (<code>[1,2,3]</code> → <code>123</code>), once with an accumulator and once
+    with <code>foldl</code>.</li>
+  <li><code>compress :: String -&gt; [(Char, Int)]</code> and <code>decompress :: [(Char, Int)] -&gt; String</code>.</li>
+  <li><code>countOcc :: Eq a =&gt; a -&gt; [a] -&gt; Int</code> — how many times does an element occur?</li>
+  <li><code>myLength</code>, tail-recursive.</li>
+  <li><code>map</code> and <code>filter</code>, written using <code>foldr</code>.</li>
+  <li><code>sumSqOdd</code>: the sum of the squares of the odd numbers in a list, using <code>filter</code>, <code>map</code>,
+    <code>foldl</code>. What is <code>sumSqOdd [1,2,3,4,5]</code>?</li>
+  <li><code>myLast</code>, <code>myMaximum</code>, <code>elemAt</code> (the n-th element, counting from 0).</li>
+  <li><code>isPal</code> (is a list a palindrome?) and <code>dedup</code> (remove <i>consecutive</i> duplicates:
+    <code>[1,1,2,3,3,3,1]</code> → <code>[1,2,3,1]</code>).</li>
+  <li><code>myZip</code>, <code>myAppend</code> (your own <code>++</code>), <code>myReplicate</code>.</li>
+  <li>Without a computer, what do these give?
+    <ol type="a">
+      <li><code>foldr (\x acc -&gt; x : x : acc) [] [1,2,3]</code></li>
+      <li><code>foldl (\acc x -&gt; x : acc) [] "abc"</code></li>
+      <li><code>foldr (\x acc -&gt; acc + 1) 0 "hello"</code></li>
+      <li><code>foldl (\acc x -&gt; acc * 2 + x) 0 [1,0,1,1]</code></li>
+      <li><code>foldl (-) 10 [1,2,3]</code> and <code>foldr (-) 10 [1,2,3]</code></li>
+    </ol></li>
+</ol>
+
+<h2>E. Grammars (both 2023 exams had these — 20 points)</h2>
+<ol start="30">
+  <li>Write a CFG for “equally many \(a\) and \(b\), and every prefix has at least as many \(a\) as \(b\)”.</li>
+  <li>Write a CFG for \(\{a^nb^m\mid n\ne m\}\).</li>
+</ol>
